@@ -1,5 +1,7 @@
 # TomoTwin
 
+![TomoTwin Logo](resources/images/tomotwin_white_on_gray_cropped.png)
+
 Particle picking in Tomograms using triplet networks and metric learning
 
 **This the development version of the code. A streamlined version including instructions how to use it will follow soon.**
