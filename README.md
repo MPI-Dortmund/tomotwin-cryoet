@@ -4,7 +4,7 @@
 
 Particle picking in Tomograms using triplet networks and metric learning
 
-![TomoTwin Logo](resources/images/tomotwin_white_on_gray_cropped.png)
+![TomoTwin Logo](resources/images/TomoTwin_black_transparent_cropped.png)
 
 ## Installation
 
