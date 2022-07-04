@@ -32,22 +32,24 @@ class ScaleCoordinates(TomoTwinTool):
         return parser
 
     @staticmethod
-    def scale_coords(coords_pth: str, px1: float, px2: float, out_name: str):
+    def scale_coords(coords_pth: str, px1: float, px2: float) -> pd.DataFrame:
 
         coords_df = pd.read_csv(coords_pth, sep=' ', header=None)
         coords_df.columns = ['X', 'Y', 'Z']
         scaling_factor = px1 / px2
         print('Scaling coordinates by ' + str(scaling_factor) + 'x')
-
         coords_df = coords_df * scaling_factor
-
-        coords_df.to_csv(out_name, index=False, header=False, sep=' ')
+        return coords_df
 
     def run(self, args):
         coords_pth = args.coords
         px1 = args.tomotwin_pixel_size
         px2 = args.extraction_pixel_size
         out_name = args.out
-        ScaleCoordinates.scale_coords(coords_pth=coords_pth, px1=px1, px2=px2, out_name=out_name)
+
+        scaled_coords = ScaleCoordinates.scale_coords(coords_pth=coords_pth, px1=px1, px2=px2)
+
+        scaled_coords.to_csv(out_name, index=False, header=False, sep=' ')
+
 
 
