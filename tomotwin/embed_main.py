@@ -97,7 +97,11 @@ def _main_():
         df.attrs["window_size"] = conf.window_size
         df.attrs["stride"] = conf.stride
         df.attrs["tomotwin_config"] = embedor.tomotwin_config
-
+        #df = df.astype(np.float16)
+        for col in df:
+            if col == 'filepath':
+                continue
+            df[col] = df[col].astype(np.float16)
         df.to_pickle(os.path.join(conf.output_path, filename))
 
         print(f"Wrote embeddings to disk to {os.path.join(conf.output_path,filename)}")
@@ -121,6 +125,7 @@ def _main_():
         df.index.name = "index"
         df.to_pickle(os.path.join(conf.output_path, "embeddings.pkl"))
         print("Done")
+
 
 
 if __name__ == "__main__":
