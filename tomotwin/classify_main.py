@@ -161,10 +161,16 @@ def run(ui: ClassifyUI):
             data=list(zip(*columns_data)),
             columns=columnes_header,
         )
-        if "window_size" in volume_embeddings.attrs:
-            classes_df.attrs["window_size"] = volume_embeddings.attrs["window_size"]
-        if "stride" in volume_embeddings.attrs:
-            classes_df.attrs["stride"] = volume_embeddings.attrs["stride"]
+
+        # Add meta information from previous step
+        for meta_key in volume_embeddings.attrs:
+            classes_df.attrs[meta_key] = volume_embeddings.attrs[meta_key]
+        # if "window_size" in volume_embeddings.attrs:
+        #    classes_df.attrs["window_size"] = volume_embeddings.attrs["window_size"]
+        #if "stride" in volume_embeddings.attrs:
+        #    classes_df.attrs["stride"] = volume_embeddings.attrs["stride"]
+
+        # Add additional meta information
         classes_df.attrs["references"] = ref_names
         classes_df.to_pickle(os.path.join(output_path, "predicted.pkl"))
 

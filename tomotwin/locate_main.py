@@ -89,6 +89,10 @@ def run(ui: LocateUI):
 
     located_particles = pd.concat(class_frames)
 
+    # Add meta information from previous step
+    for meta_key in probabilities.attrs:
+        located_particles.attrs[meta_key] = probabilities.attrs[meta_key]
+
     located_particles.to_pickle(os.path.join(out_path, f"located.pkl"))
 
 def _main_():
