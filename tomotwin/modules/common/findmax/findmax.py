@@ -15,6 +15,10 @@ from skimage.morphology._util import (
     _resolve_neighborhood,
     _set_border_values,
 )
+from typing import List
+import multiprocessing
+from multiprocessing import Pool
+from functools import partial
 
 
 @njit
@@ -50,6 +54,33 @@ def _fill_threshold(
                 return False
     return True
 
+def get_avg_pos(classes: int, regions: np.array, region_max_value: List, image: np.array):
+    maxima_coords = []
+    for cl in classes:
+        coords = np.where(regions == cl)
+        weights = image[coords]
+
+        reg_max = region_max_value[cl - 1]  # np.max(weights)
+        if len(weights) == 0:
+            pass
+
+        # weights = np.exp(2 * weights) - np.exp(-2)
+        # weights = softmax(weights)
+        try:
+            avgs = []
+            for c in coords:
+                avg = np.average(c)  # , weights=weights)
+                avgs.append(avg)
+        except ZeroDivisionError:
+            print("Zero devision. Pass this entry. Some dbug infos:")
+            print("len(coords):", len(coords))
+            print("Weights:", weights)
+            pass
+
+        p = tuple(avgs)
+        # p = region_max_pos[cl-1]
+        maxima_coords.append((p, len(coords[0]), reg_max))  # region_max_value[cl-1]))
+    return maxima_coords
 
 def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5) -> tuple[list, np.array]:
 
@@ -135,6 +166,7 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5) -> 
     k = 0
     region_max_pos = []
     region_max_value = []
+    working_image_raveled = working_image.ravel(order)
     for idx, seed_point in enumerate(tqdm.tqdm(coords_sorted, desc="Find maxima")):
         try:
             iter(seed_point)
@@ -154,7 +186,7 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5) -> 
         low_tol = max(min_value, seed_value - tolerance)
 
         keep_region = _fill_threshold(
-            working_image.ravel(order),
+            working_image_raveled,
             tmp_flags.ravel(order),
             neighbor_offsets,
             ravelled_seed_idx,
@@ -174,31 +206,16 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5) -> 
 
     regions = regions[output_slice]
 
-    maxima_coords = []
+    num_cores = multiprocessing.cpu_count()
+    region_list = list(range(1, k + 1))
+    chunked_arrays = np.array_split(region_list, len(region_list) // num_cores)
+    print("Estimate region centers...")
+    with Pool() as pool:
+        maxima_coords = pool.map(partial(get_avg_pos, regions=regions, region_max_value=region_max_value, image=image),
+                     chunked_arrays)
+    import itertools
 
-    for cl in range(1, k + 1):
-        coords = np.where(regions == cl)
-        weights = image[coords]
-
-        reg_max = region_max_value[cl - 1]  # np.max(weights)
-        if len(weights) == 0:
-            pass
-
-        weights = np.exp(2 * weights) - np.exp(-2)
-
-        try:
-            avgs = []
-            for c in coords:
-                avg = np.average(c, weights=weights)
-                avgs.append(avg)
-        except ZeroDivisionError:
-            print("Zero devision. Pass this entry. Some dbug infos:")
-            print("len(coords):", len(coords))
-            print("Weights:", weights)
-            pass
-
-        p = tuple(avgs)
-
-        maxima_coords.append((p, len(coords[0]), reg_max))  # region_max_value[cl-1]))
+    maxima_coords = list(itertools.chain.from_iterable(maxima_coords)) ## This seems to do somethin strange, should be checked in more details.... OO
+    print("done.")
 
     return maxima_coords, regions
