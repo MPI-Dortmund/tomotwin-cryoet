@@ -7,8 +7,11 @@ def get_tool_list() -> List[TomoTwinTool]:
     tools = []
 
     from tomotwin.modules.tools.extract_reference import ExtractReference
+    from tomotwin.modules.tools.scale_coordinates import ScaleCoordinates
+    scale_coords_tool = ScaleCoordinates()
     extract_ref_tool = ExtractReference()
     tools.append(extract_ref_tool)
+    tools.append(scale_coords_tool)
 
     return tools
 
