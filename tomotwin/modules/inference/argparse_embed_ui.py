@@ -139,7 +139,7 @@ class EmbedArgParseUI(EmbedUI):
             "-b",
             "--batchsize",
             type=int,
-            default=5,
+            default=64,
             required=False,
             help="Batch size during calculating the embeddings",
         )
@@ -156,7 +156,7 @@ class EmbedArgParseUI(EmbedUI):
             "-w",
             "--windowsize",
             type=int,
-            required=True,
+            default=37,
             help="Size of the sliding window",
         )
 
@@ -164,7 +164,7 @@ class EmbedArgParseUI(EmbedUI):
             "-s",
             "--stride",
             type=int,
-            required=True,
+            default=2,
             nargs='+',
             help="Stride of the sliding window. Either an integer or a tuple of 3 numbers representing the slides in x,y,z",
         )
