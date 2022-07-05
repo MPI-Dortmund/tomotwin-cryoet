@@ -51,7 +51,7 @@ class EmbedArgParseUI(EmbedUI):
         self.output = args.outpath
 
 
-        if "volume" in sys.argv[1]:
+        if "subvolumes" in sys.argv[1]:
             self.mode = EmbedMode.VOLUMES
 
         if "tomogram" in sys.argv[1]:
@@ -179,7 +179,7 @@ class EmbedArgParseUI(EmbedUI):
         )
         subparsers = parser_parent.add_subparsers(help="sub-command help")
         parser_embed_volume = subparsers.add_parser(
-            "volume",
+            "subvolumes",
             help="Embed one or multiple subvolumes.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
