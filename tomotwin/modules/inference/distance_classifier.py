@@ -63,7 +63,7 @@ class DistanceClassifier(Classifier):
         """
         distances = np.empty(shape=(references.shape[0], embeddings.shape[0]), dtype=np.float16)
         num_cores = multiprocessing.cpu_count()
-        embedding_chunks = np.array_split(embeddings,len(embeddings)//num_cores)
+        embedding_chunks = np.array_split(embeddings,num_cores)
 
         for ref_index, ref in tqdm.tqdm(enumerate(references), "Calculate distances"):
             with Pool() as pool:
