@@ -23,7 +23,9 @@ SOFTWARE.
 """
 
 from typing import Callable
-from scipy.special import softmax
+import multiprocessing
+from multiprocessing import Pool
+from functools import partial
 import numpy as np
 import tqdm
 from tomotwin.modules.inference.classifier import Classifier
@@ -60,11 +62,19 @@ class DistanceClassifier(Classifier):
         It returns a 2D array, where the columns contain the probabilities for all references for a specific embedding.
         """
         distances = np.empty(shape=(references.shape[0], embeddings.shape[0]), dtype=np.float16)
+        num_cores = multiprocessing.cpu_count()
+        embedding_chunks = np.array_split(embeddings,len(embeddings)//num_cores)
+
         for ref_index, ref in tqdm.tqdm(enumerate(references), "Calculate distances"):
-            result = self.distance_function(ref, embeddings)
+            with Pool() as pool:
+                results_chunks = pool.map(
+                    partial(self.distance_function, x_2=ref),
+                    embedding_chunks)
+            result = np.concatenate(results_chunks)
             distances[ref_index, :] = result
 
         self.distances = distances
+
         return distances
 
     def get_distances(self) -> np.array:
