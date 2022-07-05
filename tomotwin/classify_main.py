@@ -95,7 +95,7 @@ def run(ui: ClassifyUI):
         distance_func = distance.calc_np
 
         clf = DistanceClassifier(distance_function=distance_func, threshold=threshold, similarty=distance.is_similarity())
-        probs = classify(
+        _ = classify(
             classifier=clf,
             reference=reference_embeddings_np,
             volumes=volume_embeddings_np,
@@ -113,8 +113,6 @@ def run(ui: ClassifyUI):
             class_dist = np.min(distances, axis=0)
             classes[class_dist > threshold] = -1
 
-        class_prob = np.max(probs, axis=0)
-        #classes[class_prob < threshold] = -1
 
         ref_names = [
             os.path.basename(l) for l in reference_embeddings["filepath"].tolist()
@@ -126,10 +124,7 @@ def run(ui: ClassifyUI):
         for i, cl in enumerate(classes):
             if cl!=-1:
                 class_names[i] = ref_names[cl]
-        '''
-        probs_df = pd.DataFrame(data=probs, index=ref_names, columns=vol_names)
-        probs_df.to_pickle(os.path.join(output_path, "probabilities.pkl"))
-        '''
+
         columns_data = []
         columnes_header = []
 
@@ -142,20 +137,14 @@ def run(ui: ClassifyUI):
             columnes_header.append("Z")
         columns_data.append(vol_names)
         columns_data.append(classes)
-        columns_data.append(class_prob)
         columns_data.append(class_names)
         columnes_header.append("filename")
         columnes_header.append("predicted_class")
-        columnes_header.append("predicted_prob")
         columnes_header.append("predicted_class_name")
 
         for ref_index, _ in enumerate(ref_names):
-            columns_data.append(probs[ref_index, :])
-            columnes_header.append(f"p_class_{ref_index}")
-        for ref_index, _ in enumerate(ref_names):
             columns_data.append(distances[ref_index, :])
             columnes_header.append(f"d_class_{ref_index}")
-
 
         classes_df = pd.DataFrame(
             data=list(zip(*columns_data)),
@@ -165,10 +154,6 @@ def run(ui: ClassifyUI):
         # Add meta information from previous step
         for meta_key in volume_embeddings.attrs:
             classes_df.attrs[meta_key] = volume_embeddings.attrs[meta_key]
-        # if "window_size" in volume_embeddings.attrs:
-        #    classes_df.attrs["window_size"] = volume_embeddings.attrs["window_size"]
-        #if "stride" in volume_embeddings.attrs:
-        #    classes_df.attrs["stride"] = volume_embeddings.attrs["stride"]
 
         # Add additional meta information
         classes_df.attrs["references"] = ref_names

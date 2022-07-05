@@ -60,36 +60,12 @@ class DistanceClassifier(Classifier):
         It returns a 2D array, where the columns contain the probabilities for all references for a specific embedding.
         """
         distances = np.empty(shape=(references.shape[0], embeddings.shape[0]), dtype=np.float16)
-        for ref_index, ref in tqdm.tqdm(enumerate(references), "Classify step 1/2"):
+        for ref_index, ref in tqdm.tqdm(enumerate(references), "Calculate distances"):
             result = self.distance_function(ref, embeddings)
-
-            #if self.is_similarty:
-            #    result = -1* result
             distances[ref_index, :] = result
-        '''
-        mask = np.ones(shape=distances.shape, dtype=bool)
-        mask = mask == 1
 
-        if self.threshold is not None:
-            if self.is_similarty:
-                mask = distances > self.threshold
-            else:
-                mask = distances < self.threshold
-        '''
-        res = np.zeros(shape=distances.shape, dtype=np.float16)
-
-        if self.is_similarty:
-            mult = 1
-        else:
-            mult = -1
-
-        for col_index in tqdm.tqdm(range(embeddings.shape[0]),desc="Classify step 2/2"):
-            #relevant_elemnts = mask[:, col_index]
-            #if np.any(relevant_elemnts):
-            prob = softmax(mult * distances[:, col_index])
-            res[:, col_index] = prob
         self.distances = distances
-        return res
+        return distances
 
     def get_distances(self) -> np.array:
         return self.distances
