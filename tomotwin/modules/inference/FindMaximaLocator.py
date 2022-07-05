@@ -24,16 +24,21 @@ class FindMaximaLocator(Locator):
         self.output = None
         self.global_min = global_min
 
+    @staticmethod
     def to_volume(
-        self, df: pd.DataFrame, target_class: int, use_p: bool = False
+        df: pd.DataFrame,
+        target_class: int,
+        stride : Tuple[int],
+        window_size: int,
+        use_p: bool = False
     ) -> Tuple[np.array, np.array]:
         # Convert to volume:
-        half_bs = (self.window_size - 1) / 2
-        x_val = (df["X"].values - half_bs) / self.stride[0]
+        half_bs = (window_size - 1) / 2
+        x_val = (df["X"].values - half_bs) / stride[0]
         x_val = x_val.astype(int)
-        y_val = (df["Y"].values - half_bs) / self.stride[1]
+        y_val = (df["Y"].values - half_bs) / stride[1]
         y_val = y_val.astype(int)
-        z_val = (df["Z"].values - half_bs) / self.stride[2]
+        z_val = (df["Z"].values - half_bs) / stride[2]
         z_val = z_val.astype(int)
 
         # This array contains the distance(similarity)/probability at each coordinate
@@ -55,8 +60,8 @@ class FindMaximaLocator(Locator):
 
         return vol, index_vol
 
+    @staticmethod
     def maxima_to_df(
-        self,
         maximas: List[Tuple[float, float, float]],
         df: pd.DataFrame,
         index_vol: np.array,
@@ -109,6 +114,65 @@ class FindMaximaLocator(Locator):
         ]
         return selected_df
 
+    @staticmethod
+    def apply_findmax(classify_output: pd.DataFrame,
+                      class_id: int,
+                      class_name: str,
+                      window_size: int,
+                      stride: Tuple[int],
+                      tolerance: float,
+                      global_min: float,
+
+                      ) -> (pd.DataFrame, np.array):
+        df_particles = classify_output
+        vol, index_vol = FindMaximaLocator.to_volume(df_particles, target_class=class_id, window_size=window_size, stride=stride)
+
+        maximas, mask = find_maxima(vol, tolerance, global_min=global_min)
+
+        maximas_filtered = [
+            m for m in maximas if m[1] > 1
+        ]  # more than one pixel coordinate must be involved.
+
+        particle_df = FindMaximaLocator.maxima_to_df(
+            maximas_filtered, df_particles, index_vol, class_id, class_name
+        )
+        particle_df.attrs["name"] = class_name
+
+        return particle_df, vol
+
+
+
+    @staticmethod
+    def locate_class(class_id,
+                     class_name,
+                     df_particles:
+                     pd.DataFrame,
+                     window_size: int,
+                     stride: Tuple[int],
+                     tolerance: float,
+                     global_min: float,
+                     output: str) -> pd.DataFrame:
+        particle_df, vol = FindMaximaLocator.apply_findmax(classify_output=df_particles,
+                                                           class_id=class_id,
+                                                           class_name=class_name,
+                                                           window_size=window_size,
+                                                           stride=stride,
+                                                           tolerance=tolerance,
+                                                           global_min=global_min)
+
+        if output is not None:
+            with mrcfile.new(
+                    os.path.join(output, class_name + ".mrc"), overwrite=True
+            ) as mrc:
+                vol = vol.astype(np.float32)
+                vol = vol.swapaxes(0, 2)
+                mrc.set_data(vol)
+        print("Located", class_name, len(particle_df))
+        return particle_df.copy(deep=True)
+
+
+
+
     def locate(self, classify_output: pd.DataFrame) -> List[pd.DataFrame]:
 
         particles_dataframes = []
@@ -116,32 +180,24 @@ class FindMaximaLocator(Locator):
         df_particles = classify_output
         unique_classes = classify_output.attrs["references"]
 
-        for id,name in enumerate(unique_classes):
+        from concurrent.futures import ProcessPoolExecutor as Pool
+        from itertools import repeat
 
-            if id < 0:
-                continue
+        with Pool() as pool:
 
-            vol, index_vol = self.to_volume(df_particles, target_class=id)
-            #volp, _ = self.to_volume(df_particles, target_class=id, use_p=True)
-
-            maximas, mask = find_maxima(vol, self.tolerance, global_min=self.global_min)
-            self.unfiltered = maximas
-            maximas_filtered = [
-                m for m in maximas if m[1] > 1
-            ]  # more than one pixel coordinate must be involved.
-            particle_df = self.maxima_to_df(
-                maximas_filtered, df_particles, index_vol, id, name
+            df_classes = pool.map(
+                FindMaximaLocator.locate_class,
+                list(range(len(unique_classes))),
+                unique_classes,
+                repeat(df_particles),
+                repeat(self.window_size),
+                repeat(self.stride),
+                repeat(self.tolerance),
+                repeat(self.global_min),
+                repeat(self.output)
             )
-            particle_df.attrs["name"] = name
-            particles_dataframes.append(particle_df.copy(deep=True))
 
-            if self.output is not None:
-                print("Write", name, len(particle_df))
-                with mrcfile.new(
-                    os.path.join(self.output, name + ".mrc"), overwrite=True
-                ) as mrc:
-                    vol = vol.astype(np.float32)
-                    vol = vol.swapaxes(0, 2)
-                    mrc.set_data(vol)
+        for df in df_classes:
+            particles_dataframes.append(df)
 
         return particles_dataframes

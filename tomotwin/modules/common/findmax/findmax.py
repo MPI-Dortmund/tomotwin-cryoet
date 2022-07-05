@@ -167,7 +167,7 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5) -> 
     region_max_pos = []
     region_max_value = []
     working_image_raveled = working_image.ravel(order)
-    for idx, seed_point in enumerate(tqdm.tqdm(coords_sorted, desc="Find maxima")):
+    for idx, seed_point in enumerate(coords_sorted):
         try:
             iter(seed_point)
         except TypeError:
@@ -208,14 +208,15 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5) -> 
 
     num_cores = multiprocessing.cpu_count()
     region_list = list(range(1, k + 1))
-    chunked_arrays = np.array_split(region_list, len(region_list) // num_cores)
-    print("Estimate region centers...")
+    chunked_arrays = np.array_split(region_list, num_cores)
+    from concurrent.futures import ProcessPoolExecutor as Pool
     with Pool() as pool:
         maxima_coords = pool.map(partial(get_avg_pos, regions=regions, region_max_value=region_max_value, image=image),
                      chunked_arrays)
+        #maxima_coords = pool.map(get_avg_pos, repeat(regions), repeat(region_max_value), repeat(image), chunked_arrays)
     import itertools
 
-    maxima_coords = list(itertools.chain.from_iterable(maxima_coords)) ## This seems to do somethin strange, should be checked in more details.... OO
-    print("done.")
+    maxima_coords = list(itertools.chain.from_iterable(maxima_coords))
+
 
     return maxima_coords, regions
