@@ -390,7 +390,7 @@ from tomotwin.modules.inference.locator import Locator
 def readprobs(path):
     if path.endswith(".txt"):
         return pd.read_csv(path)
-    elif path.endswith(".pkl"):
+    elif path.endswith(".pkl") or path.endswith(".tmap"):
         return pd.read_pickle(path)
     else:
         print("Format not implemented")
@@ -423,7 +423,7 @@ def run(ui: LocateUI):
 
     if conf.boxsize is None:
         conf.boxsize = window_size
-    elif not conf.boxsize.isnumeric():
+    elif not (isinstance(conf.boxsize, str) and conf.boxsize.isnumeric()):
         import json
 
         with open(conf.boxsize, "r") as conf_sizes_file:
