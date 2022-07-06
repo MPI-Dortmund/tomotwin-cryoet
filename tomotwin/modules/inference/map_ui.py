@@ -375,87 +375,48 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import argparse
-import sys
-from tomotwin.modules.inference.classify_ui import (
-    ClassifyUI,
-    ClassifyConfiguration,
-    ClassifyMode,
-)
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from enum import Enum, auto
+from typing import Callable
 
-
-class ClassifiyArgParseUI(ClassifyUI):
+class MapMode(Enum):
     """
-    Argparse interface for the classify command
+    Enumartion of classifcation modes
+    """
+    DISTANCE = auto()
+
+
+@dataclass
+class MapConfiguration:
+    """
+    Represents the configuration for map calculation
+
+    :param reference_embeddings_path: Path to embedded references
+    :param volume_embeddings_path: Path to embedded volumes
+    :param mode: MapMode to run
     """
 
-    def __init__(self):
-        self.reference_pth = None
-        self.volume_pth = None
-        self.output_pth = None
-        self.mode = None
+    reference_embeddings_path: str
+    volume_embeddings_path: str
+    output_path: str
+    mode: MapMode
 
+
+class MapUI(ABC):
+    """Interface to define"""
+
+    @abstractmethod
     def run(self, args=None) -> None:
-        parser = self.create_parser()
-        args = parser.parse_args(args)
-        self.reference_pth = args.references
-        self.volume_pth = args.volumes
-        self.output_pth = args.output
-        if "distance" in sys.argv[1]:
-            self.mode = ClassifyMode.DISTANCE
-
-    def get_classification_configuration(self) -> ClassifyConfiguration:
-        conf = ClassifyConfiguration(
-            reference_embeddings_path=self.reference_pth,
-            volume_embeddings_path=self.volume_pth,
-            output_path=self.output_pth,
-            mode=self.mode,
-        )
-        return conf
-
-    @staticmethod
-    def create_distance_parser(parser):
         """
-        Create parser for distance subcommand
-        """
-        parser.add_argument(
-            "-r",
-            "--references",
-            type=str,
-            required=True,
-            help="Path to reference embeddings file",
-        )
-
-        parser.add_argument(
-            "-v",
-            "--volumes",
-            type=str,
-            required=True,
-            help="Path to volume embeddings file",
-        )
-
-        parser.add_argument(
-            "-o",
-            "--output",
-            type=str,
-            required=True,
-            help="Path to output folder.",
-        )
-
-    def create_parser(self) -> argparse.ArgumentParser:
-        """
-        Create parser for the classify command
+        Runs the UI.
+        :param args: Optional arguments that might need to pass to the parser. Can also be used for testing.
+        :return: None
         """
 
-        parser_parent = argparse.ArgumentParser(
-            description="Interface to calculate Embeddings for TomoTwin"
-        )
-        subparsers = parser_parent.add_subparsers(help="sub-command help")
-        parser_embed_volume = subparsers.add_parser(
-            "distance",
-            help="Classify volumes by distance to the references.",
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        )
-        self.create_distance_parser(parser_embed_volume)
-
-        return parser_parent
+    @abstractmethod
+    def get_map_configuration(self) -> MapConfiguration:
+        """
+        Creates the map configuration and returns it.
+        :return: A classification configuration instance
+        """

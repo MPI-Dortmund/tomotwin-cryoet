@@ -398,13 +398,11 @@ class LocateConfiguration:
     :param distance_threshold: Only keep picks with a distance below that threshold
     """
 
-    probability_path: str
+    map_path: str
     output_path: str
     tolerance: float
     boxsize: Union[str,int]
     mode: LocateMode
-    probability_threshold: float = 0
-    distance_threshold: float = 0
 
 class LocateUI(ABC):
     """Interface to define"""

@@ -400,7 +400,7 @@ def run(ui: LocateUI):
     conf = ui.get_locate_configuration()
     out_path = conf.output_path
     os.makedirs(out_path, exist_ok=True)
-    probabilities = readprobs(conf.probability_path)
+    probabilities = readprobs(conf.map_path)
 
     if conf.mode == LocateMode.FINDMAX:
         if "stride" in probabilities.attrs:
@@ -418,7 +418,7 @@ def run(ui: LocateUI):
         locator = FindMaximaLocator(tolerance=conf.tolerance, stride=stride, window_size=window_size, global_min=0.5)
         locator.output = out_path
 
-    class_frames = locator.locate(classify_output=probabilities)
+    class_frames = locator.locate(map_output=probabilities)
     size_dict=None
 
     if conf.boxsize is None:

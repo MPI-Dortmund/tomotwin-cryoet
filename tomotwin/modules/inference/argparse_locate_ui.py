@@ -383,7 +383,7 @@ from tomotwin.modules.inference.locate_ui import LocateUI, LocateConfiguration, 
 class LocateArgParseUI(LocateUI):
 
     def __init__(self):
-        self.probability_path = None
+        self.map_path = None
         self.output_path = None
         self.pthresh = None
         self.dthresh = None
@@ -396,7 +396,7 @@ class LocateArgParseUI(LocateUI):
         args = parser.parse_args(args)
 
         if "findmax" in sys.argv[1]:
-            self.probability_path = args.probability
+            self.map_path = args.map
             self.tolerance = args.tolerance
             self.output_path = args.output
             self.boxsize = args.boxsize
@@ -407,10 +407,8 @@ class LocateArgParseUI(LocateUI):
 
     def get_locate_configuration(self) -> LocateConfiguration:
         conf = LocateConfiguration(
-            probability_path=self.probability_path,
+            map_path=self.map_path,
             output_path=self.output_path,
-            probability_threshold=self.pthresh,
-            distance_threshold=self.dthresh,
             mode=self.mode,
             boxsize=self.boxsize,
             tolerance=self.tolerance
@@ -419,11 +417,11 @@ class LocateArgParseUI(LocateUI):
 
     def create_findmax_parser(self, parser):
         parser.add_argument(
-            "-p",
-            "--probability",
+            "-m",
+            "--map",
             type=str,
             required=True,
-            help="Path to the probability file (output of classify command)",
+            help="Path to the map file ( *.tmap, output of map command)",
         )
 
         parser.add_argument(
