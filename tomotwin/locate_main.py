@@ -93,7 +93,7 @@ def run(ui: LocateUI):
     for meta_key in probabilities.attrs:
         located_particles.attrs[meta_key] = probabilities.attrs[meta_key]
 
-    located_particles.to_pickle(os.path.join(out_path, f"located.pkl"))
+    located_particles.to_pickle(os.path.join(out_path, f"located.tloc"))
 
 def _main_():
     ui = LocateArgParseUI()
