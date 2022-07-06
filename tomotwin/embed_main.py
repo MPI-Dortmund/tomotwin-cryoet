@@ -477,7 +477,7 @@ def _main_():
         df = pd.DataFrame(data=embeddings, columns=column_names)
         df.insert(0, "filepath", paths)
         df.index.name = "index"
-        df.to_pickle(os.path.join(conf.output_path, "embeddings.pkl"))
+        df.to_pickle(os.path.join(conf.output_path, "embeddings.temb"))
         print("Done")
 
 
