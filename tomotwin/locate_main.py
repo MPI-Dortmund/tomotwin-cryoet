@@ -423,13 +423,15 @@ def run(ui: LocateUI):
 
     if conf.boxsize is None:
         conf.boxsize = window_size
-    elif not (isinstance(conf.boxsize, str) and conf.boxsize.isnumeric()):
-        import json
 
+    try:
+        conf.boxsize = int(conf.boxsize)
+    except ValueError:
+        print("Read boxsize from JSON")
+        import json
         with open(conf.boxsize, "r") as conf_sizes_file:
             size_dict = json.load(conf_sizes_file)
-    else:
-        conf.boxsize = int(conf.boxsize)
+
 
     for class_id, class_frame in enumerate(class_frames):
         if len(class_frame)==0:
