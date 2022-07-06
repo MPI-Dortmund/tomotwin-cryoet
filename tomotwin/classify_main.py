@@ -454,7 +454,6 @@ def run(ui: ClassifyUI):
         )
 
 
-
         ref_names = [
             os.path.basename(l) for l in reference_embeddings["filepath"].tolist()
         ]
@@ -462,27 +461,20 @@ def run(ui: ClassifyUI):
             os.path.basename(l) for l in volume_embeddings["filepath"].tolist()
         ]
 
-        columns_data = []
-        columnes_header = []
-
+        df_data = {}
         if "X" in volume_embeddings:
-            columns_data.append(volume_embeddings["X"])
-            columnes_header.append("X")
-            columns_data.append(volume_embeddings["Y"])
-            columnes_header.append("Y")
-            columns_data.append(volume_embeddings["Z"])
-            columnes_header.append("Z")
-        columns_data.append(vol_names)
-        columnes_header.append("filename")
+            df_data["X"] = volume_embeddings["X"]
+            df_data["Y"] = volume_embeddings["Y"]
+            df_data["Z"] = volume_embeddings["Z"]
 
+        df_data["filename"] = vol_names
         distances = clf.get_distances()
+
         for ref_index, _ in enumerate(ref_names):
-            columns_data.append(distances[ref_index, :])
-            columnes_header.append(f"d_class_{ref_index}")
+            df_data[f"d_class_{ref_index}"] = distances[ref_index, :]
 
         classes_df = pd.DataFrame(
-            data=list(zip(*columns_data)),
-            columns=columnes_header,
+            df_data
         )
 
         # Add meta information from previous step
