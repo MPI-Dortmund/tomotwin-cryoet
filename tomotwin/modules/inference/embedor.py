@@ -57,7 +57,6 @@ class TorchVolumeDataset(Dataset):
         vol = self.volumes[item_index]
         vol = vol.astype(np.float32)
         vol = pp.norm(vol)
-        #from tomotwin.modules.training.transforms import Shift
         vol = vol[np.newaxis]
         torch_vol = torch.from_numpy(vol)
         input_triplet = {"volume": torch_vol}
