@@ -99,18 +99,7 @@ def run(ui: ClassifyUI):
             reference=reference_embeddings_np,
             volumes=volume_embeddings_np,
         )
-        reference_embeddings_np = None
-        volume_embeddings_np = None
-        if distance.is_similarity():
-            distances = clf.get_distances()
-            classes = np.argmax(distances, axis=0)
-            #class_dist = np.max(distances, axis=0)
-            #classes[class_dist < threshold] = -1
-        else:
-            distances = clf.get_distances()
-            classes = np.argmin(distances, axis=0)
-            #class_dist = np.min(distances, axis=0)
-            #classes[class_dist > threshold] = -1
+
 
 
         ref_names = [
@@ -119,10 +108,6 @@ def run(ui: ClassifyUI):
         vol_names = [
             os.path.basename(l) for l in volume_embeddings["filepath"].tolist()
         ]
-        class_names = ["void"]*len(classes)
-        for i, cl in enumerate(classes):
-            if cl!=-1:
-                class_names[i] = ref_names[cl]
 
         columns_data = []
         columnes_header = []
@@ -135,12 +120,9 @@ def run(ui: ClassifyUI):
             columns_data.append(volume_embeddings["Z"])
             columnes_header.append("Z")
         columns_data.append(vol_names)
-        columns_data.append(classes)
-        columns_data.append(class_names)
         columnes_header.append("filename")
-        columnes_header.append("predicted_class")
-        columnes_header.append("predicted_class_name")
 
+        distances = clf.get_distances()
         for ref_index, _ in enumerate(ref_names):
             columns_data.append(distances[ref_index, :])
             columnes_header.append(f"d_class_{ref_index}")
@@ -156,7 +138,9 @@ def run(ui: ClassifyUI):
 
         # Add additional meta information
         classes_df.attrs["references"] = ref_names
-        classes_df.to_pickle(os.path.join(output_path, "predicted.pkl"))
+        pth = os.path.join(output_path, "map.tmap")
+        classes_df.to_pickle(pth)
+        print(f"Wrote output to {pth}")
 
 
 
