@@ -1,11 +1,13 @@
 import unittest
-from tomotwin.modules.inference.distance_classifier import DistanceClassifier
+from tomotwin.modules.inference.distance_mapper import DistanceMapper
 from tomotwin.modules.common.distances import Euclidean
 import numpy as np
 
 class ClassifierTestCases(unittest.TestCase):
-    def test_distance_classifier(self):
-
+    def test_distance_mapper(self):
+        '''
+        distance to first reference should be 0
+        '''
         # Generate test data
         size_embedding = 30
         num_embeddings = 1
@@ -24,14 +26,16 @@ class ClassifierTestCases(unittest.TestCase):
 
         # Setup classifer
         distances_func = Euclidean().calc_np
-        classifier = DistanceClassifier(distance_function=distances_func,threshold=None)
+        classifier = DistanceMapper(distance_function=distances_func)
 
-        result = classifier.classify(embeddings=embeddings,references=reference_embeddings)
+        result = classifier.map(embeddings=embeddings, references=reference_embeddings)
 
-        self.assertEqual(0, np.argmax(result))
+        self.assertEqual(0, result[0,0])
 
-    def test_distance_classifier_max0(self):
-
+    def test_distance_mapper_max0(self):
+        '''
+        distance should be zero
+        '''
         # Generate test data
         size_embedding = 30
         num_embeddings = 1
@@ -51,11 +55,10 @@ class ClassifierTestCases(unittest.TestCase):
         # Setup classifer
 
         distances_func = Euclidean().calc_np
-        classifier = DistanceClassifier(distance_function=distances_func,threshold=0)
+        classifier = DistanceMapper(distance_function=distances_func)
 
-        result = classifier.classify(embeddings=embeddings,references=reference_embeddings)
-
-        self.assertEqual(0, np.argmax(result))
+        result = classifier.map(embeddings=embeddings, references=reference_embeddings)
+        self.assertEqual(0, result[0,0])
 
 
 if __name__ == '__main__':

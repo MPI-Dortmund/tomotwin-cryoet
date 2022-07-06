@@ -1,0 +1,25 @@
+{
+  "identifier": "Resnet",
+  "network_config": {
+    "model_depth": 101,
+    "n_input_channels": 1,
+    "conv1_t_size": 7,
+    "conv1_t_stride": 1,
+    "no_max_pool": false,
+    "shortcut_type": "B",
+    "widen_factor": 1.0,
+    "out_head": 128,
+    "norm_name": "GroupNorm",
+    "norm_kwargs": {
+    	"num_groups": 32
+    }
+  },
+  "train_config":{
+    "loss": "TripletLoss",
+    "tl_margin": 0.74354,
+    "miner": false,
+    "miner_margin": null,
+    "learning_rate": 7.34383e-05,
+    "batchsize": 16
+  }
+}

@@ -31,6 +31,6 @@ class MyTestCase(unittest.TestCase):
         ftp = FilenameMatchingTripletProvider(path_pdb=pathpdb, path_volume=pathvolumes, max_neg=5)
         triplets = ftp.get_triplets()
 
-        self.assertEqual(len(triplets), 15)
+        self.assertEqual(15, len(triplets))
 if __name__ == '__main__':
     unittest.main()
