@@ -40,7 +40,6 @@ class ClassifiyArgParseUI(ClassifyUI):
         self.reference_pth = None
         self.volume_pth = None
         self.output_pth = None
-        self.threshold = None
         self.mode = None
 
     def run(self, args=None) -> None:
@@ -51,7 +50,6 @@ class ClassifiyArgParseUI(ClassifyUI):
         self.output_pth = args.output
         if "distance" in sys.argv[1]:
             self.mode = ClassifyMode.DISTANCE
-            self.threshold = args.threshold
 
     def get_classification_configuration(self) -> ClassifyConfiguration:
         conf = ClassifyConfiguration(
@@ -59,7 +57,6 @@ class ClassifiyArgParseUI(ClassifyUI):
             volume_embeddings_path=self.volume_pth,
             output_path=self.output_pth,
             mode=self.mode,
-            threshold=self.threshold,
         )
         return conf
 
@@ -90,13 +87,6 @@ class ClassifiyArgParseUI(ClassifyUI):
             type=str,
             required=True,
             help="Path to output folder.",
-        )
-
-        parser.add_argument(
-            "-t",
-            "--threshold",
-            type=float,
-            help="Cut-off threshold for evaluation. Embeddings with distance to a reference greater than this threshold get assign a zero probability for that reference.",
         )
 
     def create_parser(self) -> argparse.ArgumentParser:

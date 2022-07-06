@@ -37,7 +37,7 @@ class DistanceClassifier(Classifier):
     """
 
     def __init__(
-        self, distance_function: Callable[[np.array, np.array], float], threshold=None, similarty=False
+        self, distance_function: Callable[[np.array, np.array], float], similarty=False
     ):
         """
         :param distance_function: Distance function that takes one row of the references (first array) and
@@ -45,7 +45,6 @@ class DistanceClassifier(Classifier):
         :param threshold:
         """
         self.distance_function = distance_function
-        self.threshold = threshold
         self.distances = None
         self.is_similarty = similarty
 

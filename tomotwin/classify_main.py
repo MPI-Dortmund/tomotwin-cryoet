@@ -76,7 +76,6 @@ def run(ui: ClassifyUI):
     os.makedirs(output_path, exist_ok=True)
 
     if conf.mode == ClassifyMode.DISTANCE:
-        threshold = conf.threshold
         print("Read embeddings")
         reference_embeddings = read_embeddings(reference_embeddings_path)
         volume_embeddings = read_embeddings(volume_embeddings_path)
@@ -94,7 +93,7 @@ def run(ui: ClassifyUI):
         distance = dm.get_distance(volume_embeddings.attrs["tomotwin_config"]["distance"])
         distance_func = distance.calc_np
 
-        clf = DistanceClassifier(distance_function=distance_func, threshold=threshold, similarty=distance.is_similarity())
+        clf = DistanceClassifier(distance_function=distance_func, similarty=distance.is_similarity())
         _ = classify(
             classifier=clf,
             reference=reference_embeddings_np,
@@ -105,13 +104,13 @@ def run(ui: ClassifyUI):
         if distance.is_similarity():
             distances = clf.get_distances()
             classes = np.argmax(distances, axis=0)
-            class_dist = np.max(distances, axis=0)
-            classes[class_dist < threshold] = -1
+            #class_dist = np.max(distances, axis=0)
+            #classes[class_dist < threshold] = -1
         else:
             distances = clf.get_distances()
             classes = np.argmin(distances, axis=0)
-            class_dist = np.min(distances, axis=0)
-            classes[class_dist > threshold] = -1
+            #class_dist = np.min(distances, axis=0)
+            #classes[class_dist > threshold] = -1
 
 
         ref_names = [
