@@ -375,10 +375,10 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-from typing import Callable
+from typing import Callable, List
 import multiprocessing
-from multiprocessing import Pool
-from functools import partial
+from concurrent.futures import ProcessPoolExecutor as Pool
+from itertools import repeat
 import numpy as np
 import tqdm
 from tomotwin.modules.inference.classifier import Classifier
@@ -401,6 +401,14 @@ class DistanceClassifier(Classifier):
         self.distances = None
         self.is_similarty = similarty
 
+    def map_reference(self, reference: np.array, embedding_chunks: List[np.array]) -> np.array:
+        with Pool() as pool:
+            results_chunks = pool.map(self.distance_function, embedding_chunks, repeat(reference))
+        results_chunks = list(results_chunks)
+        result = np.concatenate(results_chunks)
+
+        return result
+
     def classify(
         self,
         embeddings: np.array,
@@ -417,13 +425,10 @@ class DistanceClassifier(Classifier):
         num_cores = multiprocessing.cpu_count()
         embedding_chunks = np.array_split(embeddings,num_cores)
 
-        for ref_index, ref in tqdm.tqdm(enumerate(references), "Calculate distances"):
-            with Pool() as pool:
-                results_chunks = pool.map(
-                    partial(self.distance_function, x_2=ref),
-                    embedding_chunks)
-            result = np.concatenate(results_chunks)
-            distances[ref_index, :] = result
+        with Pool() as pool:
+            ref_results = pool.map(self.map_reference, references, repeat(embedding_chunks))
+        for ref_index, res in tqdm.tqdm(enumerate(ref_results), "Calculate distances"):
+            distances[ref_index, :] = res
 
         self.distances = distances
 
