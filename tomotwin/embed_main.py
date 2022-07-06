@@ -85,7 +85,7 @@ def _main_():
         # Write results to disk
 
         filename = (
-            os.path.splitext(os.path.basename(conf.volumes_path))[0] + "_embeddings.pkl"
+            os.path.splitext(os.path.basename(conf.volumes_path))[0] + "_embeddings.temb"
         )
         print("Embeddings have shape:", embeddings.shape)
         column_names = ["Z", "Y", "X"]
