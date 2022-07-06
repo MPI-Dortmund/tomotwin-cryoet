@@ -18,19 +18,13 @@ class LocateArgParseUI(LocateUI):
         parser = self.create_parser()
         args = parser.parse_args(args)
 
-        if "simple" in sys.argv[1]:
-            self.probability_path = args.probability
-            self.output_path = args.output
-            self.pthresh = args.pthresh
-            self.dthresh = args.dthresh
-            self.mode = LocateMode.SIMPLE
-
         if "findmax" in sys.argv[1]:
             self.probability_path = args.probability
             self.tolerance = args.tolerance
             self.output_path = args.output
             self.boxsize = args.boxsize
             self.mode = LocateMode.FINDMAX
+
 
 
 
@@ -45,39 +39,6 @@ class LocateArgParseUI(LocateUI):
             tolerance=self.tolerance
         )
         return conf
-
-    def create_naive_parser(self, parser):
-        parser.add_argument(
-            "-p",
-            "--probability",
-            type=str,
-            required=True,
-            help="Path to the probability file (output of classify command)",
-        )
-
-        parser.add_argument(
-            "-o",
-            "--output",
-            type=str,
-            required=True,
-            help="Path to the output folder",
-        )
-
-        parser.add_argument(
-            "-pt",
-            "--pthresh",
-            type=float,
-            default=None,
-            help="Only keep particles with a probability above that threshold",
-        )
-
-        parser.add_argument(
-            "-dt",
-            "--dthresh",
-            type=float,
-            default=None,
-            help="Only keep particles with a distance blow that threshold",
-        )
 
     def create_findmax_parser(self, parser):
         parser.add_argument(
@@ -107,7 +68,7 @@ class LocateArgParseUI(LocateUI):
         parser.add_argument(
             "-b",
             "--boxsize",
-            default=None,
+            default=37,
             help="Provide the box size you want to use for picking or a json file with reference_filename as keys and box sizes as values.",
         )
 
@@ -117,13 +78,6 @@ class LocateArgParseUI(LocateUI):
             description="Interface to locate particles with TomoTwin"
         )
         subparsers = parser_parent.add_subparsers(help="sub-command help")
-
-        naive_parser = subparsers.add_parser(
-            "simple",
-            help="Locate your particles with a quite naive locator.",
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        )
-        self.create_naive_parser(naive_parser)
 
         findmax_parser = subparsers.add_parser(
             "findmax",

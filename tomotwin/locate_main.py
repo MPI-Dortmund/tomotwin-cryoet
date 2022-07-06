@@ -8,8 +8,7 @@ import pandas as pd
 
 from tomotwin.modules.inference.locate_ui import LocateUI, LocateMode
 from tomotwin.modules.inference.argparse_locate_ui import LocateArgParseUI
-from tomotwin.modules.inference.naivelocator import NaiveLocator
-from tomotwin.modules.inference.FindMaximaLocator import FindMaximaLocator
+from tomotwin.modules.inference.findmaxima_locator import FindMaximaLocator
 from tomotwin.modules.inference.locator import Locator
 import tqdm
 from pyStarDB import sp_pystardb as star
@@ -27,14 +26,10 @@ def run(ui: LocateUI):
     ui.run()
     conf = ui.get_locate_configuration()
     out_path = conf.output_path
-    pthresh = conf.probability_threshold
-    dthresh = conf.distance_threshold
     os.makedirs(out_path, exist_ok=True)
     probabilities = readprobs(conf.probability_path)
 
-    if conf.mode == LocateMode.SIMPLE:
-        locator = NaiveLocator(pthresh=pthresh,dthresh=dthresh)
-    elif conf.mode == LocateMode.FINDMAX:
+    if conf.mode == LocateMode.FINDMAX:
         if "stride" in probabilities.attrs:
             stride = probabilities.attrs["stride"]
         else:
@@ -80,9 +75,6 @@ def run(ui: LocateUI):
 
         class_frame = Locator.nms(class_frame, size)
         class_frames[class_id] = class_frame
-        # Does the class frame already contain estimated size?
-        #print("classframe", class_frame)
-
         print(f"Particles of class {class_name}: {len(class_frame)} (before NMS: {before_nms}) ")
 
     located_particles = pd.concat(class_frames)
