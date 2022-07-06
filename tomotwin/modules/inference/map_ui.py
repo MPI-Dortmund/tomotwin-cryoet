@@ -375,124 +375,48 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import pandas as pd
-import numpy as np
-from tomotwin.modules.inference.classifier import Classifier
-from tomotwin.modules.inference.distance_classifier import DistanceClassifier
-from tomotwin.modules.inference.classify_ui import ClassifyUI, ClassifyMode
-from tomotwin.modules.inference.argparse_classifiy_ui import ClassifiyArgParseUI
-from tomotwin.modules.common.distances import DistanceManager
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from enum import Enum, auto
+from typing import Callable
 
-import os
-from pandas.api.types import is_numeric_dtype
-
-
-def read_embeddings(path):
-    if path.endswith(".txt"):
-        df = pd.read_csv(path)
-    elif path.endswith(".pkl"):
-        df = pd.read_pickle(path)
-    else:
-        print("Format not implemented")
-        return None
-    dtypes = {}
-    cols = df.columns
-    for col_index, t in enumerate(df.dtypes):
-        if is_numeric_dtype(t):
-            dtypes[cols[col_index]] = np.float16
-        else:
-            dtypes[cols[col_index]] = t
-    old_attrs = df.attrs
-    casted = df.astype(dtypes)
-    casted.attrs = old_attrs
-    return casted
+class MapMode(Enum):
+    """
+    Enumartion of classifcation modes
+    """
+    DISTANCE = auto()
 
 
-def classify(
-    classifier: Classifier, reference: np.array, volumes: np.array
-) -> np.array:
-    return classifier.classify(embeddings=volumes, references=reference)
+@dataclass
+class MapConfiguration:
+    """
+    Represents the configuration for map calculation
+
+    :param reference_embeddings_path: Path to embedded references
+    :param volume_embeddings_path: Path to embedded volumes
+    :param mode: ClassifyMode to run
+    """
+
+    reference_embeddings_path: str
+    volume_embeddings_path: str
+    output_path: str
+    mode: MapMode
 
 
-def run(ui: ClassifyUI):
-    ui.run()
-    conf = ui.get_classification_configuration()
-    reference_embeddings_path = (
-        conf.reference_embeddings_path
-    )
-    volume_embeddings_path = (
-        conf.volume_embeddings_path
-    )
-    output_path = (
-        conf.output_path
-    )
-    os.makedirs(output_path, exist_ok=True)
+class MapUI(ABC):
+    """Interface to define"""
 
-    if conf.mode == ClassifyMode.DISTANCE:
-        print("Read embeddings")
-        reference_embeddings = read_embeddings(reference_embeddings_path)
-        volume_embeddings = read_embeddings(volume_embeddings_path)
+    @abstractmethod
+    def run(self, args=None) -> None:
+        """
+        Runs the UI.
+        :param args: Optional arguments that might need to pass to the parser. Can also be used for testing.
+        :return: None
+        """
 
-        print("Reading Done")
-        volume_embeddings_np = volume_embeddings.drop(
-            columns=["index", "filepath", "X", "Y", "Z"], errors="ignore"
-        ).to_numpy()
-
-        reference_embeddings_np = reference_embeddings.drop(
-            columns=["index", "filepath", "X", "Y", "Z"], errors="ignore"
-        ).to_numpy()
-
-        dm = DistanceManager()
-        distance = dm.get_distance(volume_embeddings.attrs["tomotwin_config"]["distance"])
-        distance_func = distance.calc_np
-
-        clf = DistanceClassifier(distance_function=distance_func, similarty=distance.is_similarity())
-        _ = classify(
-            classifier=clf,
-            reference=reference_embeddings_np,
-            volumes=volume_embeddings_np,
-        )
-
-
-        ref_names = [
-            os.path.basename(l) for l in reference_embeddings["filepath"].tolist()
-        ]
-        vol_names = [
-            os.path.basename(l) for l in volume_embeddings["filepath"].tolist()
-        ]
-
-        df_data = {}
-        if "X" in volume_embeddings:
-            df_data["X"] = volume_embeddings["X"]
-            df_data["Y"] = volume_embeddings["Y"]
-            df_data["Z"] = volume_embeddings["Z"]
-
-        df_data["filename"] = vol_names
-        distances = clf.get_distances()
-
-        for ref_index, _ in enumerate(ref_names):
-            df_data[f"d_class_{ref_index}"] = distances[ref_index, :]
-
-        classes_df = pd.DataFrame(
-            df_data
-        )
-
-        # Add meta information from previous step
-        for meta_key in volume_embeddings.attrs:
-            classes_df.attrs[meta_key] = volume_embeddings.attrs[meta_key]
-
-        # Add additional meta information
-        classes_df.attrs["references"] = ref_names
-        pth = os.path.join(output_path, "map.tmap")
-        classes_df.to_pickle(pth)
-        print(f"Wrote output to {pth}")
-
-
-
-def _main_():
-    ui = ClassifiyArgParseUI()
-    run(ui=ui)
-
-
-if __name__ == "__main__":
-    _main_()
+    @abstractmethod
+    def get_map_configuration(self) -> MapConfiguration:
+        """
+        Creates the map configuration and returns it.
+        :return: A classification configuration instance
+        """

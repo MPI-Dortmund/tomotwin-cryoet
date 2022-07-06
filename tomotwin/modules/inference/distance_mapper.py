@@ -375,49 +375,61 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from enum import Enum, auto
-from typing import Callable
+from typing import Callable, List
+import multiprocessing
+from concurrent.futures import ProcessPoolExecutor as Pool
+from itertools import repeat
+import numpy as np
+import tqdm
+from tomotwin.modules.inference.mapper import Mapper
 
-class ClassifyMode(Enum):
+
+class DistanceMapper(Mapper):
     """
-    Enumartion of classifcation modes
-    """
-    DISTANCE = auto()
-
-
-@dataclass
-class ClassifyConfiguration:
-    """
-    Represents the configuration for classification calculation
-
-    :param reference_embeddings_path: Path to embedded references
-    :param volume_embeddings_path: Path to embedded volumes
-    :param mode: ClassifyMode to run
-    :param threshold: Optional threshold
+    Classifier that is using a distance measure for classification.
     """
 
-    reference_embeddings_path: str
-    volume_embeddings_path: str
-    output_path: str
-    mode: ClassifyMode
-
-
-class ClassifyUI(ABC):
-    """Interface to define"""
-
-    @abstractmethod
-    def run(self, args=None) -> None:
+    def __init__(
+        self, distance_function: Callable[[np.array, np.array], float], similarty=False
+    ):
         """
-        Runs the UI.
-        :param args: Optional arguments that might need to pass to the parser. Can also be used for testing.
-        :return: None
+        :param distance_function: Distance function that takes one row of the references (first array) and
+        calulates the distances to a array of embeddings (second array).
+        :param threshold:
         """
+        self.distance_function = distance_function
+        self.distances = None
+        self.is_similarty = similarty
 
-    @abstractmethod
-    def get_classification_configuration(self) -> ClassifyConfiguration:
+    def map_reference(self, reference: np.array, embedding_chunks: List[np.array]) -> np.array:
+        with Pool() as pool:
+            results_chunks = pool.map(self.distance_function, embedding_chunks, repeat(reference))
+        results_chunks = list(results_chunks)
+        result = np.concatenate(results_chunks)
+
+        return result
+
+    def map(
+        self,
+        embeddings: np.array,
+        references: np.array,
+    ) -> np.array:
         """
-        Creates the classification configuration and returns it.
-        :return: A classification configuration instance
+        Will calculate the distance between evey embedding and every reference.
+        It returns a 2D array, where the columns contain the distances metric for all references for a specific embedding.
         """
+        distances = np.empty(shape=(references.shape[0], embeddings.shape[0]), dtype=np.float16)
+        num_cores = multiprocessing.cpu_count()
+        embedding_chunks = np.array_split(embeddings,num_cores)
+
+        with Pool() as pool:
+            ref_results = pool.map(self.map_reference, references, repeat(embedding_chunks))
+        for ref_index, res in tqdm.tqdm(enumerate(ref_results), "Calculate distances"):
+            distances[ref_index, :] = res
+
+        self.distances = distances
+
+        return distances
+
+    def get_distances(self) -> np.array:
+        return self.distances

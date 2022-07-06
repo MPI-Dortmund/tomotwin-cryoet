@@ -377,16 +377,16 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 import argparse
 import sys
-from tomotwin.modules.inference.classify_ui import (
-    ClassifyUI,
-    ClassifyConfiguration,
-    ClassifyMode,
+from tomotwin.modules.inference.map_ui import (
+    MapUI,
+    MapConfiguration,
+    MapMode,
 )
 
 
-class ClassifiyArgParseUI(ClassifyUI):
+class MapArgParseUI(MapUI):
     """
-    Argparse interface for the classify command
+    Argparse interface for the map command
     """
 
     def __init__(self):
@@ -402,10 +402,10 @@ class ClassifiyArgParseUI(ClassifyUI):
         self.volume_pth = args.volumes
         self.output_pth = args.output
         if "distance" in sys.argv[1]:
-            self.mode = ClassifyMode.DISTANCE
+            self.mode = MapMode.DISTANCE
 
-    def get_classification_configuration(self) -> ClassifyConfiguration:
-        conf = ClassifyConfiguration(
+    def get_map_configuration(self) -> MapConfiguration:
+        conf = MapConfiguration(
             reference_embeddings_path=self.reference_pth,
             volume_embeddings_path=self.volume_pth,
             output_path=self.output_pth,
@@ -444,16 +444,16 @@ class ClassifiyArgParseUI(ClassifyUI):
 
     def create_parser(self) -> argparse.ArgumentParser:
         """
-        Create parser for the classify command
+        Create parser for the map command
         """
 
         parser_parent = argparse.ArgumentParser(
-            description="Interface to calculate Embeddings for TomoTwin"
+            description="Interface to calculate embeddings for TomoTwin"
         )
         subparsers = parser_parent.add_subparsers(help="sub-command help")
         parser_embed_volume = subparsers.add_parser(
             "distance",
-            help="Classify volumes by distance to the references.",
+            help="Map volumes by distance to the references.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         self.create_distance_parser(parser_embed_volume)

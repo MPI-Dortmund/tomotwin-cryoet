@@ -379,16 +379,16 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 
-class Classifier(ABC):
+class Mapper(ABC):
     @abstractmethod
-    def classify(
+    def map(
         self,
         embeddings: np.array,
         references: np.array,
     ) -> np.array:
         """
-        Given a set of embediings and refences, assign each embedding a array of probilites for each reference
-        :param embeddings: 2D array of embeddings. Each row correspond to different volume.
+        Given a set of embeddings and references, it calculate the pairwise distance of each references to the embeddings
+        :param embeddings: 2D array of embeddings. Each row correspond to different subvolume.
         :param references: 2D array of reference embeddings. Each row correspond to different reference.
-        :return: It returns a 2D array, where the columns contain the probabilities for all references for a specific embedding.
+        :return: It returns a 2D array, where the columns contain the distance metric for all references for a specific embedding.
         """

@@ -375,64 +375,124 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-from typing import Callable, List
-import multiprocessing
-from concurrent.futures import ProcessPoolExecutor as Pool
-from itertools import repeat
+import pandas as pd
 import numpy as np
-import tqdm
-from tomotwin.modules.inference.classifier import Classifier
+from tomotwin.modules.inference.mapper import Mapper
+from tomotwin.modules.inference.distance_mapper import DistanceMapper
+from tomotwin.modules.inference.map_ui import MapUI, MapMode
+from tomotwin.modules.inference.argparse_map_ui import MapArgParseUI
+from tomotwin.modules.common.distances import DistanceManager
+
+import os
+from pandas.api.types import is_numeric_dtype
 
 
-class DistanceClassifier(Classifier):
-    """
-    Classifier that is using a distance measure for classification.
-    """
+def read_embeddings(path):
+    if path.endswith(".txt"):
+        df = pd.read_csv(path)
+    elif path.endswith(".pkl"):
+        df = pd.read_pickle(path)
+    else:
+        print("Format not implemented")
+        return None
+    dtypes = {}
+    cols = df.columns
+    for col_index, t in enumerate(df.dtypes):
+        if is_numeric_dtype(t):
+            dtypes[cols[col_index]] = np.float16
+        else:
+            dtypes[cols[col_index]] = t
+    old_attrs = df.attrs
+    casted = df.astype(dtypes)
+    casted.attrs = old_attrs
+    return casted
 
-    def __init__(
-        self, distance_function: Callable[[np.array, np.array], float], similarty=False
-    ):
-        """
-        :param distance_function: Distance function that takes one row of the references (first array) and
-        calulates the distances to a array of embeddings (second array).
-        :param threshold:
-        """
-        self.distance_function = distance_function
-        self.distances = None
-        self.is_similarty = similarty
 
-    def map_reference(self, reference: np.array, embedding_chunks: List[np.array]) -> np.array:
-        with Pool() as pool:
-            results_chunks = pool.map(self.distance_function, embedding_chunks, repeat(reference))
-        results_chunks = list(results_chunks)
-        result = np.concatenate(results_chunks)
+def map(
+    mapper: Mapper, reference: np.array, volumes: np.array
+) -> np.array:
+    return mapper.map(embeddings=volumes, references=reference)
 
-        return result
 
-    def classify(
-        self,
-        embeddings: np.array,
-        references: np.array,
-    ) -> np.array:
-        """
-        Will calculate the distance between evey embedding and every reference. If threshold is given
-        it will ignore all distances which are bigger than this threshold. Then it applies
-        a software to the remaining negative distances.
+def run(ui: MapUI):
+    ui.run()
+    conf = ui.get_map_configuration()
+    reference_embeddings_path = (
+        conf.reference_embeddings_path
+    )
+    volume_embeddings_path = (
+        conf.volume_embeddings_path
+    )
+    output_path = (
+        conf.output_path
+    )
+    os.makedirs(output_path, exist_ok=True)
 
-        It returns a 2D array, where the columns contain the probabilities for all references for a specific embedding.
-        """
-        distances = np.empty(shape=(references.shape[0], embeddings.shape[0]), dtype=np.float16)
-        num_cores = multiprocessing.cpu_count()
-        embedding_chunks = np.array_split(embeddings,num_cores)
+    if conf.mode == MapMode.DISTANCE:
+        print("Read embeddings")
+        reference_embeddings = read_embeddings(reference_embeddings_path)
+        volume_embeddings = read_embeddings(volume_embeddings_path)
 
-        with Pool() as pool:
-            ref_results = pool.map(self.map_reference, references, repeat(embedding_chunks))
-        for ref_index, res in tqdm.tqdm(enumerate(ref_results), "Calculate distances"):
-            distances[ref_index, :] = res
+        print("Reading Done")
+        volume_embeddings_np = volume_embeddings.drop(
+            columns=["index", "filepath", "X", "Y", "Z"], errors="ignore"
+        ).to_numpy()
 
-        self.distances = distances
+        reference_embeddings_np = reference_embeddings.drop(
+            columns=["index", "filepath", "X", "Y", "Z"], errors="ignore"
+        ).to_numpy()
 
-        return distances
+        dm = DistanceManager()
+        distance = dm.get_distance(volume_embeddings.attrs["tomotwin_config"]["distance"])
+        distance_func = distance.calc_np
 
-    def get_distances(self) -> np.array:
-        return self.distances
+        clf = DistanceMapper(distance_function=distance_func, similarty=distance.is_similarity())
+        _ = map(
+            mapper=clf,
+            reference=reference_embeddings_np,
+            volumes=volume_embeddings_np,
+        )
+
+
+        ref_names = [
+            os.path.basename(l) for l in reference_embeddings["filepath"].tolist()
+        ]
+        vol_names = [
+            os.path.basename(l) for l in volume_embeddings["filepath"].tolist()
+        ]
+
+        df_data = {}
+        if "X" in volume_embeddings:
+            df_data["X"] = volume_embeddings["X"]
+            df_data["Y"] = volume_embeddings["Y"]
+            df_data["Z"] = volume_embeddings["Z"]
+
+        df_data["filename"] = vol_names
+        distances = clf.get_distances()
+
+        for ref_index, _ in enumerate(ref_names):
+            df_data[f"d_class_{ref_index}"] = distances[ref_index, :]
+
+        classes_df = pd.DataFrame(
+            df_data
+        )
+
+        # Add meta information from previous step
+        for meta_key in volume_embeddings.attrs:
+            classes_df.attrs[meta_key] = volume_embeddings.attrs[meta_key]
+
+        # Add additional meta information
+        classes_df.attrs["references"] = ref_names
+        pth = os.path.join(output_path, "map.tmap")
+        classes_df.to_pickle(pth)
+        print(f"Wrote output to {pth}")
+
+
+
+def _main_():
+    ui = MapArgParseUI()
+    run(ui=ui)
+
+
+if __name__ == "__main__":
+    _main_()

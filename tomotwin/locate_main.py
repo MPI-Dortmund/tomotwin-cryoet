@@ -400,7 +400,7 @@ def run(ui: LocateUI):
     conf = ui.get_locate_configuration()
     out_path = conf.output_path
     os.makedirs(out_path, exist_ok=True)
-    probabilities = readprobs(conf.probability_path)
+    probabilities = readprobs(conf.map_path)
 
     if conf.mode == LocateMode.FINDMAX:
         if "stride" in probabilities.attrs:
