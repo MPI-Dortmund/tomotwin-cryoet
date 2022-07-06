@@ -164,7 +164,7 @@ class EmbedArgParseUI(EmbedUI):
             "-s",
             "--stride",
             type=int,
-            default=2,
+            default=[2],
             nargs='+',
             help="Stride of the sliding window. Either an integer or a tuple of 3 numbers representing the slides in x,y,z",
         )
