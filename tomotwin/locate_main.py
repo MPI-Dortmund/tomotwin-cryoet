@@ -35,12 +35,10 @@ def run(ui: LocateUI):
     if conf.mode == LocateMode.SIMPLE:
         locator = NaiveLocator(pthresh=pthresh,dthresh=dthresh)
     elif conf.mode == LocateMode.FINDMAX:
-        stride = conf.stride
-        if conf.stride is None:
-            if "stride" in probabilities.attrs:
-                stride = probabilities.attrs["stride"]
-            else:
-                raise ValueError("Stride unknown. Please provide it as argument.")
+        if "stride" in probabilities.attrs:
+            stride = probabilities.attrs["stride"]
+        else:
+            raise ValueError("Stride unknown. It seems that you are using an invalid model")
         if len(stride) == 1:
             stride = stride * 3
 

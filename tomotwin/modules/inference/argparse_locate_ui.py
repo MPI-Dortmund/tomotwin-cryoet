@@ -12,7 +12,6 @@ class LocateArgParseUI(LocateUI):
         self.dthresh = None
         self.tolerance = None
         self.boxsize = None
-        self.stride = None
         self.mode = None
 
     def run(self, args=None) -> None:
@@ -30,7 +29,6 @@ class LocateArgParseUI(LocateUI):
             self.probability_path = args.probability
             self.tolerance = args.tolerance
             self.output_path = args.output
-            self.stride = args.stride
             self.boxsize = args.boxsize
             self.mode = LocateMode.FINDMAX
 
@@ -43,7 +41,6 @@ class LocateArgParseUI(LocateUI):
             probability_threshold=self.pthresh,
             distance_threshold=self.dthresh,
             mode=self.mode,
-            stride=self.stride,
             boxsize=self.boxsize,
             tolerance=self.tolerance
         )
@@ -105,15 +102,6 @@ class LocateArgParseUI(LocateUI):
             type=float,
             default=0.2,
             help="Tolerance value",
-        )
-
-        parser.add_argument(
-            "-s",
-            "--stride",
-            type=float,
-            default=None,
-            nargs='+',
-            help="(Optional) Provide the same stride a during embedding",
         )
 
         parser.add_argument(

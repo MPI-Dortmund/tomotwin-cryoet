@@ -25,7 +25,6 @@ class LocateConfiguration:
     output_path: str
     tolerance: float
     boxsize: Union[str,int]
-    stride: int
     mode: LocateMode
     probability_threshold: float = 0
     distance_threshold: float = 0
