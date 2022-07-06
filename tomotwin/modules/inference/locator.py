@@ -384,9 +384,9 @@ import tqdm
 class Locator(ABC):
 
     @abstractmethod
-    def locate(self, classify_output : pd.DataFrame) -> List[pd.DataFrame]:
+    def locate(self, map_output : pd.DataFrame) -> List[pd.DataFrame]:
         """
-        Uses the tomotwin_classify output to creates a dataframe for each predicted class
+        Uses the tomotwin_map output to locate particles for each target reference
         """
 
     @staticmethod

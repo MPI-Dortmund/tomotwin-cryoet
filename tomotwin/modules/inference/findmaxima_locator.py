@@ -492,7 +492,7 @@ class FindMaximaLocator(Locator):
         return selected_df
 
     @staticmethod
-    def apply_findmax(classify_output: pd.DataFrame,
+    def apply_findmax(map_output: pd.DataFrame,
                       class_id: int,
                       class_name: str,
                       window_size: int,
@@ -501,7 +501,7 @@ class FindMaximaLocator(Locator):
                       global_min: float,
 
                       ) -> (pd.DataFrame, np.array):
-        df_particles = classify_output
+        df_particles = map_output
         vol, index_vol = FindMaximaLocator.to_volume(df_particles, target_class=class_id, window_size=window_size, stride=stride)
 
         maximas, mask = find_maxima(vol, tolerance, global_min=global_min)
@@ -529,7 +529,7 @@ class FindMaximaLocator(Locator):
                      tolerance: float,
                      global_min: float,
                      output: str) -> pd.DataFrame:
-        particle_df, vol = FindMaximaLocator.apply_findmax(classify_output=df_particles,
+        particle_df, vol = FindMaximaLocator.apply_findmax(map_output=df_particles,
                                                            class_id=class_id,
                                                            class_name=class_name,
                                                            window_size=window_size,
@@ -550,12 +550,12 @@ class FindMaximaLocator(Locator):
 
 
 
-    def locate(self, classify_output: pd.DataFrame) -> List[pd.DataFrame]:
+    def locate(self, map_output: pd.DataFrame) -> List[pd.DataFrame]:
 
         particles_dataframes = []
 
-        df_particles = classify_output
-        unique_classes = classify_output.attrs["references"]
+        df_particles = map_output
+        unique_classes = map_output.attrs["references"]
 
         from concurrent.futures import ProcessPoolExecutor as Pool
         from itertools import repeat

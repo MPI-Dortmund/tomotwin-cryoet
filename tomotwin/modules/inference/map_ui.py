@@ -394,7 +394,7 @@ class MapConfiguration:
 
     :param reference_embeddings_path: Path to embedded references
     :param volume_embeddings_path: Path to embedded volumes
-    :param mode: ClassifyMode to run
+    :param mode: MapMode to run
     """
 
     reference_embeddings_path: str
