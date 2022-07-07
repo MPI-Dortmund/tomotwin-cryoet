@@ -1,5 +1,5 @@
 import unittest
-from tomotwin.modules.training.argparse_ui import TrainingArgParseUI, TrainingConfiguration
+from tomotwin.modules.training.argparse_ui import TrainingArgParseUI
 class MyTestCase(unittest.TestCase):
 
     def test_parse_args_only_required(self):
@@ -41,9 +41,7 @@ class MyTestCase(unittest.TestCase):
         volpth = '/my/vol/path/'
         outpth = '/my/output/path/'
         epochs = '10'
-        batch_size = '3'
         nc = '/path/to/config.json'
-        lr = '0.001'
         max_neg = '3'
         ui = TrainingArgParseUI()
         parser = ui.create_parser()
@@ -65,10 +63,8 @@ class MyTestCase(unittest.TestCase):
         volpth = '/my/vol/path/'
         outpth = '/my/output/path/'
         epochs = '10'
-        batch_size = '3'
-        lr = '0.001'
         nc = '/path/to/config.json'
-        max_neg = '3'
+
         ui = TrainingArgParseUI()
         parser = ui.create_parser()
         args = parser.parse_args(['-p', pdbpth,
@@ -88,8 +84,6 @@ class MyTestCase(unittest.TestCase):
         outpth = '/my/output/path/'
         nc = '/path/to/config.json'
         epochs = '10'
-        batch_size = '3'
-        lr = '0.001'
         ui = TrainingArgParseUI()
         args = ['-p', pdbpth,
                                   '-v', volpth,
