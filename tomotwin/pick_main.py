@@ -451,7 +451,7 @@ def write_cbox(coordinates: pd.DataFrame, boxsize: int, path : str) -> None:
 def write_coords(results: pd.DataFrame, filepath):
     results[["X", "Y", "Z"]].to_csv(filepath, index=False, header=None, sep=" ")
 
-def filter(locate_results : pd.DataFrame, conf: PickConfiguration ) -> pd.DataFrame:
+def filter_results(locate_results : pd.DataFrame, conf: PickConfiguration) -> pd.DataFrame:
     '''
     Applies several filter like best metric or min and max size.
     :param locate_results: Picking results
@@ -523,7 +523,7 @@ def run(ui: PickUI) -> None:
         selection_target = target == locate_results["predicted_class_name"]
         locate_results_target = locate_results[selection_target]
 
-        locate_results_target = filter(locate_results_target,conf)
+        locate_results_target = filter_results(locate_results_target, conf)
         print(f"Target: {target} - Write {len(locate_results_target)} positions to disk.")
         write_results(locate_results_target,conf.output_path, target=target)
 

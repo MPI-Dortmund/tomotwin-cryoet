@@ -383,7 +383,6 @@ from typing import List
 import numpy as np
 import os
 import tqdm
-import itertools
 
 class FilenameMatchingTripletProviderNoPDB(TripletProvider):
     """
@@ -426,7 +425,6 @@ class FilenameMatchingTripletProviderNoPDB(TripletProvider):
         """
 
         def get_combinations(lbl_indices: np.array):
-            import random
             shuffled_list = lbl_indices.copy()
             np.random.shuffle(shuffled_list)
             offset = 0

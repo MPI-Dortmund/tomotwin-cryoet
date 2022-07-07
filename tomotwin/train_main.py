@@ -379,7 +379,7 @@ from tomotwin.modules.training.argparse_ui import TrainingArgParseUI, TrainingCo
 from tomotwin.modules.training.filenametripletprovider import (
     FilenameMatchingTripletProvider,
 )
-from tomotwin.modules.training.filenamematchingtripletprovidernopdb import FilenameMatchingTripletProviderNoPDB, TripletProvider
+from tomotwin.modules.training.filenamematchingtripletprovidernopdb import FilenameMatchingTripletProviderNoPDB
 from tomotwin.modules.training.torchtrainer import TorchTrainer, TripletDataset
 from tomotwin.modules.training.LossPyML import LossPyML
 from tomotwin.modules.common.distances import DistanceManager
@@ -393,16 +393,14 @@ from tomotwin.modules.training.transforms import (
     AugmentationPipeline,
     AddNoise,
     Rotate,
-    Blur,
     Shift,
     RotateFull,
     VoxelDropout,
-    BlockDropout
 )
 from tomotwin.modules.training.filepathtriplet import FilePathTriplet
 from tomotwin.modules.networks.networkmanager import NetworkManager
 
-from typing import List, Tuple, Union
+from typing import List, Tuple
 import os
 import sys
 import random

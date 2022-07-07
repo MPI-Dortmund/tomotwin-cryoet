@@ -504,7 +504,7 @@ class FindMaximaLocator(Locator):
         df_particles = map_output
         vol, index_vol = FindMaximaLocator.to_volume(df_particles, target_class=class_id, window_size=window_size, stride=stride)
 
-        maximas, mask = find_maxima(vol, tolerance, global_min=global_min)
+        maximas, _ = find_maxima(vol, tolerance, global_min=global_min)
 
         maximas_filtered = [
             m for m in maximas if m[1] > 1

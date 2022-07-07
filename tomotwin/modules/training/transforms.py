@@ -551,4 +551,4 @@ class Transpose(Augmentation):
         transposed = self.rot(volume)
         return transposed.copy()
     def __str__(self):
-        return f"Transpose"
+        return "Transpose"

@@ -415,7 +415,6 @@ class Trainer(ABC):
         Returns the trained model
         :return: The trained model
         """
-        pass
 
     @abstractmethod
     def write_results_to_disk(self, path: str):
@@ -424,4 +423,3 @@ class Trainer(ABC):
         :param path: Path
         :return: None
         """
-        pass

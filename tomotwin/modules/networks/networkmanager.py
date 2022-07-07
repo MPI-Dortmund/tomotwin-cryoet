@@ -389,14 +389,9 @@ import json
 class NetworkNotExistError(Exception):
     """Exception when network does not exist"""
 
-    pass
-
 
 class MalformedConfigError(Exception):
     """Expection when there when using malformed configuration files"""
-
-    pass
-
 
 class NetworkManager:
     """
@@ -430,15 +425,15 @@ class NetworkManager:
         """
         if "identifier" not in config:
             raise MalformedConfigError(
-                f"The keyword 'identifier' must be in the config file"
+                "The keyword 'identifier' must be in the config file"
             )
         if "network_config" not in config:
             raise MalformedConfigError(
-                f"The keyword 'network_config' must be in the config file"
+                "The keyword 'network_config' must be in the config file"
             )
         if "train_config" not in config:
             raise MalformedConfigError(
-                f"The keyword 'train_config' must be in the config file"
+                "The keyword 'train_config' must be in the config file"
             )
 
     def load_configuration(self, config_path: str) -> Dict:

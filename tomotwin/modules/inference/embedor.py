@@ -396,7 +396,6 @@ class Embedor(ABC):
     @abstractmethod
     def embed(self, volume_data: VolumeDataset) -> np.array:
         """Given a set of volumes, this function calculates a set of embeddings"""
-        ...
 
 
 class TorchVolumeDataset(Dataset):
@@ -461,7 +460,7 @@ class TorchEmbedor(Embedor):
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         dataset = TorchVolumeDataset(volumes=volume_data)
-        dataset.device = device
+
         volume_loader = DataLoader(
             dataset=dataset,
             batch_size=self.batchsize,
