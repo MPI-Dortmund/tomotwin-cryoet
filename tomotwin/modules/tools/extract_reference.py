@@ -374,19 +374,24 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
+import warnings
+from argparse import ArgumentParser
+import os
+import argparse
+from typing import List
 
 import mrcfile
-import warnings
 import numpy as np
 import pandas as pd
 import tqdm
-import os
-from argparse import ArgumentParser
 
-import argparse
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
 class ExtractReference(TomoTwinTool):
+    '''
+    Extracts a subvolume (reference) from a volume and save it to disk.
+    '''
+
     def get_command_name(self) -> str:
         '''
         :return: Command name
@@ -419,7 +424,17 @@ class ExtractReference(TomoTwinTool):
         return parser
 
     @staticmethod
-    def extract_and_save(volume: np.array, positions: pd.DataFrame, box_size: int, out_pth: str, basename: str):
+    def extract_and_save(volume: np.array, positions: pd.DataFrame, box_size: int, out_pth: str, basename: str) -> List[str]:
+        '''
+
+        :param volume: Volume from which the the references should be extracted
+        :param positions: Dataframe with coordinates
+        :param box_size: Extraction boxsize in pixel
+        :param out_pth: Folder where the subvolumes are written
+        :param basename: Basename for files, index and filename are added automatically.
+        :return: List with paths of written subvolumes.
+        '''
+        files_written = []
         for index, row in tqdm.tqdm(positions.iterrows()):
             x = row['X']
             y = row['Y']
@@ -434,13 +449,15 @@ class ExtractReference(TomoTwinTool):
             nz2 = (z + (box_size - 1) // 2 + 1)
 
 
-            coords = volume[int(nz1): int(nz2), int(ny1): int(ny2), int(nx1): int(nx2)]
-            if coords.shape != (box_size, box_size, box_size):
+            subvol = volume[int(nz1): int(nz2), int(ny1): int(ny2), int(nx1): int(nx2)]
+            if subvol.shape != (box_size, box_size, box_size):
                 continue
-            coords = -1 * coords  # invert
-
-            with mrcfile.new(os.path.join(out_pth,basename+".mrc")) as newmrc:
-                newmrc.set_data(coords)
+            subvol = -1 * subvol  # invert
+            fname = os.path.join(out_pth,f"{basename}_{index}.mrc")
+            with mrcfile.new(fname) as newmrc:
+                newmrc.set_data(subvol)
+            files_written.append(fname)
+        return files_written
 
     def run(self, args):
         path_tomo = args.tomo
@@ -458,11 +475,9 @@ class ExtractReference(TomoTwinTool):
         #Args to give cmd line interface
         os.makedirs(path_output,exist_ok=True)
         # Extract X Y Z coords from correct csv file
-        df = pd.read_csv(path_ref, sep='    ', header=None)
-        df.columns = ['X', 'Y', 'Z']
+        coords = pd.read_csv(path_ref, sep='    ', header=None)
+        coords.columns = ['X', 'Y', 'Z']
         mrc = mrcfile.mmap(path_tomo, permissive=True, mode='r')
 
-        ExtractReference.extract_and_save(mrc.data, df, boxsize, path_output, filebasename)
+        ExtractReference.extract_and_save(mrc.data, coords, boxsize, path_output, filebasename)
         print(f'wrote subvolume reference to {path_output}')
-
-
