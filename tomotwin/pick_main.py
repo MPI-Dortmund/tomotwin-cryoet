@@ -448,6 +448,9 @@ def write_cbox(coordinates: pd.DataFrame, boxsize: int, path : str) -> None:
 
     sfile.write_star_file(overwrite=True, tags=['global', 'cryolo', 'cryolo_include'])
 
+def write_coords(results: pd.DataFrame, filepath):
+    results[["X", "Y", "Z"]].to_csv(filepath, index=False, header=None, sep=" ")
+
 def filter(locate_results : pd.DataFrame, conf: PickConfiguration ) -> pd.DataFrame:
     '''
     Applies several filter like best metric or min and max size.
@@ -478,8 +481,9 @@ def write_results(locate_results: pd.DataFrame, output_path: str, target: str) -
     '''
     os.makedirs(output_path,exist_ok=True)
 
-    locate_results[["X", "Y", "Z"]].to_csv(os.path.join(output_path, f"{target}.coords"), index=False, header=None,
-                                        sep=" ")
+    #locate_results[["X", "Y", "Z"]].to_csv(os.path.join(output_path, f"{target}.coords"), index=False, header=None,
+    #                                    sep=" ")
+    write_coords(locate_results, os.path.join(output_path, f"{target}.coords"))
     if "width" not in locate_results:
         print("'width' column is missing in locate results. Use default box size of 37")
         size = 37
