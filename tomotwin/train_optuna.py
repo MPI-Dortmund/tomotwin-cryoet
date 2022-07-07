@@ -617,6 +617,7 @@ def objective(trial: optuna.Trial) -> float:
         checkpoint=checkpoint,
         validvolumes=VALID_PATH,
         distance=DISTANCE,
+        save_after_improvement=False
     )
     train_triplets, test_triplets = generate_triplets(tconf)
 

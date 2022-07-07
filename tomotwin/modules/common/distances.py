@@ -438,7 +438,8 @@ class SNRSimilarty(Distance, dist.SNRDistance):
         :param x_2: Second array
         :return: Pairwise Cosine similarty
         """
-        return dist.SNRDistance.pairwise_distance(x_1, x_2)
+        snr_dist = dist.SNRDistance()
+        return snr_dist.pairwise_distance(x_1, x_2)
 
     def calc_np(self, x_1: np.array, x_2: np.array) -> np.array:
         """
@@ -467,7 +468,8 @@ class CosineSimilarty(Distance, dist.CosineSimilarity):
         :param x_2: Second array
         :return: Pairwise Cosine similarty
         """
-        return dist.CosineSimilarity.pairwise_distance(x_1, x_2)
+        cos_sim = dist.CosineSimilarity()
+        return cos_sim.pairwise_distance(x_1, x_2)
 
     def calc_np(self, x_1: np.array, x_2: np.array) -> np.array:
         """
@@ -527,6 +529,7 @@ class Geodesic(Distance):
         :return: Geodesic distance
         """
         product = (x_1 * x_2).sum(1)
+
         return torch.acos(product)
 
     def calc_np(self, x_1: np.array, x_2: np.array) -> np.array:
