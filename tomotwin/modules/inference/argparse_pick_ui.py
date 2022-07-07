@@ -406,7 +406,7 @@ class PickArgParseUI(PickUI):
         )
         self.create_parser(parser_parent)
 
-        args = parser_parent.parse_args()
+        args = parser_parent.parse_args(args)
 
         self.locate_results_path = args.locate_results
         self.target_reference = args.target
