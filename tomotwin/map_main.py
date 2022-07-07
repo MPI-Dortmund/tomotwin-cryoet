@@ -431,9 +431,10 @@ def run(ui: MapUI):
     if conf.mode == MapMode.DISTANCE:
         print("Read embeddings")
         reference_embeddings = read_embeddings(reference_embeddings_path)
+
         volume_embeddings = read_embeddings(volume_embeddings_path)
 
-        print("Reading Done")
+        print("Reading Done 2")
         volume_embeddings_np = volume_embeddings.drop(
             columns=["index", "filepath", "X", "Y", "Z"], errors="ignore"
         ).to_numpy()
@@ -441,12 +442,13 @@ def run(ui: MapUI):
         reference_embeddings_np = reference_embeddings.drop(
             columns=["index", "filepath", "X", "Y", "Z"], errors="ignore"
         ).to_numpy()
-
+        print("Convert ot np done")
         dm = DistanceManager()
         distance = dm.get_distance(volume_embeddings.attrs["tomotwin_config"]["distance"])
         distance_func = distance.calc_np
 
         clf = DistanceMapper(distance_function=distance_func, similarty=distance.is_similarity())
+        print("Run map")
         _ = map(
             mapper=clf,
             reference=reference_embeddings_np,

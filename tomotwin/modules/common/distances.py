@@ -380,9 +380,9 @@ import torch
 from abc import ABC, abstractmethod
 import pytorch_metric_learning.distances as dist
 
-
 class DistanceDoesNotExistError(Exception):
     '''Exception when distance function does not exist'''
+
 
 class Distance(ABC):
     '''
@@ -471,7 +471,8 @@ class CosineSimilarty(Distance, dist.CosineSimilarity):
         cos_sim = dist.CosineSimilarity()
         return cos_sim.pairwise_distance(x_1, x_2)
 
-    def calc_np(self, x_1: np.array, x_2: np.array) -> np.array:
+    @staticmethod
+    def calc_np(x_1: np.array, x_2: np.array) -> np.array:
         """
         Calculates the pairwise cosine similarty
         :param x_1: First array
@@ -479,7 +480,10 @@ class CosineSimilarty(Distance, dist.CosineSimilarity):
         :return: Pairwise Cosine similarty
         """
         # no need for additional normalization, as our embeddings are already l2 normalized.
-        return (x_1 * x_2).sum(1)
+        print("calc")
+        res = (x_1 * x_2).sum(1)
+        print("done")
+        return res
 
     def name(self) -> str:
         return "COSINE"
@@ -508,6 +512,7 @@ class Euclidean(Distance):
         :param x_2: Second tensor
         :return: Euclidean distance
         """
+
         return np.sum(np.square(x_1 - x_2), axis=1)
 
     def name(self) -> str:
@@ -540,7 +545,8 @@ class Geodesic(Distance):
         :return: Geodesic distance
         """
         product = (x_1 * x_2).sum(1)
-        return np.arccos(product)
+        res = np.arccos(product)
+        return res
 
     def name(self) -> str:
         return "GEODESIC"

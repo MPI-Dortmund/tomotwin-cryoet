@@ -1,9 +1,7 @@
 from setuptools import setup
 import datetime
 import sys
-import re
 import os
-import codecs
 
 pthversion = os.path.join(os.path.dirname(__file__), "VERSION.txt")
 if sys.argv[1] == "sdist":
