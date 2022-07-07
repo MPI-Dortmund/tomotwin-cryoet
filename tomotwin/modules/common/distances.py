@@ -385,6 +385,9 @@ class DistanceDoesNotExistError(Exception):
     '''Exception when distance function does not exist'''
 
 class Distance(ABC):
+    '''
+    Abstract base class for distance metrics
+    '''
 
     @abstractmethod
     def calc(self, x_1: torch.Tensor, x_2: torch.Tensor) -> torch.Tensor:
@@ -405,6 +408,9 @@ class Distance(ABC):
         '''
 
 class DistanceManager():
+    '''
+    Manages all distance metrics
+    '''
 
     def __init__(self):
         self.distances = {}
@@ -421,6 +427,9 @@ class DistanceManager():
 
 
 class SNRSimilarty(Distance, dist.SNRDistance):
+    '''
+    Signal to Noise Ratio distance metric
+    '''
 
     def calc(self, x_1: torch.Tensor, x_2: torch.Tensor) -> torch.Tensor:
         """
@@ -447,6 +456,9 @@ class SNRSimilarty(Distance, dist.SNRDistance):
         return True
 
 class CosineSimilarty(Distance, dist.CosineSimilarity):
+    '''
+    Cosine similarty metric
+    '''
 
     def calc(self, x_1: torch.Tensor, x_2: torch.Tensor) -> torch.Tensor:
         """
@@ -474,6 +486,9 @@ class CosineSimilarty(Distance, dist.CosineSimilarity):
         return True
 
 class Euclidean(Distance):
+    '''
+    Euclidian distance metric
+    '''
 
     def calc(self, x_1: torch.Tensor, x_2: torch.Tensor) -> torch.Tensor:
         """
@@ -500,6 +515,9 @@ class Euclidean(Distance):
         return False
 
 class Geodesic(Distance):
+    '''
+    Geodesic distance metric
+    '''
 
     def calc(self, x_1: torch.Tensor, x_2: torch.Tensor) -> torch.Tensor:
         """
