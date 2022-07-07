@@ -9,9 +9,6 @@ class MyTestCase(unittest.TestCase):
         outpth = '/my/out/path/'
 
         ui = PickArgParseUI()
-        cmd = ""
-        #testargs = ["", cmd]
-        #with patch.object(sys, 'argv', testargs):
         ui.run(['-l', locate_results, '-o', outpth])
         conf = ui.get_pick_configuration()
 

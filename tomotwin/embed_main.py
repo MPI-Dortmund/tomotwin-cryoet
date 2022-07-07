@@ -451,7 +451,7 @@ def _main_():
         df.attrs["stride"] = conf.stride
         df.attrs['tomogram_input_shape'] = tomo.shape
         df.attrs["tomotwin_config"] = embedor.tomotwin_config
-        #df = df.astype(np.float16)
+
         for col in df:
             if col == 'filepath':
                 continue
