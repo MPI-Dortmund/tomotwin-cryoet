@@ -381,21 +381,6 @@ import numpy as np
 import tqdm
 from tomotwin.modules.inference.mapper import Mapper
 
-class ChunkIterator:
-
-    def __init__(self, chunks):
-        self.current = -1
-        self.chunks = chunks
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        self.current += 1
-        if self.current < len(self.chunks):
-            return self.chunks[self.current].value
-
-        raise StopIteration
 class DistanceMapper(Mapper):
     """
     Classifier that is using a distance measure for classification.
@@ -410,43 +395,24 @@ class DistanceMapper(Mapper):
         :param threshold:
         """
         self.distance_function = distance_function
-        self.distances = None
         self.is_similarty = similarty
 
 
 
     def map_reference(self, reference: np.array, embedding_chunks: List[np.array]) -> np.array:
-        #print("start map ref", reference.shape, "chunk size:", embedding_chunks[0].shape)
-        def map_process_pool_executor():
-            from concurrent.futures import ProcessPoolExecutor as Pool
-            from itertools import repeat
-            with Pool() as pool:
-                results_chunks = pool.map(self.distance_function, embedding_chunks, repeat(reference))
-            return results_chunks
 
-        def map_multiprocessing_map():
+        def map_multiprocessing_map(embedding_chunks):
             from multiprocessing.pool import Pool
-            from functools import partial
             from itertools import repeat
+
             with Pool() as pool:
-                results_chunks = pool.starmap(self.distance_function,zip(ChunkIterator(embedding_chunks),repeat(reference)))
+                results_chunks = pool.starmap(self.distance_function,zip(embedding_chunks, repeat(reference)))
 
             return results_chunks
 
+        results_chunks = map_multiprocessing_map(embedding_chunks)
 
-        def non_parallel_processing():
-
-            result_chunks = []
-            for chunk in embedding_chunks:
-                result_chunks.append(self.distance_function(chunk,reference))
-            return result_chunks
-
-        results_chunks = map_multiprocessing_map()
-        #print("List!")
-        #results_chunks = list(results_chunks)
-        result = np.concatenate(results_chunks)
-        print("Map ref done")
-        return result
+        return np.concatenate(results_chunks)
 
     def map(
         self,
@@ -457,23 +423,21 @@ class DistanceMapper(Mapper):
         Will calculate the distance between evey embedding and every reference.
         It returns a 2D array, where the columns contain the distances metric for all references for a specific embedding.
         """
-        self.distances = np.empty(shape=(references.shape[0], embeddings.shape[0]), dtype=np.float16)
-        embedding_chunks = np.array_split(embeddings,12)
-        del embeddings
+        embedding_chunks = np.array_split(embeddings,multiprocessing.cpu_count())
         from multiprocessing import Manager
         import ctypes
         manager = Manager()
-        help = []
+        shared_memory_chunks = []
+
         for chunks in embedding_chunks:
             k = manager.Value(ctypes.py_object, chunks)
-            help.append(k)
-        embedding_chunks = help
+            shared_memory_chunks.append(k.value)
 
-        print("start map")
-        for ref_index, ref in enumerate(references):
-            self.distances[ref_index, :] = self.map_reference(reference=ref, embedding_chunks=embedding_chunks)
+        distances = np.empty(shape=(references.shape[0], embeddings.shape[0]), dtype=np.float16)
+        del embeddings
+        del embedding_chunks
 
-        return self.distances
+        for ref_index in tqdm.tqdm(range(references.shape[0]), desc="Map references"):
+            distances[ref_index, :] = self.map_reference(reference=references[ref_index,:], embedding_chunks=shared_memory_chunks)
 
-    def get_distances(self) -> np.array:
-        return self.distances
+        return distances

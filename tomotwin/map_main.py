@@ -434,7 +434,6 @@ def run(ui: MapUI):
 
         volume_embeddings = read_embeddings(volume_embeddings_path)
 
-        print("Reading Done 2")
         volume_embeddings_np = volume_embeddings.drop(
             columns=["index", "filepath", "X", "Y", "Z"], errors="ignore"
         ).to_numpy()
@@ -442,46 +441,48 @@ def run(ui: MapUI):
         reference_embeddings_np = reference_embeddings.drop(
             columns=["index", "filepath", "X", "Y", "Z"], errors="ignore"
         ).to_numpy()
-        print("Convert ot np done")
+
+
         dm = DistanceManager()
         distance = dm.get_distance(volume_embeddings.attrs["tomotwin_config"]["distance"])
         distance_func = distance.calc_np
 
         clf = DistanceMapper(distance_function=distance_func, similarty=distance.is_similarity())
-        print("Run map")
-        _ = map(
+
+        distances = map(
             mapper=clf,
             reference=reference_embeddings_np,
             volumes=volume_embeddings_np,
         )
-
+        print("Prepare output...")
+        del volume_embeddings_np
+        del reference_embeddings_np
 
         ref_names = [
-            os.path.basename(l) for l in reference_embeddings["filepath"].tolist()
+            os.path.basename(l) for l in reference_embeddings["filepath"]
         ]
-        vol_names = [
-            os.path.basename(l) for l in volume_embeddings["filepath"].tolist()
-        ]
-
+        del reference_embeddings
+        attributes = volume_embeddings.attrs
         df_data = {}
+        df_data["filename"] = volume_embeddings["filepath"].apply(lambda x: os.path.basename(x))
         if "X" in volume_embeddings:
             df_data["X"] = volume_embeddings["X"]
             df_data["Y"] = volume_embeddings["Y"]
             df_data["Z"] = volume_embeddings["Z"]
-
-        df_data["filename"] = vol_names
-        distances = clf.get_distances()
+        del volume_embeddings
 
         for ref_index, _ in enumerate(ref_names):
             df_data[f"d_class_{ref_index}"] = distances[ref_index, :]
 
+
         classes_df = pd.DataFrame(
-            df_data
+            df_data, copy=False
         )
 
+
         # Add meta information from previous step
-        for meta_key in volume_embeddings.attrs:
-            classes_df.attrs[meta_key] = volume_embeddings.attrs[meta_key]
+        for meta_key in attributes:
+            classes_df.attrs[meta_key] = attributes[meta_key]
 
         # Add additional meta information
         classes_df.attrs["references"] = ref_names
