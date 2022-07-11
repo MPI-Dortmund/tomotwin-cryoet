@@ -445,8 +445,8 @@ def _main_():
         for i in range(embeddings.shape[1]-3):
             column_names.append(str(i))
         df = pd.DataFrame(data=embeddings, columns=column_names)
-        df.insert(0, "filepath", [conf.volumes_path] * len(embeddings))
         df.index.name = "index"
+        df.attrs['filepath'] = conf.volumes_path
         df.attrs["window_size"] = conf.window_size
         df.attrs["stride"] = conf.stride
         df.attrs['tomogram_input_shape'] = tomo.shape
