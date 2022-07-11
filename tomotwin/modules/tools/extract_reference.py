@@ -387,6 +387,9 @@ import tqdm
 
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
+class EvenBoxSizeException(Exception):
+    ...
+
 class ExtractReference(TomoTwinTool):
     '''
     Extracts a subvolume (reference) from a volume and save it to disk.
@@ -434,6 +437,9 @@ class ExtractReference(TomoTwinTool):
         :param basename: Basename for files, index and filename are added automatically.
         :return: List with paths of written subvolumes.
         '''
+        if box_size % 2 == 0:
+            raise EvenBoxSizeException()
+
         files_written = []
         for index, row in tqdm.tqdm(positions.iterrows()):
             x = row['X']
@@ -450,9 +456,11 @@ class ExtractReference(TomoTwinTool):
 
 
             subvol = volume[int(nz1): int(nz2), int(ny1): int(ny2), int(nx1): int(nx2)]
+
             if subvol.shape != (box_size, box_size, box_size):
                 continue
             subvol = -1 * subvol  # invert
+            subvol = subvol.astype(np.float32)
             fname = os.path.join(out_pth,f"{basename}_{index}.mrc")
             with mrcfile.new(fname) as newmrc:
                 newmrc.set_data(subvol)
