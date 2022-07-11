@@ -464,7 +464,7 @@ def run(ui: MapUI):
         del reference_embeddings
         attributes = volume_embeddings.attrs
         df_data = {}
-        df_data["filename"] = volume_embeddings["filepath"].apply(lambda x: os.path.basename(x))
+        #df_data["filename"] = volume_embeddings["filepath"].apply(lambda x: os.path.basename(x))
         if "X" in volume_embeddings:
             df_data["X"] = volume_embeddings["X"]
             df_data["Y"] = volume_embeddings["Y"]

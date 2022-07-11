@@ -400,25 +400,37 @@ def run(ui: LocateUI):
     conf = ui.get_locate_configuration()
     out_path = conf.output_path
     os.makedirs(out_path, exist_ok=True)
-    probabilities = readprobs(conf.map_path)
-
+    map = readprobs(conf.map_path)
+    print(map.dtypes)
+    print(map.shape)
+    if 'filname' in map.columns:
+        map.drop(columns=["filename"],inplace=True)
     if conf.mode == LocateMode.FINDMAX:
-        if "stride" in probabilities.attrs:
-            stride = probabilities.attrs["stride"]
+        if "stride" in map.attrs:
+            stride = map.attrs["stride"]
         else:
             raise ValueError("Stride unknown. It seems that you are using an invalid model")
         if len(stride) == 1:
             stride = stride * 3
 
-        if "window_size" in probabilities.attrs:
-            window_size = probabilities.attrs["window_size"]
+        if "window_size" in map.attrs:
+            window_size = map.attrs["window_size"]
         else:
             raise ValueError("Window size unknown. Stop.")
 
         locator = FindMaximaLocator(tolerance=conf.tolerance, stride=stride, window_size=window_size, global_min=0.5)
         locator.output = out_path
 
-    class_frames = locator.locate(map_output=probabilities)
+    print("make shared")
+    from multiprocessing import Manager
+
+    ## Maybe create the shared memory object before passing it to locate, in that way the original object can be deleted.
+    import ctypes
+    manager = Manager()
+    map = manager.Value(ctypes.py_object, map).value
+    #del map_output
+
+    class_frames = locator.locate(map_output=map)
     size_dict=None
 
     if conf.boxsize is None:
@@ -437,11 +449,7 @@ def run(ui: LocateUI):
         if len(class_frame)==0:
             print("No particles for class", class_frame.attrs['name'])
             continue
-        class_name = np.unique(class_frame["predicted_class_name"])
-        if len(class_name)>1:
-            print("More than one class name predicted? Quit")
-            sys.exit(1)
-        class_name=class_name[0]
+        class_name = class_frame.attrs["name"]
         before_nms = len(class_frame)
         if size_dict is not None:
             size = size_dict[class_name]
@@ -455,8 +463,8 @@ def run(ui: LocateUI):
     located_particles = pd.concat(class_frames)
 
     # Add meta information from previous step
-    for meta_key in probabilities.attrs:
-        located_particles.attrs[meta_key] = probabilities.attrs[meta_key]
+    for meta_key in map.attrs:
+        located_particles.attrs[meta_key] = map.attrs[meta_key]
 
     located_particles.to_pickle(os.path.join(out_path, f"located.tloc"))
 

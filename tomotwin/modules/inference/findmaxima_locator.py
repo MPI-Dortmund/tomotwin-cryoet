@@ -407,7 +407,6 @@ class FindMaximaLocator(Locator):
         target_class: int,
         stride : Tuple[int],
         window_size: int,
-        use_p: bool = False
     ) -> Tuple[np.array, np.array]:
         # Convert to volume:
         half_bs = (window_size - 1) / 2
@@ -422,19 +421,17 @@ class FindMaximaLocator(Locator):
         vol = np.zeros(shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1))
         # This volumes contains the corresponding row index in the input data frame for each coordinate
         index_vol = np.zeros(
-            shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1), dtype=int
+            shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1), dtype=np.int32
         )
 
         # Fill the array
-        if use_p:
-            vals = df[f"p_class_{int(target_class)}"].values
-        else:
-            vals = df[f"d_class_{int(target_class)}"].values
+        vals = df[f"d_class_{int(target_class)}"].values
+
         vol[(x_val, y_val, z_val)] = vals
 
         # Fill index array
         index_vol[(x_val, y_val, z_val)] = np.arange(len(vals))
-
+        vol = vol.astype(np.float16)
         return vol, index_vol
 
     @staticmethod
@@ -443,9 +440,7 @@ class FindMaximaLocator(Locator):
         df: pd.DataFrame,
         index_vol: np.array,
         target: int,
-        class_name: str,
     ) -> pd.DataFrame:
-        df = df.copy()
         selected_rows = []
         sizes = []
         region_best = []
@@ -457,7 +452,6 @@ class FindMaximaLocator(Locator):
                     int(np.round(maxima[1])),
                     int(np.round(maxima[2])),
                 ]
-                # if df.iloc[row_index]["predicted_class"] == target:
                 selected_rows.append(row_index)
                 sizes.append(size)
                 region_best.append(max_val)
@@ -471,49 +465,51 @@ class FindMaximaLocator(Locator):
                         int(np.round(maxima[2])),
                     ),
                 )
-
         selected_df = df.iloc[selected_rows].copy()
         selected_df["size"] = sizes
         selected_df["metric_best"] = region_best
         selected_df["predicted_class"] = target
-        selected_df["predicted_class_name"] = class_name
         selected_df = selected_df[
             [
                 "X",
                 "Y",
                 "Z",
-                "filename",
                 "predicted_class",
-                "predicted_class_name",
                 "size",
                 "metric_best",
             ]
         ]
+        selected_df["predicted_class"] = selected_df["predicted_class"].astype(np.int8)
+        selected_df["size"] = selected_df["size"].astype(np.uint16)
+        selected_df["metric_best"] = selected_df["metric_best"].astype(np.float16)
         return selected_df
 
     @staticmethod
     def apply_findmax(map_output: pd.DataFrame,
                       class_id: int,
-                      class_name: str,
                       window_size: int,
                       stride: Tuple[int],
                       tolerance: float,
                       global_min: float,
-
+                      **kwargs
                       ) -> (pd.DataFrame, np.array):
-        df_particles = map_output
-        vol, index_vol = FindMaximaLocator.to_volume(df_particles, target_class=class_id, window_size=window_size, stride=stride)
+        print("Apply findmax")
+        vol, index_vol = FindMaximaLocator.to_volume(map_output, target_class=class_id, window_size=window_size, stride=stride)
+        maximas, _ = find_maxima(vol, tolerance, global_min=global_min,tqdm_pos=kwargs.get("tqdm_pos"))
+        del _
 
-        maximas, _ = find_maxima(vol, tolerance, global_min=global_min)
+        print("max found")
 
-        maximas_filtered = [
+        maximas = [
             m for m in maximas if m[1] > 1
         ]  # more than one pixel coordinate must be involved.
-
         particle_df = FindMaximaLocator.maxima_to_df(
-            maximas_filtered, df_particles, index_vol, class_id, class_name
+            maximas, map_output, index_vol, class_id
         )
-        particle_df.attrs["name"] = class_name
+        del index_vol
+        print("Done")
+        print("particle",particle_df.dtypes)
+
 
         return particle_df, vol
 
@@ -528,15 +524,17 @@ class FindMaximaLocator(Locator):
                      stride: Tuple[int],
                      tolerance: float,
                      global_min: float,
-                     output: str) -> pd.DataFrame:
+                     output: str
+                     ) -> pd.DataFrame:
+        #print("Run findmax")
         particle_df, vol = FindMaximaLocator.apply_findmax(map_output=df_particles,
                                                            class_id=class_id,
-                                                           class_name=class_name,
                                                            window_size=window_size,
                                                            stride=stride,
                                                            tolerance=tolerance,
-                                                           global_min=global_min)
-
+                                                           global_min=global_min,
+                                                           tqdm_pos=class_id)
+        #print("Done")
         if output is not None:
             with mrcfile.new(
                     os.path.join(output, class_name + ".mrc"), overwrite=True
@@ -544,29 +542,30 @@ class FindMaximaLocator(Locator):
                 vol = vol.astype(np.float32)
                 vol = vol.swapaxes(0, 2)
                 mrc.set_data(vol)
-        print("Located", class_name, len(particle_df))
+        particle_df.attrs["name"] = class_name
+        #print("Done")
         return particle_df.copy(deep=True)
 
 
 
 
     def locate(self, map_output: pd.DataFrame) -> List[pd.DataFrame]:
-
+        print("Start locate")
         particles_dataframes = []
 
-        df_particles = map_output
+
         unique_classes = map_output.attrs["references"]
+
 
         from concurrent.futures import ProcessPoolExecutor as Pool
         from itertools import repeat
-
+        print("start pool")
         with Pool() as pool:
-
             df_classes = pool.map(
                 FindMaximaLocator.locate_class,
                 list(range(len(unique_classes))),
                 unique_classes,
-                repeat(df_particles),
+                repeat(map_output),
                 repeat(self.window_size),
                 repeat(self.stride),
                 repeat(self.tolerance),
@@ -574,7 +573,9 @@ class FindMaximaLocator(Locator):
                 repeat(self.output)
             )
 
-        for df in df_classes:
+        print("Pool done")
+        for df_i, df in enumerate(df_classes):
+            print("Located", df.attrs["name"], len(df))
             particles_dataframes.append(df)
-
+        print("Return")
         return particles_dataframes

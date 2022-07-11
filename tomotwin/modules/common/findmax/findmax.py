@@ -459,7 +459,7 @@ def get_avg_pos(classes: int, regions: np.array, region_max_value: List, image: 
         maxima_coords.append((p, len(coords[0]), reg_max))  # region_max_value[cl-1]))
     return maxima_coords
 
-def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5) -> tuple[list, np.array]:
+def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5, **kwargs) -> tuple[list, np.array]:
 
     """
     :param volume: 3D volume
@@ -510,13 +510,14 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5) -> 
         print("Dimension > 3 not supported!")
 
     local_maxima = skim.local_maxima(image, indices=True, allow_borders=False)
+
     max_sorted = np.argsort(-1 * image[local_maxima])
 
     # Start flood filling
     coords_sorted = [
         tuple([arr[max_index] for arr in local_maxima]) for max_index in max_sorted
     ]
-
+    del max_sorted
     if global_min == None:
         global_min = np.min(image) + tolerance
         print("effective global min:", global_min)
@@ -544,7 +545,8 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5) -> 
     region_max_pos = []
     region_max_value = []
     working_image_raveled = working_image.ravel(order)
-    for idx, seed_point in enumerate(coords_sorted):
+
+    for seed_point in coords_sorted:
         try:
             iter(seed_point)
         except TypeError:
@@ -580,7 +582,10 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5) -> 
         regions[tmp_flags.astype(bool)] = k
         region_max_pos.append(seed_point)
         region_max_value.append(seed_value)
+    image = volume.astype(np.float16)
 
+    #Average positions
+    print("AVG")
     regions = regions[output_slice]
 
     num_cores = multiprocessing.cpu_count()
@@ -594,6 +599,7 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5) -> 
     import itertools
 
     maxima_coords = list(itertools.chain.from_iterable(maxima_coords))
-
+    from sys import getsizeof
+    print("Size", getsizeof(maxima_coords))
 
     return maxima_coords, regions
