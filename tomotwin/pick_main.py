@@ -503,13 +503,14 @@ def run(ui: PickUI) -> None:
 
     # Get picks for target reference
     locate_results = pd.read_pickle(conf.locate_results_path)
+    print()
     print("Found the following references:")
-    referenes = np.unique(locate_results["predicted_class_name"])
-    for ref in referenes:
+    references = locate_results.attrs['references']
+    for ref in references:
         print(f"  - {ref}")
 
     if conf.target_reference is None:
-        targets = np.unique(locate_results["predicted_class_name"])
+        targets = references
     else:
         targets = conf.target_reference
     print("Filtering:")
@@ -517,10 +518,11 @@ def run(ui: PickUI) -> None:
         print(f"  - {target}")
 
     for target in targets:
-        if target not in referenes:
+        if target not in references:
             print(f"Target {target} is not a known reference. Skip")
             continue
-        selection_target = target == locate_results["predicted_class_name"]
+
+        selection_target = references.index(target) == locate_results["predicted_class"]
         locate_results_target = locate_results[selection_target]
 
         locate_results_target = filter_results(locate_results_target, conf)
