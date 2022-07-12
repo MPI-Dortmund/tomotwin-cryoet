@@ -384,7 +384,6 @@ class LocateMode(Enum):
     """
     Enumeration of embedding modes
     """
-    SIMPLE = auto()
     FINDMAX = auto()
 
 @dataclass
@@ -403,6 +402,7 @@ class LocateConfiguration:
     tolerance: float
     boxsize: Union[str,int]
     mode: LocateMode
+    global_min: float
 
 class LocateUI(ABC):
     """Interface to define"""

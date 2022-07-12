@@ -390,6 +390,7 @@ class LocateArgParseUI(LocateUI):
         self.tolerance = None
         self.boxsize = None
         self.mode = None
+        self.global_min = None
 
     def run(self, args=None) -> None:
         parser = self.create_parser()
@@ -401,6 +402,7 @@ class LocateArgParseUI(LocateUI):
             self.output_path = args.output
             self.boxsize = args.boxsize
             self.mode = LocateMode.FINDMAX
+            self.global_min = args.global_min
 
 
 
@@ -411,7 +413,8 @@ class LocateArgParseUI(LocateUI):
             output_path=self.output_path,
             mode=self.mode,
             boxsize=self.boxsize,
-            tolerance=self.tolerance
+            tolerance=self.tolerancem,
+            global_min=self.global_min,
         )
         return conf
 
@@ -445,6 +448,14 @@ class LocateArgParseUI(LocateUI):
             "--boxsize",
             default=37,
             help="Provide the box size you want to use for picking or a json file with reference_filename as keys and box sizes as values.",
+        )
+
+        parser.add_argument(
+            "-g",
+            "--global_min",
+            type=float,
+            default=0.5,
+            help="Global minimum of the find max procedure. Maximums below value will be ignored. Higher values give faster runtime.",
         )
 
     def create_parser(self) -> argparse.ArgumentParser:
