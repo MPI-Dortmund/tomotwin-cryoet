@@ -413,7 +413,7 @@ class LocateArgParseUI(LocateUI):
             output_path=self.output_path,
             mode=self.mode,
             boxsize=self.boxsize,
-            tolerance=self.tolerancem,
+            tolerance=self.tolerance,
             global_min=self.global_min,
         )
         return conf

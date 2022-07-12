@@ -435,7 +435,7 @@ def run(ui: LocateUI):
         locator = FindMaximaLocator(tolerance=conf.tolerance,
                                     stride=stride,
                                     window_size=window_size,
-                                    global_min=0.5)
+                                    global_min=conf.global_min)
         locator.output = out_path
 
     sub_dfs = extract_subclass_df(map)
