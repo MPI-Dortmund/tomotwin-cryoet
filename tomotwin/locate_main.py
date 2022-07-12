@@ -441,11 +441,11 @@ def run(ui: LocateUI):
     sub_dfs = extract_subclass_df(map)
     map_attrs = map.attrs
     del map
-    from concurrent.futures import ProcessPoolExecutor as Pool
 
+    from concurrent.futures import ProcessPoolExecutor as Pool
     with Pool(4) as pool:
         class_frames = list(pool.map(locator.locate,sub_dfs))
-    #class_frames = locator.locate(maps=sub_dfs)
+
     size_dict=None
 
     if conf.boxsize is None:
