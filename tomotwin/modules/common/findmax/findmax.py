@@ -385,7 +385,6 @@ except ImportError:
         return inner
 import numpy as np
 np.set_printoptions(suppress=True, linewidth=1000)
-import tqdm
 import skimage.morphology as skim
 from skimage.morphology._util import (
     _offsets_to_raveled_neighbors,
@@ -394,7 +393,6 @@ from skimage.morphology._util import (
 )
 from typing import List
 import multiprocessing
-from multiprocessing import Pool
 from functools import partial
 
 
@@ -431,22 +429,24 @@ def _fill_threshold(
                 return False
     return True
 
-def get_avg_pos(classes: int, regions: np.array, region_max_value: List, image: np.array):
+def get_avg_pos(classes: List[int], regions: np.array, region_max_value: List, image: np.array):
     maxima_coords = []
     for cl in classes:
-        coords = np.where(regions == cl)
-        weights = image[coords]
-
-        reg_max = region_max_value[cl - 1]  # np.max(weights)
-        if len(weights) == 0:
+       # coords =
+        coords = tuple([c.astype(np.int16) for c in np.where(regions == cl)])
+        if len(coords[0]) == 0:
             pass
+
+        weights = image[coords]
+        reg_max = region_max_value[cl - 1]  # np.max(weights)
+
 
         # weights = np.exp(2 * weights) - np.exp(-2)
         # weights = softmax(weights)
         try:
             avgs = []
             for c in coords:
-                avg = np.average(c)  # , weights=weights)
+                avg = np.average(c.astype(np.float16))  # , weights=weights)
                 avgs.append(avg)
         except ZeroDivisionError:
             print("Zero devision. Pass this entry. Some dbug infos:")
@@ -520,7 +520,12 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5, **k
     del max_sorted
     if global_min == None:
         global_min = np.min(image) + tolerance
-        print("effective global min:", global_min)
+    #fltimg = image.flatten()
+    #global_min = np.min(fltimg[np.argpartition(fltimg, -100)[-100:]]) - tolerance
+    #del fltimg
+    print("effective global min:", global_min)
+
+
 
     footprint = None
     connectivity = None
@@ -542,7 +547,6 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5, **k
         min_value = np.iinfo(working_image.dtype).min
 
     k = 0
-    region_max_pos = []
     region_max_value = []
     working_image_raveled = working_image.ravel(order)
 
@@ -580,26 +584,21 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5, **k
 
         k = k + 1
         regions[tmp_flags.astype(bool)] = k
-        region_max_pos.append(seed_point)
-        region_max_value.append(seed_value)
+        region_max_value.append(np.float16(seed_value))
     image = volume.astype(np.float16)
 
     #Average positions
-    print("AVG")
     regions = regions[output_slice]
 
     num_cores = multiprocessing.cpu_count()
     region_list = list(range(1, k + 1))
     chunked_arrays = np.array_split(region_list, num_cores)
     from concurrent.futures import ProcessPoolExecutor as Pool
-    with Pool() as pool:
+    with Pool(multiprocessing.cpu_count()//2) as pool:
         maxima_coords = pool.map(partial(get_avg_pos, regions=regions, region_max_value=region_max_value, image=image),
                      chunked_arrays)
         #maxima_coords = pool.map(get_avg_pos, repeat(regions), repeat(region_max_value), repeat(image), chunked_arrays)
     import itertools
-
     maxima_coords = list(itertools.chain.from_iterable(maxima_coords))
-    from sys import getsizeof
-    print("Size", getsizeof(maxima_coords))
 
     return maxima_coords, regions

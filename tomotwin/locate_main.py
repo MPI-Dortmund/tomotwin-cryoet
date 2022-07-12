@@ -379,6 +379,7 @@ import os
 import sys
 
 import numpy as np
+from typing import List
 import pandas as pd
 
 from tomotwin.modules.inference.locate_ui import LocateUI, LocateMode
@@ -387,13 +388,28 @@ from tomotwin.modules.inference.findmaxima_locator import FindMaximaLocator
 from tomotwin.modules.inference.locator import Locator
 
 
-def readprobs(path):
+def readprobs(path: str) -> pd.DataFrame:
     if path.endswith(".txt"):
-        return pd.read_csv(path)
+        df_map = pd.read_csv(path)
     elif path.endswith(".pkl") or path.endswith(".tmap"):
-        return pd.read_pickle(path)
+        df_map = pd.read_pickle(path)
+
     else:
         print("Format not implemented")
+        return None
+    if 'filename' in df_map.columns:
+        df_map.drop(columns=["filename"], inplace=True)
+    return df_map
+
+
+def extract_subclass_df(map: pd.DataFrame) -> List[pd.DataFrame]:
+    sub_dfs = []
+    for i in range(len(map.attrs['references'])):
+        sub = map[['X', 'Y', 'Z', f"d_class_{i}"]]
+        sub.attrs["ref_name"] = map.attrs['references'][i]
+        sub.attrs["ref_index"] = i
+        sub_dfs.append(sub)
+    return sub_dfs
 
 def run(ui: LocateUI):
     ui.run()
@@ -401,10 +417,8 @@ def run(ui: LocateUI):
     out_path = conf.output_path
     os.makedirs(out_path, exist_ok=True)
     map = readprobs(conf.map_path)
-    print(map.dtypes)
-    print(map.shape)
-    if 'filname' in map.columns:
-        map.drop(columns=["filename"],inplace=True)
+
+
     if conf.mode == LocateMode.FINDMAX:
         if "stride" in map.attrs:
             stride = map.attrs["stride"]
@@ -418,24 +432,24 @@ def run(ui: LocateUI):
         else:
             raise ValueError("Window size unknown. Stop.")
 
-        locator = FindMaximaLocator(tolerance=conf.tolerance, stride=stride, window_size=window_size, global_min=0.5)
+        locator = FindMaximaLocator(tolerance=conf.tolerance,
+                                    stride=stride,
+                                    window_size=window_size,
+                                    global_min=0.5)
         locator.output = out_path
 
-    print("make shared")
-    from multiprocessing import Manager
+    sub_dfs = extract_subclass_df(map)
+    map_attrs = map.attrs
+    del map
+    from concurrent.futures import ProcessPoolExecutor as Pool
 
-    ## Maybe create the shared memory object before passing it to locate, in that way the original object can be deleted.
-    import ctypes
-    manager = Manager()
-    map = manager.Value(ctypes.py_object, map).value
-    #del map_output
-
-    class_frames = locator.locate(map_output=map)
+    with Pool(4) as pool:
+        class_frames = list(pool.map(locator.locate,sub_dfs))
+    #class_frames = locator.locate(maps=sub_dfs)
     size_dict=None
 
     if conf.boxsize is None:
         conf.boxsize = window_size
-
     try:
         conf.boxsize = int(conf.boxsize)
     except ValueError:
@@ -463,8 +477,8 @@ def run(ui: LocateUI):
     located_particles = pd.concat(class_frames)
 
     # Add meta information from previous step
-    for meta_key in map.attrs:
-        located_particles.attrs[meta_key] = map.attrs[meta_key]
+    for meta_key in map_attrs:
+        located_particles.attrs[meta_key] = map_attrs[meta_key]
 
     located_particles.to_pickle(os.path.join(out_path, f"located.tloc"))
 

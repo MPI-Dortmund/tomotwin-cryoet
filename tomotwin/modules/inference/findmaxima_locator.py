@@ -421,7 +421,7 @@ class FindMaximaLocator(Locator):
         vol = np.zeros(shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1))
         # This volumes contains the corresponding row index in the input data frame for each coordinate
         index_vol = np.zeros(
-            shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1), dtype=np.int32
+            shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1), dtype=np.uint16
         )
 
         # Fill the array
@@ -493,12 +493,10 @@ class FindMaximaLocator(Locator):
                       global_min: float,
                       **kwargs
                       ) -> (pd.DataFrame, np.array):
-        print("Apply findmax")
+
         vol, index_vol = FindMaximaLocator.to_volume(map_output, target_class=class_id, window_size=window_size, stride=stride)
         maximas, _ = find_maxima(vol, tolerance, global_min=global_min,tqdm_pos=kwargs.get("tqdm_pos"))
         del _
-
-        print("max found")
 
         maximas = [
             m for m in maximas if m[1] > 1
@@ -507,8 +505,7 @@ class FindMaximaLocator(Locator):
             maximas, map_output, index_vol, class_id
         )
         del index_vol
-        print("Done")
-        print("particle",particle_df.dtypes)
+
 
 
         return particle_df, vol
@@ -517,16 +514,13 @@ class FindMaximaLocator(Locator):
 
     @staticmethod
     def locate_class(class_id,
-                     class_name,
-                     df_particles:
-                     pd.DataFrame,
+                     df_particles: pd.DataFrame,
                      window_size: int,
                      stride: Tuple[int],
                      tolerance: float,
                      global_min: float,
                      output: str
                      ) -> pd.DataFrame:
-        #print("Run findmax")
         particle_df, vol = FindMaximaLocator.apply_findmax(map_output=df_particles,
                                                            class_id=class_id,
                                                            window_size=window_size,
@@ -537,45 +531,20 @@ class FindMaximaLocator(Locator):
         #print("Done")
         if output is not None:
             with mrcfile.new(
-                    os.path.join(output, class_name + ".mrc"), overwrite=True
+                    os.path.join(output, df_particles.attrs['ref_name'] + ".mrc"), overwrite=True
             ) as mrc:
                 vol = vol.astype(np.float32)
                 vol = vol.swapaxes(0, 2)
                 mrc.set_data(vol)
-        particle_df.attrs["name"] = class_name
+
         #print("Done")
         return particle_df.copy(deep=True)
 
 
+    def locate(self, map: pd.DataFrame) -> pd.DataFrame:
 
-
-    def locate(self, map_output: pd.DataFrame) -> List[pd.DataFrame]:
-        print("Start locate")
-        particles_dataframes = []
-
-
-        unique_classes = map_output.attrs["references"]
-
-
-        from concurrent.futures import ProcessPoolExecutor as Pool
-        from itertools import repeat
-        print("start pool")
-        with Pool() as pool:
-            df_classes = pool.map(
-                FindMaximaLocator.locate_class,
-                list(range(len(unique_classes))),
-                unique_classes,
-                repeat(map_output),
-                repeat(self.window_size),
-                repeat(self.stride),
-                repeat(self.tolerance),
-                repeat(self.global_min),
-                repeat(self.output)
-            )
-
-        print("Pool done")
-        for df_i, df in enumerate(df_classes):
-            print("Located", df.attrs["name"], len(df))
-            particles_dataframes.append(df)
-        print("Return")
-        return particles_dataframes
+        print("start locate ", map.attrs['ref_name'])
+        df_class = FindMaximaLocator.locate_class(map.attrs['ref_index'], map, self.window_size, self.stride, self.tolerance, self.global_min, self.output)
+        df_class.attrs["name"] = map.attrs['ref_name']
+        print("Located", df_class.attrs["name"], len(df_class))
+        return df_class
