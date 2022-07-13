@@ -421,7 +421,7 @@ class FindMaximaLocator(Locator):
         vol = np.zeros(shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1))
         # This volumes contains the corresponding row index in the input data frame for each coordinate
         index_vol = np.zeros(
-            shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1), dtype=np.uint16
+            shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1), dtype=np.int32
         )
 
         # Fill the array
@@ -444,6 +444,7 @@ class FindMaximaLocator(Locator):
         selected_rows = []
         sizes = []
         region_best = []
+
         for maxima, size, max_val in maximas:
 
             try:
@@ -455,6 +456,8 @@ class FindMaximaLocator(Locator):
                 selected_rows.append(row_index)
                 sizes.append(size)
                 region_best.append(max_val)
+                #print(row_index, "", maxima[0], maxima[1], maxima[2])
+                #print(df.iloc[row_index])
             except IndexError:
                 print(
                     "Index error for",
@@ -465,6 +468,7 @@ class FindMaximaLocator(Locator):
                         int(np.round(maxima[2])),
                     ),
                 )
+
         selected_df = df.iloc[selected_rows].copy()
         selected_df["size"] = sizes
         selected_df["metric_best"] = region_best
@@ -495,6 +499,7 @@ class FindMaximaLocator(Locator):
                       ) -> (pd.DataFrame, np.array):
 
         vol, index_vol = FindMaximaLocator.to_volume(map_output, target_class=class_id, window_size=window_size, stride=stride)
+
         maximas, _ = find_maxima(vol, tolerance, global_min=global_min,tqdm_pos=kwargs.get("tqdm_pos"))
         del _
 
