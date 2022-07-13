@@ -382,6 +382,8 @@ import os
 import numpy as np
 from pyStarDB import sp_pystardb as star
 
+class InvalidLocateResults(Exception):
+    ...
 
 def write_cbox(coordinates: pd.DataFrame, boxsize: int, path : str) -> None:
     '''
@@ -479,17 +481,19 @@ def write_results(locate_results: pd.DataFrame, output_path: str, target: str) -
     :param output_path: Path where to write results
     :param target: Target name
     '''
-    os.makedirs(output_path,exist_ok=True)
 
-    #locate_results[["X", "Y", "Z"]].to_csv(os.path.join(output_path, f"{target}.coords"), index=False, header=None,
-    #                                    sep=" ")
+    if len(locate_results)==0:
+        raise InvalidLocateResults("Locate results are empty")
+
     write_coords(locate_results, os.path.join(output_path, f"{target}.coords"))
     if "width" not in locate_results:
         print("'width' column is missing in locate results. Use default box size of 37")
         size = 37
     else:
         size = np.unique(locate_results["width"])[0]
+    os.makedirs(output_path, exist_ok=True)
     write_cbox(locate_results, size, os.path.join(output_path, f"{target}.cbox"))
+
 
 
 def run(ui: PickUI) -> None:
@@ -527,7 +531,10 @@ def run(ui: PickUI) -> None:
 
         locate_results_target = filter_results(locate_results_target, conf)
         print(f"Target: {target} - Write {len(locate_results_target)} positions to disk.")
-        write_results(locate_results_target,conf.output_path, target=target)
+        try:
+            write_results(locate_results_target,conf.output_path, target=target)
+        except InvalidLocateResults:
+            print("Skip.")
 
 
 def _main_():
