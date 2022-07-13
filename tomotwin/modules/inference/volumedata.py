@@ -424,7 +424,7 @@ class SlidingWindowVolumeData(VolumeDataset):
     Represents a volume datset that came from a sliding window.
     """
 
-    def __init__(self, volumes: np.array, stride: Tuple, boxsize: int, zrange: Tuple[int] = None):
+    def __init__(self, volumes: np.array, stride: Tuple, boxsize: int, zrange: Tuple[int, int] = None):
         """
         :param volumes: array with shape (X,Y,Z,BS,BS,BS), where was BS is the box size and X,Y,Z relate
         to the position of the subvolume.
@@ -439,14 +439,14 @@ class SlidingWindowVolumeData(VolumeDataset):
         self.indicies = {}
 
 
-        if not zrange:
-            zrange = range(volumes.shape[0])
-        self.indicies = np.array(list(itertools.product(zrange, range(volumes.shape[1]),range(volumes.shape[2]))))
+        self.indicies = np.array(list(itertools.product(range(volumes.shape[0]), range(volumes.shape[1]),range(volumes.shape[2]))))
         self.center_coords = self.indicies * self.stride + (self.boxsize-1)/2
+        if zrange:
+            self.center_coords[:,0] = zrange[0] + self.center_coords[:,0]
 
 
     def __len__(self) -> int:
-        return self.volumes.shape[0] * self.volumes.shape[1] * self.volumes.shape[2]
+        return len(self.center_coords)
 
     def __getitem__(self, itemindex) -> np.array:
         location = self.indicies[itemindex]

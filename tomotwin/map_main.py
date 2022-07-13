@@ -386,15 +386,16 @@ from tomotwin.modules.common.distances import DistanceManager
 import os
 from pandas.api.types import is_numeric_dtype
 
+class FormatNotImplemented(Exception):
+    ...
 
 def read_embeddings(path):
     if path.endswith(".txt"):
         df = pd.read_csv(path)
-    elif path.endswith((".pkl", ".temb")):
+    elif path.endswith((".pkl",".temb")):
         df = pd.read_pickle(path)
     else:
-        print("Format not implemented")
-        return None
+        raise FormatNotImplemented()
     dtypes = {}
     cols = df.columns
     for col_index, t in enumerate(df.dtypes):

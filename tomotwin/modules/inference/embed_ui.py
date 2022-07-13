@@ -377,7 +377,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List
+from typing import List, Tuple
 from enum import Enum, auto
 
 
@@ -408,6 +408,7 @@ class EmbedConfiguration:
     batchsize: int
     window_size: bool = None
     stride: int = None
+    zrange: Tuple[int,int] = None
 
 
 class EmbedUI(ABC):

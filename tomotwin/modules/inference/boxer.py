@@ -390,13 +390,15 @@ class Boxer(ABC):
     def box(self, tomogram: NDArray) -> SlidingWindowVolumeData:
         """Transforms tomogram into a set of boxes. Returns an array of arrays (boxes)"""
 
+class InvalidZRangeConfiguration(Exception):
+    ...
 
 class SlidingWindowBoxer(Boxer):
     """
     Sliding window boxer
     """
 
-    def __init__(self, box_size: int, stride: Union[int, Tuple]):
+    def __init__(self, box_size: int, stride: Union[int, Tuple], zrange: Tuple[int,int] = None):
         self.box_size = box_size
         self.stride = stride
         if isinstance(self.stride,int):
@@ -407,23 +409,36 @@ class SlidingWindowBoxer(Boxer):
             self._stride_x, self._stride_y, self._stride_z = stride
 
         self.center_coords = None
+        self.zrange = zrange
+
+
 
     def box(self, tomogram: NDArray) -> SlidingWindowVolumeData:
         """
         Transforms tomogram into a set of boxes
         """
+        if self.zrange:
+            if self.zrange[0] < 0 or (self.zrange[0] >= self.zrange[1]) or self.zrange[1] > tomogram.shape[0]:
+                raise InvalidZRangeConfiguration()
+
+            tomogram = tomogram[self.zrange[0]:self.zrange[1]]
 
         window_shape = (self.box_size, self.box_size, self.box_size)
         sliding_window_views = tricks.sliding_window_view(
             tomogram, window_shape=window_shape
         )
 
+
+
         sliding_window_strides = sliding_window_views[
-            :: self._stride_z, :: self._stride_y, :: self._stride_x
+            ::self._stride_z, :: self._stride_y, :: self._stride_x
         ]
 
         data = SlidingWindowVolumeData(
-            volumes=sliding_window_strides, boxsize=self.box_size, stride=(self._stride_x,self._stride_y,self._stride_z)
+            volumes=sliding_window_strides,
+            boxsize=self.box_size,
+            stride=(self._stride_x,self._stride_y,self._stride_z),
+            zrange=self.zrange
         )
 
         return data

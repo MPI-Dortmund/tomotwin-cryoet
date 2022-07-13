@@ -428,10 +428,17 @@ def _main_():
 
 
     if conf.mode == EmbedMode.TOMO:
-        tomo = -1*io.read_mrc(conf.volumes_path)
+        tomo = -1*io.read_mrc(conf.volumes_path) # -1 to invert the contrast
+        if conf.zrange:
+            hb = int((conf.window_size - 1) // 2)
+            minz = max(0,conf.zrange[0] - hb)
+            maxz = min(conf.zrange[1] + hb, tomo.shape[0])
+            conf.zrange = (minz, maxz)  # here we need to take make sure that the box size is subtracted etc.
+
         boxer = SlidingWindowBoxer(
             box_size=conf.window_size,
             stride=conf.stride,
+            zrange=conf.zrange
         )
         embeddings = sliding_window_embedding(tomo=tomo, boxer=boxer, embedor=embedor)
 
