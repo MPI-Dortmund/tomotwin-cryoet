@@ -428,7 +428,7 @@ def _main_():
 
 
     if conf.mode == EmbedMode.TOMO:
-        tomo = -1*io.read_mrc(conf.volumes_path)
+        tomo = -1*io.read_mrc(conf.volumes_path) # -1 to invert the contrast
         boxer = SlidingWindowBoxer(
             box_size=conf.window_size,
             stride=conf.stride,
