@@ -410,35 +410,35 @@ class SlidingWindowBoxer(Boxer):
 
         self.center_coords = None
         hb = int((self.box_size-1)//2)
-        self.zrange = (220-hb,260+hb) # here we need to take make sure that the box size is subtracted etc.
+        self.zrange = None#(100-hb,160+hb) # here we need to take make sure that the box size is subtracted etc.
 
 
     def box(self, tomogram: NDArray) -> SlidingWindowVolumeData:
         """
         Transforms tomogram into a set of boxes
         """
+        if self.zrange:
+            if self.zrange[0] < 0 or (self.zrange[0] >= self.zrange[1]) or self.zrange[1] > tomogram.shape[0]:
+                raise InvalidZRangeConfiguration()
+
+            tomogram = tomogram[self.zrange[0]:self.zrange[1]]
 
         window_shape = (self.box_size, self.box_size, self.box_size)
         sliding_window_views = tricks.sliding_window_view(
             tomogram, window_shape=window_shape
         )
-        minz = 0
-        maxz = tomogram.shape[0]
-        if self.zrange:
-            if self.zrange[0] < 0 or (self.zrange[0] >= self.zrange[1]) or self.zrange[1] > tomogram.shape[0]:
-                raise InvalidZRangeConfiguration()
-            minz = self.zrange[0]
-            maxz = self.zrange[1]
+
+
 
         sliding_window_strides = sliding_window_views[
-            minz:maxz:self._stride_z, :: self._stride_y, :: self._stride_x
+            ::self._stride_z, :: self._stride_y, :: self._stride_x
         ]
 
         data = SlidingWindowVolumeData(
             volumes=sliding_window_strides,
             boxsize=self.box_size,
             stride=(self._stride_x,self._stride_y,self._stride_z),
-            zrange=(minz,maxz)
+            zrange=self.zrange
         )
 
         return data
