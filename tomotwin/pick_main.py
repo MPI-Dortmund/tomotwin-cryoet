@@ -484,14 +484,14 @@ def write_results(locate_results: pd.DataFrame, output_path: str, target: str) -
 
     if len(locate_results)==0:
         raise InvalidLocateResults("Locate results are empty")
-
+    os.makedirs(output_path, exist_ok=True)
     write_coords(locate_results, os.path.join(output_path, f"{target}.coords"))
     if "width" not in locate_results:
         print("'width' column is missing in locate results. Use default box size of 37")
         size = 37
     else:
         size = np.unique(locate_results["width"])[0]
-    os.makedirs(output_path, exist_ok=True)
+
     write_cbox(locate_results, size, os.path.join(output_path, f"{target}.cbox"))
 
 
