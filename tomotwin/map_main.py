@@ -392,6 +392,8 @@ def read_embeddings(path):
         df = pd.read_csv(path)
     elif path.endswith(".pkl"):
         df = pd.read_pickle(path)
+    elif path.endswith(".temb"):
+        df = pd.read_pickle(path)
     else:
         print("Format not implemented")
         return None
