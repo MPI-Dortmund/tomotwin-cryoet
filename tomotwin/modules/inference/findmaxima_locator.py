@@ -421,7 +421,7 @@ class FindMaximaLocator(Locator):
         vol = np.zeros(shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1))
         # This volumes contains the corresponding row index in the input data frame for each coordinate
         index_vol = np.zeros(
-            shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1), dtype=np.uint16
+            shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1), dtype=np.int32
         )
 
         # Fill the array
