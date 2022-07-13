@@ -398,7 +398,7 @@ class SlidingWindowBoxer(Boxer):
     Sliding window boxer
     """
 
-    def __init__(self, box_size: int, stride: Union[int, Tuple]):
+    def __init__(self, box_size: int, stride: Union[int, Tuple], zrange: Tuple[int,int] = None):
         self.box_size = box_size
         self.stride = stride
         if isinstance(self.stride,int):
@@ -409,8 +409,8 @@ class SlidingWindowBoxer(Boxer):
             self._stride_x, self._stride_y, self._stride_z = stride
 
         self.center_coords = None
-        hb = int((self.box_size-1)//2)
-        self.zrange = None#(100-hb,160+hb) # here we need to take make sure that the box size is subtracted etc.
+        self.zrange = zrange
+
 
 
     def box(self, tomogram: NDArray) -> SlidingWindowVolumeData:

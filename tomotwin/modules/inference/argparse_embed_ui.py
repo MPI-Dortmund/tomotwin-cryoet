@@ -394,6 +394,7 @@ class EmbedArgParseUI(EmbedUI):
         self.window_size = None
         self.stride = None
         self.mode = None
+        self.zrange = None
 
     def run(self, args=None) -> None:
         parser = self.create_parser()
@@ -412,6 +413,7 @@ class EmbedArgParseUI(EmbedUI):
             self.mode = EmbedMode.TOMO
             self.window_size = args.windowsize
             self.stride = args.stride
+            self.zrange = args.zrange
             if len(self.stride) == 1:
                 self.stride = self.stride*3
 
@@ -424,6 +426,7 @@ class EmbedArgParseUI(EmbedUI):
             batchsize=self.batchsize,
             window_size=self.window_size,
             stride=self.stride,
+            zrange=self.zrange
         )
         return conf
 
@@ -521,6 +524,15 @@ class EmbedArgParseUI(EmbedUI):
             default=[2],
             nargs='+',
             help="Stride of the sliding window. Either an integer or a tuple of 3 numbers representing the slides in x,y,z",
+        )
+
+        parser.add_argument(
+            "-z",
+            "--zrange",
+            type=int,
+            default=None,
+            nargs=2,
+            help="Minimum z and maximum z for to run the sliding window on. Handy to skip the void volume in order to speed up the embedding.",
         )
 
     def create_parser(self) -> argparse.ArgumentParser:

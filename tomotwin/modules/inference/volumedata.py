@@ -443,8 +443,6 @@ class SlidingWindowVolumeData(VolumeDataset):
         self.center_coords = self.indicies * self.stride + (self.boxsize-1)/2
         if zrange:
             self.center_coords[:,0] = zrange[0] + self.center_coords[:,0]
-        print("SHAPE", self.center_coords.shape)
-        print(self.center_coords)
 
 
     def __len__(self) -> int:
