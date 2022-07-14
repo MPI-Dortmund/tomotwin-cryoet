@@ -336,22 +336,32 @@ class LocateOptimEvaluator():
 
     def get_stats(self, df, positions):
         #label_filename()
-        class_name = os.path.splitext(np.unique(df["predicted_class_name"])[0])[0]
+
+        refs = df.attrs['references']
+        pc = df['predicted_class'].iloc[0]
+        class_name = os.path.splitext(refs[pc])[0]
         class_name = label_filename(class_name)
+
         pos_classes = np.array([cl.upper() for cl in positions["class"]])
         class_positions = positions[pos_classes == class_name.upper()]
         class_positions = class_positions[["X", "Y", "Z", "width", "height", "depth"]]
         # locate_results.columns = [["X", "Y", "Z", "class"]]
+
         df = df.rename(columns={"predicted_class_name": "class"})
         df["class"] = class_name
         df = _add_size(df, self.size, self.size_dict)
+
         stats = locate_positions_stats(locate_results=df, class_positions=class_positions, iou_thresh=self.iou_thresh)
         return stats
 
     def optim(self,locate_results, positions):
 
         def find_best(locate_results, field, range, stepsize, type):
+
             best_stats = self.get_stats(locate_results, positions)
+            #print(best_stats)
+            #import sys
+            #sys.exit()
             best_f1 = best_stats["F1"]
             best_value = 0
             best_df = locate_results
@@ -430,11 +440,9 @@ class LocateOptimEvaluator():
 
         locate_results = pd.read_pickle(self.locate_results_path)
         unique_class_labels = np.unique(locate_results['predicted_class'])
-
         for id in tqdm.tqdm(unique_class_labels,desc="Optimize"):
             dfc = locate_results[locate_results["predicted_class"] == id]
-
-            class_name = label_filename(np.unique(dfc["predicted_class_name"])[0]) #os.path.splitext(np.unique(dfc["predicted_class_name"])[0])[0]
+            class_name = label_filename(locate_results.attrs['references'][id])
             print(class_name)
             if class_name.upper() not in gt_data_classes:
                 print("Skip ", class_name)
