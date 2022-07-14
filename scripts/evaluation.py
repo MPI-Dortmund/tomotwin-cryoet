@@ -442,7 +442,11 @@ class LocateOptimEvaluator():
         unique_class_labels = np.unique(locate_results['predicted_class'])
         for id in tqdm.tqdm(unique_class_labels,desc="Optimize"):
             dfc = locate_results[locate_results["predicted_class"] == id]
-            class_name = label_filename(locate_results.attrs['references'][id])
+            try:
+                class_name = label_filename(locate_results.attrs['references'][id])
+            except AttributeError:
+                print("Skip. Not valid class:", locate_results.attrs['references'][id])
+                continue
             print(class_name)
             if class_name.upper() not in gt_data_classes:
                 print("Skip ", class_name)
