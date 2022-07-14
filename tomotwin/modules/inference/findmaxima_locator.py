@@ -419,10 +419,6 @@ class FindMaximaLocator(Locator):
 
         # This array contains the distance(similarity)/probability at each coordinate
         vol = np.zeros(shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1))
-        # This volumes contains the corresponding row index in the input data frame for each coordinate
-        index_vol = np.zeros(
-            shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1), dtype=np.int32
-        )
 
         # Fill the array
         vals = df[f"d_class_{int(target_class)}"].values
@@ -430,63 +426,45 @@ class FindMaximaLocator(Locator):
         vol[(x_val, y_val, z_val)] = vals
 
         # Fill index array
-        index_vol[(x_val, y_val, z_val)] = np.arange(len(vals))
         vol = vol.astype(np.float16)
-        return vol, index_vol
+
+        return vol
 
     @staticmethod
     def maxima_to_df(
         maximas: List[Tuple[float, float, float]],
-        df: pd.DataFrame,
-        index_vol: np.array,
         target: int,
+        stride: Tuple[int],
+        boxsize: int
+
     ) -> pd.DataFrame:
-        selected_rows = []
-        sizes = []
-        region_best = []
 
+        bshalf = (boxsize-1)//2
+        dat = {
+            "X": [],
+            "Y": [],
+            "Z": [],
+            "size": [],
+            "metric_best": [],
+
+        }
         for maxima, size, max_val in maximas:
+            dat["size"].append(size)
+            dat["metric_best"].append(max_val)
+            dat["X"].append(maxima[0]*stride[0]+bshalf)
+            dat["Y"].append(maxima[1]*stride[1]+bshalf)
+            dat["Z"].append(maxima[2]*stride[2]+bshalf)
 
-            try:
-                row_index = index_vol[
-                    int(np.round(maxima[0])),
-                    int(np.round(maxima[1])),
-                    int(np.round(maxima[2])),
-                ]
-                selected_rows.append(row_index)
-                sizes.append(size)
-                region_best.append(max_val)
-                #print(row_index, "", maxima[0], maxima[1], maxima[2])
-                #print(df.iloc[row_index])
-            except IndexError:
-                print(
-                    "Index error for",
-                    maxima,
-                    (
-                        int(np.round(maxima[0])),
-                        int(np.round(maxima[1])),
-                        int(np.round(maxima[2])),
-                    ),
-                )
 
-        selected_df = df.iloc[selected_rows].copy()
-        selected_df["size"] = sizes
-        selected_df["metric_best"] = region_best
-        selected_df["predicted_class"] = target
-        selected_df = selected_df[
-            [
-                "X",
-                "Y",
-                "Z",
-                "predicted_class",
-                "size",
-                "metric_best",
-            ]
-        ]
-        selected_df["predicted_class"] = selected_df["predicted_class"].astype(np.int8)
-        selected_df["size"] = selected_df["size"].astype(np.uint16)
-        selected_df["metric_best"] = selected_df["metric_best"].astype(np.float16)
-        return selected_df
+        dat = pd.DataFrame(dat)
+        dat["predicted_class"]=target
+        dat["X"] = dat["X"].astype(np.float16)
+        dat["Y"] = dat["Y"].astype(np.float16)
+        dat["Z"] = dat["Z"].astype(np.float16)
+        dat["predicted_class"] = dat["predicted_class"].astype(np.int8)
+        dat["size"] = dat["size"].astype(np.uint16)
+        dat["metric_best"] = dat["metric_best"].astype(np.float16)
+        return dat
 
     @staticmethod
     def apply_findmax(map_output: pd.DataFrame,
@@ -498,7 +476,7 @@ class FindMaximaLocator(Locator):
                       **kwargs
                       ) -> (pd.DataFrame, np.array):
 
-        vol, index_vol = FindMaximaLocator.to_volume(map_output, target_class=class_id, window_size=window_size, stride=stride)
+        vol = FindMaximaLocator.to_volume(map_output, target_class=class_id, window_size=window_size, stride=stride)
 
         maximas, _ = find_maxima(vol, tolerance, global_min=global_min,tqdm_pos=kwargs.get("tqdm_pos"))
         del _
@@ -507,11 +485,8 @@ class FindMaximaLocator(Locator):
             m for m in maximas if m[1] > 1
         ]  # more than one pixel coordinate must be involved.
         particle_df = FindMaximaLocator.maxima_to_df(
-            maximas, map_output, index_vol, class_id
+            maximas, class_id, stride=stride,boxsize=window_size
         )
-        del index_vol
-
-
 
         return particle_df, vol
 

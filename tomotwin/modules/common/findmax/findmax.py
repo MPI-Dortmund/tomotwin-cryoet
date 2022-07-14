@@ -441,13 +441,21 @@ def get_avg_pos(classes: List[int], regions: np.array, region_max_value: List, i
         reg_max = region_max_value[cl - 1]  # np.max(weights)
 
 
-        # weights = np.exp(2 * weights) - np.exp(-2)
-        # weights = softmax(weights)
+
+        from scipy.special import softmax
+        weights = softmax(weights)
+        #print("W", weights)
+        #weights=weights*weights
+
         try:
             avgs = []
             for c in coords:
-                avg = np.average(c.astype(np.float16))  # , weights=weights)
+                avg = np.average(c.astype(np.float16))#, weights=weights)
                 avgs.append(avg)
+                if np.isnan(avgs).any():
+                    print("NAN!!!!!!")
+                    print(weights)
+                    print("SUM", np.sum(weights))
         except ZeroDivisionError:
             print("Zero devision. Pass this entry. Some dbug infos:")
             print("len(coords):", len(coords))
@@ -455,7 +463,7 @@ def get_avg_pos(classes: List[int], regions: np.array, region_max_value: List, i
             pass
 
         p = tuple(avgs)
-        # p = region_max_pos[cl-1]
+        #p = region_max_pos[cl-1]
         maxima_coords.append((p, len(coords[0]), reg_max))  # region_max_value[cl-1]))
     return maxima_coords
 
@@ -585,7 +593,7 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5, **k
         k = k + 1
         regions[tmp_flags.astype(bool)] = k
         region_max_value.append(np.float16(seed_value))
-    image = volume.astype(np.float16)
+    image = volume.astype(np.float32)
 
     #Average positions
     regions = regions[output_slice]
