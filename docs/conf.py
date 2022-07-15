@@ -69,4 +69,4 @@ html_theme_options = {
 extensions += ['sphinx-prompt']
 
 def setup(app):
-    app.add_javascript("version-alert.js")
+    app.add_js_file("version-alert.js")
