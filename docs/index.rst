@@ -13,3 +13,4 @@ User Guide: full table of contents
    :maxdepth: 2
 
    installation
+   tutorials/tutorials_overview
