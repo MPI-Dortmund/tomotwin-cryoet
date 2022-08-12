@@ -27,7 +27,7 @@ Don't denoise your tomogram that you want to use. TomoTwin was trained on unfilt
  For easy identification we recommend to use low-pass filter to 60 angstroms and/or denoising.
 
 
-.. note::
+ .. note::
 
     **Use multiple references per particle class**
 
