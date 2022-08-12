@@ -97,6 +97,12 @@ Run `tomotwin_locate` to locate particles:
 
     tomotwin_locate.py findmax -p out/classify/tomo_apof/map.tmap -o out/locate/
 
+ .. note::
+
+    **Similarity maps**
+
+    In the output folder :file:`out/locate/` you will find a similarity map for each reference - just in case you are interested.
+
 7. Inspect your particles with the boxmanager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
