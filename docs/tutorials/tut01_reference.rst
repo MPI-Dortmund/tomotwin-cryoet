@@ -18,7 +18,7 @@ Don't denoise your tomogram that you want to use. TomoTwin was trained on unfilt
 2. Pick and extract your reference
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. To use a subvolume within the tomogram as a reference, open the tomogram in imod:
+#. To use a subvolume within the tomogram as a reference, open the tomogram in imod:
 
 .. prompt:: bash $
 
@@ -26,11 +26,11 @@ Don't denoise your tomogram that you want to use. TomoTwin was trained on unfilt
 
 For easy identification we recommend to use low-pass filter to 60 angstroms and/or denoising. Furthermore we recommend to pick multiple (2-3) references per particle, as not all subvolumes work equally well.
 
-2. As :guilabel:`Mode` select :guilabel:`model` instead of :guilabel:`movie`, navigate to the central slice of the particle you would like to use as a reference, middle click to place a point on the center of the particle. You can use Edit>Object>Type and increase the :guilabel:`Sphere radius for points` to visualize the box that will be used for extraction (radius 18 or 19).
+#. As :guilabel:`Mode` select :guilabel:`model` instead of :guilabel:`movie`, navigate to the central slice of the particle you would like to use as a reference, middle click to place a point on the center of the particle. You can use Edit>Object>Type and increase the :guilabel:`Sphere radius for points` to visualize the box that will be used for extraction (radius 18 or 19).
 
-3. Press :kbd:`s` to open the model saving window and save the model as something like "reference_a.mod".
+#. Press :kbd:`s` to open the model saving window and save the model as something like "reference_a.mod".
 
-4. Exit imod and use the command
+#. Exit imod and use the command
 .. prompt:: bash $
 
     model2point -inp reference_a.mod -ou reference_a.coords
@@ -38,7 +38,7 @@ For easy identification we recommend to use low-pass filter to 60 angstroms and/
 command to convert to a coords file.
 
 
-Finally, use the `tomotwin_tools.py extractref` script to extract a box from the tomogram (the original, not the denoised/lp60) at the coordinates for the reference. If there are multiple references you would like to pick in the tomogram, repeat this process multiple times changing the name of the reference each time.
+#. Finally, use the `tomotwin_tools.py extractref` script to extract a box from the tomogram (the original, not the denoised/lp60) at the coordinates for the reference. If there are multiple references you would like to pick in the tomogram, repeat this process multiple times changing the name of the reference each time.
 
 .. prompt:: bash $
 
