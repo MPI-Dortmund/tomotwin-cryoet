@@ -24,7 +24,7 @@ Don't denoise your tomogram that you want to use. TomoTwin was trained on unfilt
 
     imod tomo/your_tomo_a10.mrc
 
-For easy identification we recommend to use low-pass filter to 60 angstroms and/or denoising.
+For easy identification we recommend to use low-pass filter to 60 angstroms and/or denoising. Furthermore we recommend to pick multiple (2-3) references per particle, as not all subvolumes work equally well.
 
 2. As :guilabel:`Mode` select :guilabel:`model` instead of :guilabel:`movie`, navigate to the central slice of the particle you would like to use as a reference, middle click to place a point on the center of the particle. You can use Edit>Object>Type and increase the :guilabel:`Sphere radius for points` to visualize the box that will be used for extraction (radius 18 or 19).
 
