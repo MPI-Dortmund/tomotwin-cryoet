@@ -120,17 +120,14 @@ Open your particles with the following command:
 
     napari tomo/your_tomo_a10.mrc out/locate/located.tloc -w napari-boxmanager
 
-.. figure:: ../img/tutorial_1/start.png
-   :align: center
-   :width: 700
-
+.. image:: ../img/tutorial_1/start.png
+   :width: 600
 
 The example shown here is from the SHREC competition. In table on the right you see 12 references. I selected the :guilabel:`model_8_5MRC_86.mrc`, which is a ribosome.
 Below the table, you need to adjust the :guilabel:`metric min` and :guilabel:`size min` thresholds until you like the results. After the optimization is done the result might look similar to this:
 
 .. image:: ../img/tutorial_1/after_optim.png
-   :align: center
-   :width: 700
+   :width: 600
 
 
 
