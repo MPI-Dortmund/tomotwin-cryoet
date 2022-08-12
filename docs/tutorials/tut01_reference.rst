@@ -31,6 +31,7 @@ For easy identification we recommend to use low-pass filter to 60 angstroms and/
 #. Press :kbd:`s` to open the model saving window and save the model as something like "reference_a.mod".
 
 #. Exit imod and use the command
+
 .. prompt:: bash $
 
     model2point -inp reference_a.mod -ou reference_a.coords
