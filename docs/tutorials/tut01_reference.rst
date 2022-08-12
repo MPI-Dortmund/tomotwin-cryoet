@@ -120,7 +120,7 @@ Open your particles with the following command:
 
     napari tomo/your_tomo_a10.mrc out/locate/located.tloc -w napari-boxmanager
 
-.. image:: ../img/tutorial_1/start.png
+.. figure:: ../img/tutorial_1/start.png
    :align: center
    :width: 700
 
