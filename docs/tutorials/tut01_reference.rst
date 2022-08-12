@@ -100,4 +100,20 @@ Run `tomotwin_locate` to locate particles:
 7. Inspect your particles with the boxmanager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Activate the your napari environment to inspect your selected particles. I assume
+Activate the your napari environment to inspect your selected particles. I assume the environment is called `napari`.
+
+.. prompt:: bash $
+
+    conda activate napari
+
+Open your particles with the following command:
+
+.. prompt:: bash $
+
+    napari tomo/your_tomo_a10.mrc out/locate/located.tloc -w napari-boxmanager
+
+.. image:: img/tutorial_1/start.png
+   :align: center
+   :width: 650
+
+
