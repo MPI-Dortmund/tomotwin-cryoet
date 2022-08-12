@@ -28,7 +28,9 @@ Don't denoise your tomogram that you want to use. TomoTwin was trained on unfilt
 
 2. As :guilabel:`Mode` select :guilabel:`model` instead of :guilabel:`movie`, navigate to the central slice of the particle you would like to use as a reference, middle click to place a point on the center of the particle. You can use :guilabel:`Edit` -> :guilabel:`Object` -> :guilabel:`Type` and increase the :guilabel:`Sphere radius for points` to visualize the box that will be used for extraction (radius 18 or 19).
 
+
 3. Press :kbd:`s` to open the model saving window and save the model as something like "reference_a.mod".
+
 
 4. Exit imod and use the command
 
