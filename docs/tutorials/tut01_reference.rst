@@ -99,7 +99,7 @@ Run `tomotwin_locate` to locate particles:
 
     tomotwin_locate.py findmax -p out/classify/tomo_apof/map.tmap -o out/locate/
 
- .. note::
+.. note::
 
     **Similarity maps**
 
