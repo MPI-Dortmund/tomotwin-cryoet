@@ -18,6 +18,8 @@ Don't denoise your tomogram that you want to use. TomoTwin was trained on unfilt
 2. Pick and extract your reference
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+For the reference based approch you need, of course, references. To pick them follow the next steps:
+
 1. To use a subvolume within the tomogram as a reference, open the tomogram in imod:
 
  .. prompt:: bash $
@@ -120,6 +122,6 @@ Open your particles with the following command:
 
 .. image:: ../img/tutorial_1/start.png
    :align: center
-   :width: 650
+   :width: 700
 
 
