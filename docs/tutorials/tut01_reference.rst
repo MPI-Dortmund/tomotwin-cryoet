@@ -20,9 +20,9 @@ Don't denoise your tomogram that you want to use. TomoTwin was trained on unfilt
 
 #. To use a subvolume within the tomogram as a reference, open the tomogram in imod:
 
-.. prompt:: bash $
+    .. prompt:: bash $
 
-    imod tomo/your_tomo_a10.mrc
+        imod tomo/your_tomo_a10.mrc
 
     For easy identification we recommend to use low-pass filter to 60 angstroms and/or denoising. Furthermore we recommend to pick multiple (2-3) references per particle, as not all subvolumes work equally well.
 
@@ -32,20 +32,19 @@ Don't denoise your tomogram that you want to use. TomoTwin was trained on unfilt
 
 #. Exit imod and use the command
 
-.. prompt:: bash $
+    .. prompt:: bash $
 
-    model2point -inp reference_a.mod -ou reference_a.coords
+        model2point -inp reference_a.mod -ou reference_a.coords
 
     command to convert to a coords file.
 
 #. Finally, use the `tomotwin_tools.py extractref` script to extract a box from the tomogram (the original, not the denoised/lp60) at the coordinates for the reference. If there are multiple references you would like to pick in the tomogram, repeat this process multiple times changing the name of the reference each time.
 
-.. prompt:: bash $
+    .. prompt:: bash $
 
-    tomotwin_tools.py extractref --tomo path/to/tomo.mrc --coords path/to/coords.coords --out reference/ --filename reference_a
+        tomotwin_tools.py extractref --tomo path/to/tomo.mrc --coords path/to/coords.coords --out reference/ --filename reference_a
 
-
-You will find your reference in `reference/reference_a.mrc`
+    You will find your reference in `reference/reference_a.mrc`
 
 3. Embed your Tomogram
 ^^^^^^^^^^^^^^^^^^^^^^
