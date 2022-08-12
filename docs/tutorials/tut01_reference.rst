@@ -37,7 +37,7 @@ Don't denoise your tomogram that you want to use. TomoTwin was trained on unfilt
 2. As :guilabel:`Mode` select :guilabel:`model` instead of :guilabel:`movie`, navigate to the central slice of the particle you would like to use as a reference, middle click to place a point on the center of the particle. You can use :guilabel:`Edit` -> :guilabel:`Object` -> :guilabel:`Type` and increase the :guilabel:`Sphere radius for points` to visualize the box that will be used for extraction (radius 18 or 19).
 
 
-3. Press :kbd:`s` to open the model saving window and save the model as something like "reference_a.mod".
+3. Press :kbd:`s` to open the model saving window and save the model as something like :file:`reference_a.mod`.
 
 
 4. Exit imod and use the command
@@ -52,9 +52,9 @@ Don't denoise your tomogram that you want to use. TomoTwin was trained on unfilt
 
  .. prompt:: bash $
 
-    tomotwin_tools.py extractref --tomo path/to/tomo.mrc --coords path/to/coords.coords --out reference/ --filename reference_a
+    tomotwin_tools.py extractref --tomo path/to/tomo.mrc --coords path/to/coords.coords --out reference/ --filename references
 
- You will find your reference in `reference/reference_a.mrc`
+ You will find your extracted references in `reference/references_X.mrc` where X is a running number.
 
 3. Embed your Tomogram
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -76,7 +76,7 @@ Now you can embed your reference:
 
 .. prompt:: bash $
 
-    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py subvolumes -m tomotwin_model_p120_052022.pth -v reference/ref.mrc -b 12 -o out/embed/reference/
+    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py subvolumes -m tomotwin_model_p120_052022.pth -v reference/*.mrc -b 12 -o out/embed/reference/
 
 
 5. Map your tomogram
