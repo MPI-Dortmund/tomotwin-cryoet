@@ -6,7 +6,7 @@ In this tutorial we describe how to use TomoTwin for picking in tomograms using 
 1. Downscale your Tomogram to 10 Å
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You can do that by fourier shrink your tomogram with EMAN2. Lets say you have a Tomogram with a pixelsize of 5.9359 angstrom. The fouriershrink factor is then 10/5.9359 = 1.684
+TomoTwin was trained on data with a pixelsize of 10A. While it is also work with data with a lower or higher pixel size it is probably ideal to run it on data with the same pixelsize. For that you may need to downscale your tomogram. You can do that by fourier shrink your tomogram with EMAN2. Lets say you have a Tomogram with a pixelsize of 5.9359 angstrom. The fouriershrink factor is then 10/5.9359 = 1.684
 
 .. prompt:: bash $
 
@@ -139,11 +139,14 @@ Finally to convert the .tloc file into .coords you need to run
 
 You will find coordinate file in :file:`.coords` format in the :file:`dotcoords/` folder.
 
-
 8. Scale your coordinates
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-TODO
+After step 7 you have the coordinates for your tomogram. If downscaled your tomogram in step 1, you need to scale your coordinates. I assume that your initial tomogram had a pixelsize of 5.9359, then the command would be:
+
+.. prompt:: bash $
+
+    tomotwin_tools.py scale_coordinates --coords dotcoords/your_coords_file.coords --tomotwin_pixel_size 10 --extraction_pixel_size 5.9359 --out multi_refs_0_bin2.coords
 
 
 
