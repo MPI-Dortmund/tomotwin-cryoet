@@ -123,7 +123,7 @@ Open your particles with the following command:
 .. image:: ../img/tutorial_1/start.png
    :width: 650
 
-The example shown here is from the SHREC competition. In table on the right you see 12 references. I selected the :guilabel:`model_8_5MRC_86.mrc`, which is a ribosome.
+The example shown here is from the SHREC competition. In the table on the right you see 12 references. I selected the :guilabel:`model_8_5MRC_86.mrc`, which is a ribosome.
 Below the table, you need to adjust the :guilabel:`metric min` and :guilabel:`size min` thresholds until you like the results. After the optimization is done the result might look similar to this:
 
 .. image:: ../img/tutorial_1/after_optim.png
