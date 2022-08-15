@@ -129,7 +129,7 @@ Below the table, you need to adjust the :guilabel:`metric min` and :guilabel:`si
 .. image:: ../img/tutorial_1/after_optim.png
    :width: 650
 
-You can now press :guilabel:`File` -> :guilabel:`Save selected Layer(s)`. In the dialog, change the :guilabel:`Files of type` to  :guilabel:`Box Manager`. Next choose a path a filename like :guilabel:`coords.tloc`. Make sure that the file ending is :file:`.tloc`.
+You can now press :guilabel:`File` -> :guilabel:`Save selected Layer(s)`. In the dialog, change the :guilabel:`Files of type` to  :guilabel:`Box Manager`. Choose filename like :guilabel:`coords.tloc`. Make sure that the file ending is :file:`.tloc`.
 
 To convert the :file:`.tloc` file into :file:`.coords` you need to run
 
