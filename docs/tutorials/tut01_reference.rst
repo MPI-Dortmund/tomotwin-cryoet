@@ -84,7 +84,7 @@ Now you can embed your reference:
 5. Map your tomogram
 ^^^^^^^^^^^^^^^^^^^^
 
-Map will calculate the pairwise distances/similarity between the references and the subvolumes and therefore a localization map:
+The map command will calculate the pairwise distances/similarity between the references and the subvolumes and therefore a localization map:
 
 .. prompt:: bash $
 
