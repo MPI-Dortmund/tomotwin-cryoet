@@ -140,5 +140,10 @@ Finally to convert the .tloc file into .coords you need to run
 You will find coordinate file in :file:`.coords` format in the :file:`dotcoords/` folder.
 
 
+8. Scale your coordinates
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+TODO
+
 
 
