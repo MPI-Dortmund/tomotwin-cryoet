@@ -142,11 +142,10 @@ You will find coordinate file in :file:`.coords` format in the :file:`dotcoords/
 8. Scale your coordinates
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-After step 7 you have the coordinates for your tomogram. If downscaled your tomogram in step 1, you need to scale your coordinates. I assume that your initial tomogram had a pixelsize of 5.9359, then the command would be:
+After step 7 you have the coordinates for your tomogram. If you downscaled your tomogram in step 1, you need to scale your coordinates. I assume that your initial tomogram had a pixelsize of 5.9359, then the command would be:
 
 .. prompt:: bash $
 
     tomotwin_tools.py scale_coordinates --coords dotcoords/your_coords_file.coords --tomotwin_pixel_size 10 --extraction_pixel_size 5.9359 --out multi_refs_0_bin2.coords
-
 
 
