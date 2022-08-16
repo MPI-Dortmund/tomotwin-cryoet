@@ -18,7 +18,7 @@ class Info(TomoTwinTool):
 
         parser = parentparser.add_parser(
             self.get_command_name(),
-            help="Prints info about pickled files",
+            help="Prints info about pickled tomotwin files",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
 
@@ -37,9 +37,9 @@ class Info(TomoTwinTool):
         print("DATA:")
         print("###########")
         print(dat)
-
+        print("")
         print("###########")
         print("ATTRIBUTES:")
         print("###########")
         import json
-        print(json.dumps(dat.attrs, sort_keys=False, indent=4))
+        print(json.dumps(dat.attrs, sort_keys=False, indent=3))
