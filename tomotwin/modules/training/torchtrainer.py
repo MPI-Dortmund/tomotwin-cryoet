@@ -794,9 +794,11 @@ class TorchTrainer(Trainer):
         :param best_f1:  Current best validtion f1 score
         :return:
         """
+        import tomotwin
         results_dict = {
             "model_state_dict": model.state_dict(),
             "tomotwin_config": config,
+            "tt_version_train": tomotwin.__version__
         }
         if optimizer is not None:
             results_dict["optimizer_state_dict"] = optimizer.state_dict()
