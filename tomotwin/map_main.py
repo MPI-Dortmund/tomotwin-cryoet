@@ -377,6 +377,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 import pandas as pd
 import numpy as np
+import tomotwin
 from tomotwin.modules.inference.mapper import Mapper
 from tomotwin.modules.inference.distance_mapper import DistanceMapper
 from tomotwin.modules.inference.map_ui import MapUI, MapMode
@@ -479,7 +480,7 @@ def run(ui: MapUI):
         classes_df = pd.DataFrame(
             df_data, copy=False
         )
-
+        classes_df.attrs["tt_version_map"] = tomotwin.__version__
 
         # Add meta information from previous step
         for meta_key in attributes:

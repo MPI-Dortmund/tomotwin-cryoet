@@ -385,6 +385,7 @@ import numpy as np
 import os
 import glob
 import pandas as pd
+import tomotwin
 
 
 
@@ -453,6 +454,7 @@ def _main_():
             column_names.append(str(i))
         df = pd.DataFrame(data=embeddings, columns=column_names)
         df.index.name = "index"
+        df.attrs["tt_version_embed"] = tomotwin.__version__
         df.attrs['filepath'] = conf.volumes_path
         df.attrs["window_size"] = conf.window_size
         df.attrs["stride"] = conf.stride

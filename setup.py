@@ -1,7 +1,9 @@
 from setuptools import setup
 import datetime
 import sys
+import codecs
 import os
+import re
 
 pthversion = os.path.join(os.path.dirname(__file__), "VERSION.txt")
 if sys.argv[1] == "sdist":
@@ -13,10 +15,23 @@ else:
     f = open(pthversion, 'r')
     __version__ = f.read()
 
-print(type(__version__))
+def find_version(*file_paths):
+    def read(*parts):
+        here = os.path.abspath(os.path.dirname(__file__))
+        with codecs.open(os.path.join(here, *parts), 'r') as fp:
+            return fp.read()
+
+    print("==========================================",sys.argv)
+    version_file = read(*file_paths)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                              version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
+
 setup(
     name='tomotwin',
-    version="0.0.1-"+__version__,
+    version=find_version("tomotwin", "__init__.py")+"post"+__version__,
     python_requires='>=3.7.0',
     packages=[
         'scripts','tomotwin','tomotwin.modules',

@@ -576,6 +576,7 @@ class TorchTrainer(Trainer):
                 negative_vol = batch["negative"].to(self.device, non_blocking=True)
                 filenames = batch["filenames"]
                 with autocast():
+                    # TODO: Probably concat anchor, positive and vol into one batch and run only one forward pass is enough.
                     anchor_out = self.model.forward(anchor_vol)
                     positive_out = self.model.forward(positive_vol)
                     negative_out = self.model.forward(negative_vol)
@@ -607,6 +608,7 @@ class TorchTrainer(Trainer):
         positive_vol = batch["positive"].to(self.device, non_blocking=True)
         negative_vol = batch["negative"].to(self.device, non_blocking=True)
         with autocast():
+            # TODO: Probably concat anchor, positive and vol into one batch and run only on forward pass is enough.
             anchor_out = self.model.forward(anchor_vol)
             positive_out = self.model.forward(positive_vol)
             negative_out = self.model.forward(negative_vol)

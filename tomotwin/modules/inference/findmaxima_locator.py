@@ -476,6 +476,8 @@ class FindMaximaLocator(Locator):
                       **kwargs
                       ) -> (pd.DataFrame, np.array):
 
+
+
         vol = FindMaximaLocator.to_volume(map_output, target_class=class_id, window_size=window_size, stride=stride)
 
         maximas, _ = find_maxima(vol, tolerance, global_min=global_min,tqdm_pos=kwargs.get("tqdm_pos"))
@@ -494,14 +496,14 @@ class FindMaximaLocator(Locator):
 
     @staticmethod
     def locate_class(class_id,
-                     df_particles: pd.DataFrame,
+                     map: pd.DataFrame,
                      window_size: int,
                      stride: Tuple[int],
                      tolerance: float,
                      global_min: float,
                      output: str
                      ) -> pd.DataFrame:
-        particle_df, vol = FindMaximaLocator.apply_findmax(map_output=df_particles,
+        particle_df, vol = FindMaximaLocator.apply_findmax(map_output=map,
                                                            class_id=class_id,
                                                            window_size=window_size,
                                                            stride=stride,
@@ -511,7 +513,7 @@ class FindMaximaLocator(Locator):
         #print("Done")
         if output is not None:
             with mrcfile.new(
-                    os.path.join(output, df_particles.attrs['ref_name'] + ".mrc"), overwrite=True
+                    os.path.join(output, map.attrs['ref_name'] + ".mrc"), overwrite=True
             ) as mrc:
                 vol = vol.astype(np.float32)
                 vol = vol.swapaxes(0, 2)

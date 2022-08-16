@@ -381,6 +381,7 @@ import sys
 import numpy as np
 from typing import List
 import pandas as pd
+import tomotwin
 
 from tomotwin.modules.inference.locate_ui import LocateUI, LocateMode
 from tomotwin.modules.inference.argparse_locate_ui import LocateArgParseUI
@@ -475,6 +476,8 @@ def run(ui: LocateUI):
         print(f"Particles of class {class_name}: {len(class_frame)} (before NMS: {before_nms}) ")
 
     located_particles = pd.concat(class_frames)
+
+    located_particles.attrs["tt_version_locate"] = tomotwin.__version__
 
     # Add meta information from previous step
     for meta_key in map_attrs:
