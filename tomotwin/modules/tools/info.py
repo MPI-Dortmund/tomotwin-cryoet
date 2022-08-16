@@ -2,6 +2,7 @@ import argparse
 from argparse import ArgumentParser
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 import pandas as pd
+import numpy as np
 class Info(TomoTwinTool):
 
     def get_command_name(self) -> str:
@@ -37,6 +38,14 @@ class Info(TomoTwinTool):
         print("DATA:")
         print("###########")
         print(dat)
+        print("")
+
+        print("###########")
+        print("STATS:")
+        print("###########")
+
+        for cl in range(len(dat.attrs['references'])):
+            print(f"Picked particles for class {cl} ({dat.attrs['references'][cl]}): {np.sum(dat['predicted_class']==cl)}")
         print("")
         print("###########")
         print("ATTRIBUTES:")
