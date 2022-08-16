@@ -46,6 +46,7 @@ class Info(TomoTwinTool):
 
         for cl in range(len(dat.attrs['references'])):
             print(f"Picked particles for class {cl} ({dat.attrs['references'][cl]}): {np.sum(dat['predicted_class']==cl)}")
+
         print("")
         print("###########")
         print("ATTRIBUTES:")
