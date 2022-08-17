@@ -118,7 +118,9 @@ def _main_():
         if event.key == "enter":
             indicies = selector.get_indicis_full_data().tolist()
             emb_data_selection = emb_data.iloc[indicies]
-            new_ref = emb_data_selection.drop(columns=["index", "filepath", "X", "Y", "Z"], errors="ignore").mean(axis=0)
+            emb_data_selection = emb_data_selection.drop(columns=["X", "Y", "Z","filepath"], errors="ignore")
+
+            new_ref = emb_data_selection.astype(np.float32).mean(axis=0)
             new_ref = new_ref.to_frame().T#reshape(32,1)
 
             references.append(new_ref)
