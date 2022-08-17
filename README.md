@@ -15,12 +15,14 @@ To create the necessary conda environment run:
 ### Default
 ```
 conda install -c conda-forge mamba
-mamba create -n tomotwin -c pytorch -c rapidsai -c nvidia python=3.9 pytorch==1.11 torchvision pandas scipy numpy matplotlib pytables rapids=22.04 -c conda-forge
+mamba create -n tomotwin_t12 -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.9 pytorch==1.12 torchvision pandas scipy numpy matplotlib pytables cuML=22.06 cudatoolkit=11.5 'protobuf>3.20' tensorboard
+pip install .
 ```
 ### With Optuna support:
 ```
 conda install -c conda-forge mamba
-mamba create -n tomotwin -c pytorch -c rapidsai -c nvidia python=3.9 pytorch==1.11 torchvision pandas scipy numpy matplotlib pytables rapids=22.04 optuna mysql-connector-python -c conda-forge
+mamba create -n tomotwin_t12 -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.9 pytorch==1.12 torchvision pandas scipy numpy matplotlib pytables cuML=22.06 cudatoolkit=11.5 'protobuf>3.20' tensorboard optuna mysql-connector-python
+pip install .
 ```
 For optuna you also need config which should look like the `optuna_config.json` in the resources directory
 

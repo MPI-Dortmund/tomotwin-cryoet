@@ -54,6 +54,7 @@ setup(
         "pystardb==0.3.1",
         "pandas >= 1.3",
         "pytorch-metric-learning",
+        "cupy-cuda115",
         "numba",
         "tabulate"
     ],
