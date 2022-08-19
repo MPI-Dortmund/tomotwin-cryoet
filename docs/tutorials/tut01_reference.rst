@@ -88,7 +88,7 @@ The map command will calculate the pairwise distances/similarity between the ref
 
 .. prompt:: bash $
 
-    tomotwin_map.py distance -r out/embed/reference/embeddings.temb -v out/embed/tomo/d01t04_embeddings.temb -o out/classify/tomo_apof/
+    tomotwin_map.py distance -r out/embed/reference/embeddings.temb -v out/embed/tomo/your_tomo_a10_embeddings.temb -o out/map/
 
 6. Localize potential particles
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -97,7 +97,7 @@ Run `tomotwin_locate` to locate particles:
 
 .. prompt:: bash $
 
-    tomotwin_locate.py findmax -p out/classify/tomo_apof/map.tmap -o out/locate/
+    tomotwin_locate.py findmax -p out/map/map.tmap -o out/locate/
 
 .. note::
 
