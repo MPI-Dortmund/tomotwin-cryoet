@@ -62,6 +62,12 @@ def create_position_parser(parser_parent):
         help="If given, it optimized the parameters"
     )
 
+    parser_parent.add_argument(
+        "--stepsize_optim_similarity",
+        type=float,
+        default=0.05,
+    )
+
 
 
 def create_parser():
@@ -311,12 +317,14 @@ class SubvolumeEvaluator():
 
 class LocateOptimEvaluator():
 
-    def __init__(self, positions_path: str, locate_results_path: str, sizes_pth: str):
+    def __init__(self, positions_path: str, locate_results_path: str, sizes_pth: str, stepsize_optim_similarity: float = 0.05):
         self.positions_path = positions_path
         self.locate_results_path = locate_results_path
         self.size = 37
         self.iou_thresh = 0.6
         self.size_dict = get_size_dict_json(sizes_pth)
+        self.stepsize_optim_similarity = stepsize_optim_similarity
+
 
     def filter(self, df, min_val=None, max_val=None, field=None):
 
@@ -385,7 +393,7 @@ class LocateOptimEvaluator():
         max_size_range = [1, 500]
         dsize = 2
         min_similarity_range = [0,1]
-        dsim = 0.05
+        dsim = self.stepsize_optim_similarity
         locate_results_id = locate_results
         o_dict = {}
         stats, locate_results_filtered, best_value = find_best(
@@ -566,8 +574,9 @@ def _main_():
         locate_path = args.locate
         optim = args.optim
         sizes_pth = args.size
+
         if optim:
-            evaluator = LocateOptimEvaluator(positions_path=positions_path, locate_results_path=locate_path, sizes_pth=sizes_pth)
+            evaluator = LocateOptimEvaluator(positions_path=positions_path, locate_results_path=locate_path, sizes_pth=sizes_pth, stepsize_optim_similarity=args.stepsize_optim_similarity)
         else:
             evaluator = LocateEvaluator(positions_path=positions_path, locate_results_path=locate_path)
         stats = evaluator.run()
