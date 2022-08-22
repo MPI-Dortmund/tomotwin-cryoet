@@ -77,7 +77,7 @@ class SelectFromCollection:
         self.canvas.draw_idle()
 
 def get_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description='Convert clusters to coords')
+    parser = argparse.ArgumentParser(description='Convert clusters to coords', formatter_class=argparse.ArgumentDefaultsHelpFormatter,)
     parser.add_argument('-u','--umap', type=str, required=True,
                         help='Path to pickled pandas dataframe with the umap')
     parser.add_argument('-e','--embedding', type=str, required=True,
@@ -125,14 +125,14 @@ def _main_():
 
             references.append(new_ref)
             conc_ref = pd.concat(references, ignore_index=True)
-            pth = os.path.join(out_dir,f"cluster_{len(references)}.pkl")
+            pth = os.path.join(out_dir,f"cluster_{len(references)}.temb")
 
             references_names.append(os.path.basename(pth))
             conc_ref["filepath"] = references_names
             plt.savefig(os.path.splitext(pth)[0]+".png")
             emb_data_selection.to_pickle(pth)
             print(f"Written: {pth}")
-            pth_ref = os.path.join(out_dir, f"references.pkl")
+            pth_ref = os.path.join(out_dir, f"references.temb")
             conc_ref.to_pickle(pth_ref)
             print(f"Update: {pth_ref}")
             selector.disconnect()
