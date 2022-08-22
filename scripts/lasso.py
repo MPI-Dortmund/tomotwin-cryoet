@@ -89,8 +89,8 @@ def get_parser() -> argparse.ArgumentParser:
 def _main_():
     parser = get_parser()
     args = parser.parse_args()
-    pth_umap = args.umap #"/mnt/data/twagner/Projects/TomoTwin/data/misc/emb_umap/map_2.pkl"
-    pth_embedding = args.embedding # "/home/twagner/Documents/Publications/TomoTwin/Figures/gen_figure/gen_3_v04/embed/tomo/tiltseries_rec_embeddings.pkl"
+    pth_umap = args.umap
+    pth_embedding = args.embedding
     emb_umap = pd.read_pickle(pth_umap)
     emb_data = pd.read_pickle(pth_embedding)
     references = []
