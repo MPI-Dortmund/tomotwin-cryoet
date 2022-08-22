@@ -43,8 +43,8 @@ class UmapTool(TomoTwinTool):
             transform_chunk_size: int) -> ArrayLike:
         print("Prepare data")
         fit_sample = embeddings.sample(n=fit_sample_size, random_state=17)
-        fit_sample = fit_sample.drop(['filepath', 'Z', 'Y', 'X'], axis=1)
-        all_data = embeddings.drop(['filepath', 'Z', 'Y', 'X'],axis=1)
+        fit_sample = fit_sample.drop(['filepath', 'Z', 'Y', 'X'], axis=1, errors='ignore')
+        all_data = embeddings.drop(['filepath', 'Z', 'Y', 'X'],axis=1, errors='ignore')
 
         reducer = cuml.UMAP(
             n_neighbors=200,
