@@ -427,7 +427,7 @@ class ExtractReference(TomoTwinTool):
         return parser
 
     @staticmethod
-    def extract_and_save(volume: np.array, positions: pd.DataFrame, box_size: int, out_pth: str, basename: str) -> List[str]:
+    def extract_and_save(volume: np.array, positions: pd.DataFrame, box_size: int, out_pth: str, basename: str, apix=None) -> List[str]:
         '''
 
         :param volume: Volume from which the the references should be extracted
@@ -463,6 +463,8 @@ class ExtractReference(TomoTwinTool):
             subvol = subvol.astype(np.float32)
             fname = os.path.join(out_pth,f"{basename}_{index}.mrc")
             with mrcfile.new(fname) as newmrc:
+                if apix:
+                    newmrc.voxel_size = apix
                 newmrc.set_data(subvol)
             files_written.append(fname)
         return files_written
@@ -487,5 +489,5 @@ class ExtractReference(TomoTwinTool):
         coords.columns = ['X', 'Y', 'Z']
         mrc = mrcfile.mmap(path_tomo, permissive=True, mode='r')
 
-        ExtractReference.extract_and_save(mrc.data, coords, boxsize, path_output, filebasename)
+        ExtractReference.extract_and_save(mrc.data, coords, boxsize, path_output, filebasename, apix=mrc.voxel_size)
         print(f'wrote subvolume reference to {path_output}')
