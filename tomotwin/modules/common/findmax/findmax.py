@@ -559,7 +559,7 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5, **k
     working_image_raveled = working_image.ravel(order)
     import tqdm
 
-    for seed_point in tqdm.tqdm(coords_sorted):
+    for seed_point in tqdm.tqdm(coords_sorted,position=kwargs["tqdm_pos"], desc=f"Locate class {kwargs['tqdm_pos']}"):
         try:
             iter(seed_point)
         except TypeError:
