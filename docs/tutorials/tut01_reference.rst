@@ -36,7 +36,7 @@ For the reference based approch you need, of course, references. To pick them fo
     We recommend to pick multiple (2-3) references per particle class, as not all subvolumes work equally well.
 
 
-2. As :guilabel:`Mode` select :guilabel:`model` instead of :guilabel:`movie`, navigate to the central slice of the particle you would like to use as a reference, middle click to place a point on the center of the particle. You can use :guilabel:`Edit` -> :guilabel:`Object` -> :guilabel:`Type` and increase the :guilabel:`Sphere radius for points` to visualize the box that will be used for extraction (radius 18 or 19).
+2. As :guilabel:`Mode` select :guilabel:`model` instead of :guilabel:`movie`, navigate to the central slice of the particle you would like to use as a reference, middle click to place a point on the center of the particle. You can use :guilabel:`Edit` -> :guilabel:`Object` -> :guilabel:`Type` and increase the :guilabel:`Sphere radius for points` to visualize the box that will be used for extraction (radius 18 or 19). Try to pick them as centered as possible.
 
 
 3. Press :kbd:`s` to open the model saving window and save the model as something like :file:`references.mod`.
