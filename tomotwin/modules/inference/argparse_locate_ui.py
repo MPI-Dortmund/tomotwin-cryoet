@@ -391,6 +391,7 @@ class LocateArgParseUI(LocateUI):
         self.boxsize = None
         self.mode = None
         self.global_min = None
+        self.processes = 4
 
     def run(self, args=None) -> None:
         parser = self.create_parser()
@@ -403,6 +404,7 @@ class LocateArgParseUI(LocateUI):
             self.boxsize = args.boxsize
             self.mode = LocateMode.FINDMAX
             self.global_min = args.global_min
+            self.processes = args.processes
 
 
 
@@ -415,6 +417,7 @@ class LocateArgParseUI(LocateUI):
             boxsize=self.boxsize,
             tolerance=self.tolerance,
             global_min=self.global_min,
+            processes=self.processes
         )
         return conf
 
@@ -456,6 +459,13 @@ class LocateArgParseUI(LocateUI):
             type=float,
             default=0.5,
             help="Global minimum of the find max procedure. Maximums below value will be ignored. Higher values give faster runtime.",
+        )
+
+        parser.add_argument(
+            "--processes",
+            type=int,
+            default=4,
+            help="Number of parallel processes. More processes require more memory. Parallelization only effective when m",
         )
 
     def create_parser(self) -> argparse.ArgumentParser:

@@ -444,7 +444,7 @@ def run(ui: LocateUI):
     del map
 
     from concurrent.futures import ProcessPoolExecutor as Pool
-    with Pool(4) as pool:
+    with Pool(conf.processes) as pool:
         class_frames = list(pool.map(locator.locate,sub_dfs))
 
     size_dict=None
