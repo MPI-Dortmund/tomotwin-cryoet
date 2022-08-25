@@ -6,7 +6,7 @@ In this tutorial we describe how to use TomoTwin for picking in tomograms using 
 1. Downscale your Tomogram to 10 Å
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-TomoTwin was trained on data with a pixelsize of 10A. While it is also work with data with a lower or higher pixel size it is probably ideal to run it on data with the same pixelsize. For that you may need to downscale your tomogram. You can do that by fourier shrink your tomogram with EMAN2. Lets say you have a Tomogram with a pixelsize of 5.9359 angstrom. The fouriershrink factor is then 10/5.9359 = 1.684
+TomoTwin was trained on data with a pixelsize of 10Å. While it is also work with data with a lower or higher pixel size it is probably ideal to run it on data with the same pixelsize. For that you may need to downscale your tomogram. You can do that by fourier shrink your tomogram with EMAN2. Lets say you have a Tomogram with a pixelsize of 5.9359Å. The fouriershrink factor is then 10Å/5.9359Å = 1.684
 
 .. prompt:: bash $
 
