@@ -26,7 +26,7 @@ For the reference based approch you need, of course, references. To pick them fo
 
     imod tomo/your_tomo_a10.mrc
 
- For easy identification we recommend to use low-pass filter to 60 angstroms and/or denoising.
+ For easy identification we recommend to use low-pass filter to 60Å and/or denoising.
 
 
  .. note::
