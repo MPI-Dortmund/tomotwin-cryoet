@@ -463,9 +463,9 @@ class ExtractReference(TomoTwinTool):
             subvol = subvol.astype(np.float32)
             fname = os.path.join(out_pth,f"{basename}_{index}.mrc")
             with mrcfile.new(fname) as newmrc:
+                newmrc.set_data(subvol)
                 if apix:
                     newmrc.voxel_size = apix
-                newmrc.set_data(subvol)
             files_written.append(fname)
         return files_written
 
