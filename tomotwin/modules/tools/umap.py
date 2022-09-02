@@ -77,4 +77,4 @@ class UmapTool(TomoTwinTool):
         import os
         os.makedirs(out_pth,exist_ok=True)
 
-        pd.DataFrame(umap_embeddings).to_pickle(os.path.join(out_pth,os.path.splitext(os.path.basename(args.input))[0]+"_UMAP.pkl"))
+        pd.DataFrame(umap_embeddings).to_pickle(os.path.join(out_pth,os.path.splitext(os.path.basename(args.input))[0]+".tumap"))
