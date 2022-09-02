@@ -601,19 +601,8 @@ def _main_():
     train_triplets, test_triplets = generate_triplets(tconf)
 
     print("Number of train triplets:", len(train_triplets))
-    '''
-    print(
-        "Anchors in train triplets:",
-        set([os.path.basename(t.anchor) for t in train_triplets]),
-    )
-    '''
     print("Number of validation triplets:", len(test_triplets))
-    '''
-    print(
-        "Anchors in validation triplets:",
-        set([os.path.basename(t.anchor) for t in test_triplets]),
-    )
-    '''
+
     ########################
     # Load config
     ########################
