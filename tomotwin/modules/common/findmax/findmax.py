@@ -528,9 +528,7 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5, **k
     del max_sorted
     if global_min == None:
         global_min = np.min(image) + tolerance
-    #fltimg = image.flatten()
-    #global_min = np.min(fltimg[np.argpartition(fltimg, -100)[-100:]]) - tolerance
-    #del fltimg
+
     print("effective global min:", global_min)
 
 
@@ -558,8 +556,13 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5, **k
     region_max_value = []
     working_image_raveled = working_image.ravel(order)
     import tqdm
+    desc="Locate"
+    pos=None
+    if 'tqdm_pos' in kwargs:
+        desc = f"Locate class {kwargs['tqdm_pos']}"
+        pos = kwargs["tqdm_pos"]
 
-    for seed_point in tqdm.tqdm(coords_sorted,position=kwargs["tqdm_pos"], desc=f"Locate class {kwargs['tqdm_pos']}"):
+    for seed_point in tqdm.tqdm(coords_sorted,position=pos, desc=desc):
         try:
             iter(seed_point)
         except TypeError:
@@ -604,6 +607,7 @@ def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5, **k
     chunked_arrays = np.array_split(region_list, num_cores)
     from concurrent.futures import ProcessPoolExecutor as Pool
     with Pool(multiprocessing.cpu_count()//2) as pool:
+        print("Call get_avg_pos")
         maxima_coords = pool.map(partial(get_avg_pos, regions=regions, region_max_value=region_max_value, image=image),
                      chunked_arrays)
         #maxima_coords = pool.map(get_avg_pos, repeat(regions), repeat(region_max_value), repeat(image), chunked_arrays)
