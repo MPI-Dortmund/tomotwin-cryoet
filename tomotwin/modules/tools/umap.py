@@ -42,7 +42,8 @@ class UmapTool(TomoTwinTool):
             fit_sample_size: int,
             transform_chunk_size: int) -> ArrayLike:
         print("Prepare data")
-        fit_sample = embeddings.sample(n=fit_sample_size, random_state=17)
+
+        fit_sample = embeddings.sample(n=min(len(embeddings),fit_sample_size), random_state=17)
         fit_sample = fit_sample.drop(['filepath', 'Z', 'Y', 'X'], axis=1, errors='ignore')
         all_data = embeddings.drop(['filepath', 'Z', 'Y', 'X'],axis=1, errors='ignore')
 
