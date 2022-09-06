@@ -103,7 +103,8 @@ def _main_():
 
     print(f"Length umap", len(emb_umap))
     print(f"Length data", len(emb_data))
-    emb_umap_selection = emb_umap.sample(n=500000)
+
+    emb_umap_selection = emb_umap.sample(n=min(len(emb_umap),500000))
 
     data = emb_umap_selection.to_numpy()
 
