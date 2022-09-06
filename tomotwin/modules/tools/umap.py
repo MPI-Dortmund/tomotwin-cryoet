@@ -54,7 +54,7 @@ class UmapTool(TomoTwinTool):
             min_dist=0.0,
             random_state=19
         )
-        print(f"Fit umap on {fit_sample_size} samples")
+        print(f"Fit umap on {len(fit_sample)} samples")
         reducer.fit(fit_sample)
 
         num_chunks = max(1, int(len(all_data) / transform_chunk_size))
