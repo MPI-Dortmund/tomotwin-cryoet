@@ -399,6 +399,7 @@ class NetworkManager:
     """
 
     def __init__(self):
+        # Does not need to be class variable
         self.network_identifier_map = {}
         self.add_network("SiameseNet", SiameseNet3D)
         self.add_network("ResNet", Resnet)
@@ -408,6 +409,7 @@ class NetworkManager:
         self.add_network("DNet16", DNet16)
 
     def add_network(self, key: str, netclass: TorchModel) -> None:
+        # NOT NECESSARY
         """
         Add a network to the network identifier map.
 
@@ -417,7 +419,9 @@ class NetworkManager:
         """
         self.network_identifier_map[key.upper()] = netclass
 
+
     def check_format(self, config: Dict) -> None:
+        # CAN BE STATIC!!!
         """
         Check if all necessary fields are in the configuration file.
         :param config: Configuration dictionary
@@ -437,6 +441,7 @@ class NetworkManager:
             )
 
     def load_configuration(self, config_path: str) -> Dict:
+        # CAN BE STATIC
         """
         Load the configuration
         :param config_path: Path to config file.
