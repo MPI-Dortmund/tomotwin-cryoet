@@ -569,7 +569,7 @@ def get_loss_func(net_conf: Dict, train_conf: Dict, distance: distances.Distance
     return loss_func
 
 def _main_():
-    seed = 17
+    seed = 17 #seed value
     np.random.seed(seed)
     random.seed(seed)
 
