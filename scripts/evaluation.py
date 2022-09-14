@@ -447,7 +447,7 @@ class LocateOptimEvaluator():
         positions = _add_size(positions, self.size, self.size_dict)
 
         locate_results = pd.read_pickle(self.locate_results_path)
-        unique_class_labels = np.unique(locate_results['predicted_class'])
+        unique_class_labels = np.sort(np.unique(locate_results['predicted_class']))
         for id in tqdm.tqdm(unique_class_labels,desc="Optimize"):
             dfc = locate_results[locate_results["predicted_class"] == id]
             try:
