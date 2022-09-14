@@ -465,7 +465,7 @@ class LocateArgParseUI(LocateUI):
             "--processes",
             type=int,
             default=4,
-            help="Number of parallel processes. More processes require more memory. Parallelization only effective when m",
+            help="Number of parallel processed references. More processes require more memory.",
         )
 
     def create_parser(self) -> argparse.ArgumentParser:
