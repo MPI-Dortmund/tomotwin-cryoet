@@ -485,7 +485,8 @@ class ExtractReference(TomoTwinTool):
         #Args to give cmd line interface
         os.makedirs(path_output,exist_ok=True)
         # Extract X Y Z coords from correct csv file
-        coords = pd.read_csv(path_ref, sep='    ', header=None)
+        #coords = pd.read_csv(path_ref, sep='    ', header=None)
+        coords = pd.read_csv(path_ref, delim_whitespace=True, header=None)
         coords.columns = ['X', 'Y', 'Z']
         mrc = mrcfile.mmap(path_tomo, permissive=True, mode='r')
 
