@@ -10,7 +10,20 @@ Particle picking in Tomograms using triplet networks and metric learning
 
 ## Installation
 
-To create the necessary conda environment run:
+**!!!** The installation of the napari-boxmanager requires at least napari version `0.4.16.rc8`! **!!!**
+If the version is not yet available use:
+
+    conda create -y -n napari-env -c conda-forge python=3.9
+    conda activate napari-env
+    pip install 'napari[all]'
+    pip uninstall napari
+    pip install git+https://github.com/napari/napari
+
+**!!!** The following is not yet working, pypi upload follows soon **!!!**
+
+You can install `napari-boxmanager` via [pip]:
+
+    pip install napari-boxmanager
 
 ### Default
 ```
