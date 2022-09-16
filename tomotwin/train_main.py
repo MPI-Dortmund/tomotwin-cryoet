@@ -662,13 +662,16 @@ def _main_():
     ########################
     # Create trainer and start training
     ########################
+    only_negative_labels = []
+    if 'only_negative_labels' in config['train_config']:
+        only_negative_labels = config['train_config']['only_negative_labels']
     trainer = TorchTrainer(
         epochs=tconf.num_epochs,
         batchsize=int(config["train_config"]["batchsize"]),
         learning_rate=config["train_config"]["learning_rate"],
         network=network,
         criterion=LossPyML(
-            loss_func=loss_func, miner=miner
+            loss_func=loss_func, miner=miner, only_negative_labels=only_negative_labels
         ),
         workers=12,
         log_dir=os.path.join(tconf.output_path, "tensorboard"),

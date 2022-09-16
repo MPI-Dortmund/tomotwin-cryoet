@@ -388,12 +388,17 @@ class LossPyML(nn.Module):
     def __init__(
         self,
         loss_func: losses.BaseMetricLossFunction,
-        miner: miners.BaseTupleMiner = None
+        miner: miners.BaseTupleMiner = None,
+        only_negative_labels = None
     ):
         super().__init__()
 
         self.miner = miner #miners.TripletMarginMiner(margin=self.margin,type_of_triplets="semihard")
         self.loss_func = loss_func #losses.TripletMarginLoss(margin=self.margin, distance=self.distance)
+        if only_negative_labels is None:
+            self.only_negative_labels = []
+        else:
+            self.only_negative_labels = only_negative_labels
 
     def forward(
         self, anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor, **kwargs
@@ -404,6 +409,7 @@ class LossPyML(nn.Module):
         :param negative: Negative example tensor (different class as anchor)
         :return: Triplet loss
         """
+
         labels = []
         labels.extend(kwargs["label_anchor"][0])
         labels.extend(kwargs["label_positive"][0])
@@ -414,8 +420,15 @@ class LossPyML(nn.Module):
         labels = torch.tensor(labels_int)
         emb = torch.cat([anchor,positive,negative],dim=0) # concat all embeddings
         hard_pairs = None
+
         if self.miner:
             hard_pairs = self.miner(emb, labels)
+            only_negative_labels_indicis = [unique_labels.index(l) for l in self.only_negative_labels]
+            valid_indicies = [int(i) for i in hard_pairs[0] if labels_int[int(i)] not in only_negative_labels_indicis]
+            hard_pairs = (hard_pairs[0][valid_indicies], hard_pairs[1][valid_indicies], hard_pairs[2][valid_indicies])
+
+
+
         l = self.loss_func(emb, labels, hard_pairs)
 
         return l
