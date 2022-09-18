@@ -433,7 +433,14 @@ class LossPyML(nn.Module):
                     pass
 
             valid_indicies = [int(i) for i in hard_pairs[0] if labels_int[int(i)] not in only_negative_labels_indicis]
-            hard_pairs = (hard_pairs[0][valid_indicies], hard_pairs[1][valid_indicies], hard_pairs[2][valid_indicies])
+            try:
+                new_hard_pairs = (hard_pairs[0][valid_indicies], hard_pairs[1][valid_indicies], hard_pairs[2][valid_indicies])
+                hard_pairs = new_hard_pairs
+            except RuntimeError as e:
+                print("Runtime error. Use old hard pairs")
+                print(valid_indicies)
+                print(e)
+
 
 
 
