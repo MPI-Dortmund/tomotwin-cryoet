@@ -423,8 +423,9 @@ class LossPyML(nn.Module):
 
         if self.miner:
             hard_pairs = self.miner(emb, labels)
-            only_negative_labels_asint = []
 
+            ## Remove only negative labels
+            only_negative_labels_asint = []
             for l in self.only_negative_labels:
                 try:
                     uniq_index = unique_labels.index(l)
