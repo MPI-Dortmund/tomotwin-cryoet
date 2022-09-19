@@ -423,16 +423,16 @@ class LossPyML(nn.Module):
 
         if self.miner:
             hard_pairs = self.miner(emb, labels)
-            only_negative_labels_indicis = []
+            only_negative_labels_asint = []
 
             for l in self.only_negative_labels:
                 try:
                     uniq_index = unique_labels.index(l)
-                    only_negative_labels_indicis.append(uniq_index)
+                    only_negative_labels_asint.append(uniq_index)
                 except ValueError:
                     pass
 
-            valid_indicies = [i for i in range(len(hard_pairs[0])) if labels_int[hard_pairs[0][i]] not in only_negative_labels_indicis]
+            valid_indicies = [i for i in range(len(hard_pairs[0])) if labels_int[hard_pairs[0][i]] not in only_negative_labels_asint]
             try:
                 new_hard_pairs = (hard_pairs[0][valid_indicies], hard_pairs[1][valid_indicies], hard_pairs[2][valid_indicies])
                 hard_pairs = new_hard_pairs
