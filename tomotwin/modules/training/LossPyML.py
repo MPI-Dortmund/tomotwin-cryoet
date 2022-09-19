@@ -432,7 +432,7 @@ class LossPyML(nn.Module):
                 except ValueError:
                     pass
 
-            valid_indicies = [int(i) for i in hard_pairs[0] if labels_int[int(i)] not in only_negative_labels_indicis]
+            valid_indicies = [i for i in range(len(hard_pairs[0])) if labels_int[hard_pairs[0][i]] not in only_negative_labels_indicis]
             try:
                 new_hard_pairs = (hard_pairs[0][valid_indicies], hard_pairs[1][valid_indicies], hard_pairs[2][valid_indicies])
                 hard_pairs = new_hard_pairs
