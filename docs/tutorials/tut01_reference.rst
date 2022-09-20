@@ -69,7 +69,7 @@ To embed your tomogram using two GPUs do:
 
 .. prompt:: bash $
 
-    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -m tomotwin_model_p120_052022.pth -v your_tomo_a10.mrc -b 256 -o out/embed/ -w 37 -s 2
+    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -m tomotwin_model_p120_052022.pth -v your_tomo_a10.mrc -b 256 -o out/embed/
 
 4. Embed your reference
 ^^^^^^^^^^^^^^^^^^^^^^^
