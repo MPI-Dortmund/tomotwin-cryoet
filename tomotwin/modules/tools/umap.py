@@ -58,7 +58,7 @@ class UmapTool(TomoTwinTool):
         reducer.fit(fit_sample)
 
         num_chunks = max(1, int(len(all_data) / transform_chunk_size))
-        print(f"Transform complete dataset in {num_chunks} chunks with a chunksize of ~{transform_chunk_size}")
+        print(f"Transform complete dataset in {num_chunks} chunks with a chunksize of ~{int(len(all_data)/num_chunks)}")
 
         chunk_embeddings = []
         for chunk in tqdm(np.array_split(all_data, num_chunks),desc="Transform"):
