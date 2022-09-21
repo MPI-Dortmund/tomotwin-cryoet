@@ -380,5 +380,8 @@ import numpy as np
 
 
 def read_mrc(pth: str) -> np.array:
-    vol = mrcfile.open(pth, mode="r", permissive=True)
+    try:
+        vol = mrcfile.open(pth, mode="r", permissive=True)
+    except ValueError as e:
+        raise Exception(f"Failed reading {pth}") from e
     return vol.data

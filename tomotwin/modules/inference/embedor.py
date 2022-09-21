@@ -438,7 +438,7 @@ class TorchEmbedor(Embedor):
         self.workers = workers
         self.weightspth = weightspth
         print("reading", self.weightspth)
-        network_manager = NetworkManager()
+        network_manager = NetworkManager() # should be a statica call
         checkpoint = torch.load(self.weightspth)
         self.tomotwin_config = checkpoint["tomotwin_config"]
         print("Model config:")

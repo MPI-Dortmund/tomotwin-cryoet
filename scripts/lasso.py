@@ -77,7 +77,7 @@ class SelectFromCollection:
         self.canvas.draw_idle()
 
 def get_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description='Convert clusters to coords')
+    parser = argparse.ArgumentParser(description='Convert clusters to coords', formatter_class=argparse.ArgumentDefaultsHelpFormatter,)
     parser.add_argument('-u','--umap', type=str, required=True,
                         help='Path to pickled pandas dataframe with the umap')
     parser.add_argument('-e','--embedding', type=str, required=True,
@@ -89,8 +89,8 @@ def get_parser() -> argparse.ArgumentParser:
 def _main_():
     parser = get_parser()
     args = parser.parse_args()
-    pth_umap = args.umap #"/mnt/data/twagner/Projects/TomoTwin/data/misc/emb_umap/map_2.pkl"
-    pth_embedding = args.embedding # "/home/twagner/Documents/Publications/TomoTwin/Figures/gen_figure/gen_3_v04/embed/tomo/tiltseries_rec_embeddings.pkl"
+    pth_umap = args.umap
+    pth_embedding = args.embedding
     emb_umap = pd.read_pickle(pth_umap)
     emb_data = pd.read_pickle(pth_embedding)
     references = []
@@ -103,7 +103,8 @@ def _main_():
 
     print(f"Length umap", len(emb_umap))
     print(f"Length data", len(emb_data))
-    emb_umap_selection = emb_umap.sample(n=500000)
+
+    emb_umap_selection = emb_umap.sample(n=min(len(emb_umap),500000))
 
     data = emb_umap_selection.to_numpy()
 
@@ -125,14 +126,14 @@ def _main_():
 
             references.append(new_ref)
             conc_ref = pd.concat(references, ignore_index=True)
-            pth = os.path.join(out_dir,f"cluster_{len(references)}.pkl")
+            pth = os.path.join(out_dir,f"cluster_{len(references)}.temb")
 
             references_names.append(os.path.basename(pth))
             conc_ref["filepath"] = references_names
             plt.savefig(os.path.splitext(pth)[0]+".png")
             emb_data_selection.to_pickle(pth)
             print(f"Written: {pth}")
-            pth_ref = os.path.join(out_dir, f"references.pkl")
+            pth_ref = os.path.join(out_dir, f"references.temb")
             conc_ref.to_pickle(pth_ref)
             print(f"Update: {pth_ref}")
             selector.disconnect()

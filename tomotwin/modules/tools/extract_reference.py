@@ -427,7 +427,7 @@ class ExtractReference(TomoTwinTool):
         return parser
 
     @staticmethod
-    def extract_and_save(volume: np.array, positions: pd.DataFrame, box_size: int, out_pth: str, basename: str) -> List[str]:
+    def extract_and_save(volume: np.array, positions: pd.DataFrame, box_size: int, out_pth: str, basename: str, apix=None) -> List[str]:
         '''
 
         :param volume: Volume from which the the references should be extracted
@@ -464,6 +464,8 @@ class ExtractReference(TomoTwinTool):
             fname = os.path.join(out_pth,f"{basename}_{index}.mrc")
             with mrcfile.new(fname) as newmrc:
                 newmrc.set_data(subvol)
+                if apix:
+                    newmrc.voxel_size = apix
             files_written.append(fname)
         return files_written
 
@@ -483,9 +485,15 @@ class ExtractReference(TomoTwinTool):
         #Args to give cmd line interface
         os.makedirs(path_output,exist_ok=True)
         # Extract X Y Z coords from correct csv file
-        coords = pd.read_csv(path_ref, sep='    ', header=None)
+        #coords = pd.read_csv(path_ref, sep='    ', header=None)
+        coords = pd.read_csv(path_ref,
+                             delim_whitespace=True,
+                             header=None,
+                             index_col=False,
+                             dtype=float,
+                             )
         coords.columns = ['X', 'Y', 'Z']
         mrc = mrcfile.mmap(path_tomo, permissive=True, mode='r')
 
-        ExtractReference.extract_and_save(mrc.data, coords, boxsize, path_output, filebasename)
+        ExtractReference.extract_and_save(mrc.data, coords, boxsize, path_output, filebasename, apix=mrc.voxel_size)
         print(f'wrote subvolume reference to {path_output}')

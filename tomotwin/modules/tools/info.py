@@ -29,11 +29,7 @@ class Info(TomoTwinTool):
 
         return parser
 
-    def run(self, args):
-        path_file = args.input
-
-        dat = pd.read_pickle(path_file)
-
+    def print_pickle(self, dat):
         print("###########")
         print("DATA:")
         print("###########")
@@ -45,7 +41,8 @@ class Info(TomoTwinTool):
         print("###########")
         if 'predicted_class' in dat:
             for cl in range(len(dat.attrs['references'])):
-                print(f"Picked particles for class {cl} ({dat.attrs['references'][cl]}): {np.sum(dat['predicted_class']==cl)}")
+                print(
+                    f"Picked particles for class {cl} ({dat.attrs['references'][cl]}): {np.sum(dat['predicted_class'] == cl)}")
         else:
             print("-")
 
@@ -55,3 +52,31 @@ class Info(TomoTwinTool):
         print("###########")
         import json
         print(json.dumps(dat.attrs, sort_keys=False, indent=3))
+
+    def run(self, args):
+        path_file = args.input
+        try_torch = False
+        try:
+            dat = pd.read_pickle(path_file)
+            self.print_pickle(dat)
+        except:
+            print("Is not a pickled tomotwin file. Try torch model.")
+            try_torch = True
+
+        if try_torch:
+            import torch
+            checkpoint = torch.load(path_file)
+            print("#######################")
+            print("Torch Model Info:")
+            print("#######################")
+            print("Keys:", checkpoint.keys())
+            print("Best loss:", checkpoint['best_loss'])
+            print("Best F1:", checkpoint['best_f1'])
+            print("Epoch:", checkpoint['epoch'])
+            print("")
+            print("#######################")
+            print("Saved TomoTwin config:")
+            print("#######################")
+            self.tomotwin_config = checkpoint["tomotwin_config"]
+            import json
+            print(json.dumps(self.tomotwin_config, sort_keys=False, indent=3))

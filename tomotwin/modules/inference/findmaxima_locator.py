@@ -481,6 +481,7 @@ class FindMaximaLocator(Locator):
         vol = FindMaximaLocator.to_volume(map_output, target_class=class_id, window_size=window_size, stride=stride)
 
         maximas, _ = find_maxima(vol, tolerance, global_min=global_min,tqdm_pos=kwargs.get("tqdm_pos"))
+        print("done", class_id)
         del _
 
         maximas = [

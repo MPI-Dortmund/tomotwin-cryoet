@@ -1,6 +1,5 @@
 import unittest
 from tomotwin.modules.training.torchtrainer import TorchTrainer
-from tomotwin.modules.training.tripletloss import TripletLoss
 from tomotwin.modules.common.distances import DistanceManager
 from tomotwin.modules.training.filenametripletprovider import FilenameMatchingTripletProvider
 from tomotwin.modules.training.tripletdataset import TripletDataset
@@ -56,25 +55,6 @@ class MyTestCase(unittest.TestCase):
 
         np.testing.assert_array_almost_equal(expected_distance,result)
 
-    def test_tripletloss_forward(self):
-        import torch
-        dm = DistanceManager()
-
-        loss = TripletLoss(distance=dm.get_distance("EUCLIDEAN"), margin=1.0)
-        batch_size=3
-        out_head=3
-        anchor = np.zeros(shape=[batch_size,out_head])
-        positive = np.zeros(shape=[batch_size, out_head])
-        negative = np.zeros(shape=[batch_size, out_head])
-        negative[:,:] = 20
-        expected = np.array([0])
-        l, _, _ = loss.forward(anchor=torch.tensor(anchor),
-                              positive=torch.tensor(positive),
-                              negative=torch.tensor(negative),
-                              )
-        l_np = l.cpu().detach().numpy()
-        print(l_np)
-        np.testing.assert_array_almost_equal(expected,l_np)
 
     def test_set_train_data(self):
         # Generate dummy triplet data

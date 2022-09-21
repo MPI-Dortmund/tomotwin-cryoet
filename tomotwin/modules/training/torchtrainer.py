@@ -705,7 +705,7 @@ class TorchTrainer(Trainer):
             scaler.scale(loss).backward()
             scaler.step(self.optimizer)
             scaler.update()
-            desc_t = f"Training (loss: {np.mean(running_loss[-20:]):.4f} "
+            desc_t = f"Training (loss: {np.mean(running_loss[-20:]):.4f}) "
 
             t.set_description(desc=desc_t)
 

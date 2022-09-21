@@ -569,7 +569,7 @@ def get_loss_func(net_conf: Dict, train_conf: Dict, distance: distances.Distance
     return loss_func
 
 def _main_():
-    seed = 17
+    seed = 17 #seed value
     np.random.seed(seed)
     random.seed(seed)
 
@@ -601,19 +601,8 @@ def _main_():
     train_triplets, test_triplets = generate_triplets(tconf)
 
     print("Number of train triplets:", len(train_triplets))
-    '''
-    print(
-        "Anchors in train triplets:",
-        set([os.path.basename(t.anchor) for t in train_triplets]),
-    )
-    '''
     print("Number of validation triplets:", len(test_triplets))
-    '''
-    print(
-        "Anchors in validation triplets:",
-        set([os.path.basename(t.anchor) for t in test_triplets]),
-    )
-    '''
+
     ########################
     # Load config
     ########################
@@ -673,13 +662,16 @@ def _main_():
     ########################
     # Create trainer and start training
     ########################
+    only_negative_labels = []
+    if 'only_negative_labels' in config['train_config']:
+        only_negative_labels = config['train_config']['only_negative_labels']
     trainer = TorchTrainer(
         epochs=tconf.num_epochs,
         batchsize=int(config["train_config"]["batchsize"]),
         learning_rate=config["train_config"]["learning_rate"],
         network=network,
         criterion=LossPyML(
-            loss_func=loss_func, miner=miner
+            loss_func=loss_func, miner=miner, only_negative_labels=only_negative_labels
         ),
         workers=12,
         log_dir=os.path.join(tconf.output_path, "tensorboard"),

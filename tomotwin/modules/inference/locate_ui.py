@@ -403,6 +403,7 @@ class LocateConfiguration:
     boxsize: Union[str,int]
     mode: LocateMode
     global_min: float
+    processes: int
 
 class LocateUI(ABC):
     """Interface to define"""
