@@ -29,7 +29,7 @@ For the reference based approach you need, of course, references. To pick them f
 
  .. prompt:: bash $
 
-    imod tomo/your_tomo_a10.mrc
+    3dmod tomo/your_tomo_a10.mrc
 
  For easy identification of your reference particle we recommend to use low-pass filter to 60 angstroms and/or denoising (be sure it has the same pixel size of the tomogram you will pick on).
 
