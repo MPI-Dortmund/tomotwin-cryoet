@@ -1,15 +1,6 @@
 Installation and Download
 =========================
 
-Here are some installation instructions.
-
-
-System requirements
-^^^^^^^^^^^^^^^^^^^
-
-Where was it tested on
-
-
 Install TomoTwin
 ^^^^^^^^^^^^^^^^
 
@@ -52,3 +43,11 @@ This is an optional step, but for convinience reasons we link an adapted napari 
     echo -e "#\!/usr/bin/bash\nnapari_exe='$(which napari)'\n\${napari_exe} \${@} -w napari-boxmanager __all__" > ${napari_link_file}
     chmod +x ${napari_link_file}
 
+System requirements
+^^^^^^^^^^^^^^^^^^^
+
+So far we run it on Ubuntu 20.04 and the following GPUs:
+
+    - NVIDIA V100
+    - NVIDIA RTX 2080
+    - NVIDIA A100
