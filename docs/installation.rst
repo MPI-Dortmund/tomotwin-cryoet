@@ -20,8 +20,8 @@ Here we assume that you don't have napari installed. Until the new release from 
 
 .. prompt:: bash $
 
-    conda create -y -n napari-env -c conda-forge python=3.10
-    conda activate napari-env
+    conda create -y -n napari-tomotwin -c conda-forge python=3.10
+    conda activate napari-tomotwin
     pip install 'napari[all]'
     pip uninstall napari
     pip install git+https://github.com/napari/napari
