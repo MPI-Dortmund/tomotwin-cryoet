@@ -23,7 +23,19 @@ Install TomoTwin
 Install Napari
 ^^^^^^^^^^^^^^
 
-Here we assume that you don't have napari installed. Instructions will follow
+Here we assume that you don't have napari installed. Until the new release from Napari, we need to build it via github as we require the latest changes. Please do:
+
+.. prompt:: bash $
+    conda create -y -n napari-env -c conda-forge python=3.9
+    conda activate napari-env
+    pip install 'napari[all]'
+    pip uninstall napari
+    pip install git+https://github.com/napari/napari
+
+You can install `napari-boxmanager` via [pip]:
+
+.. prompt:: bash $
+    pip install napari-boxmanager
 
 Link Napari
 ^^^^^^^^^^^
