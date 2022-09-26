@@ -27,7 +27,7 @@ Here we assume that you don't have napari installed. Until the new release from 
 
 .. prompt:: bash $
 
-    conda create -y -n napari-env -c conda-forge python=3.9
+    conda create -y -n napari-env -c conda-forge python=3.10
     conda activate napari-env
     pip install 'napari[all]'
     pip uninstall napari
