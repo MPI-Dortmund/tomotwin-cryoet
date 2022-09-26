@@ -45,8 +45,7 @@ For the reference based approach you need, of course, references. To pick them f
 
     We recommend to pick multiple (2-3) references per protein of interest, as not all subvolumes work equally well.
 
-    Each reference is used to pick separately, allowing you to decide which reference leads to the best picking for each protein of interest.
-
+    Each reference can be later evaluated seperately using the boxmanager, allowing you to decide which gives the best result for each protein of interest
 
 2. As :guilabel:`Mode` select :guilabel:`model` instead of :guilabel:`movie`, navigate to the central slice of the particle you would like to use as a reference, middle click to place a point on the center of the particle. You can use :guilabel:`Edit` -> :guilabel:`Object` -> :guilabel:`Type` and increase the :guilabel:`Sphere radius for points` to visualize the area that will be used for extraction (radius 18 or 19). Pick 2-3 particles for each protein of interest and repeat this step (creating a seperate mod file) for each protein you'd like to pick in the tomogram.
 
