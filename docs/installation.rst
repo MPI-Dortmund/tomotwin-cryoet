@@ -1,7 +1,9 @@
 Installation and Download
 =========================
 
-Install TomoTwin
+There are three main steps to install TomoTwin:
+
+1. Install TomoTwin
 ^^^^^^^^^^^^^^^^
 
 .. prompt:: bash $
@@ -11,7 +13,7 @@ Install TomoTwin
     pip install git+https://github.com/MPI-Dortmund/tomotwin-cryoet@dev
     conda remove --force cupy
 
-Install Napari
+2. Install Napari
 ^^^^^^^^^^^^^^
 
 Here we assume that you don't have napari installed. Until the new release from Napari, we need to build it via github as we require the latest changes. Please do:
@@ -30,7 +32,7 @@ You can install `napari-boxmanager` via [pip]:
 
     pip install napari-boxmanager
 
-Link Napari
+3. Link Napari
 ^^^^^^^^^^^
 
 This is an optional step, but for convinience reasons we link an adapted napari call into the tomotwin environment. With that you don't need to switch environments when working with tomotwin. While this is optional, I assume during the tutorials that you did this step. Here is what you need to do:
