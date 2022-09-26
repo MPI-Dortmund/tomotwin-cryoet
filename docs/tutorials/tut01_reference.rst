@@ -18,7 +18,6 @@ TomoTwin was trained on tomograms with a pixelsize of 10Å. While in practice we
 
 TomoTwin should be used to pick on tomograms without denoising or lowpass filtering. But you may use these tomograms to find the coordinates of your particle of interest for use as a reference. In this case, you should make sure the denoised/lowpass filtered tomogram has the same pixel size as the one you will pick on.
 
-
  .. note::
 
     **What if my protein is too big for a box size of 37x37x37 pixels?**
