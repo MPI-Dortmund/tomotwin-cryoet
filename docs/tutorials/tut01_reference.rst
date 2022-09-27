@@ -61,7 +61,7 @@ For the reference based approach you need, of course, references. To pick them f
 
 7. To save the reference of the selected particle layer (see layer list in napari), click on :guilabel:`File` -> :guilabel:`Save Selected Layer(s)`. Create a new folder by right click in the dialog and name it for example 'coords'. Now select as :guilabel:`Files of type` the entry :guilabel:`Box Manager`. Use the filename `reference.coords` and press :guilabel:`Save`.
 
-8. Finally, use the `tomotwin_tools.py extractref` script to extract a box from the tomogram (the original, not the denoised/lp60) at the coordinates for each reference. If there are multiple references you would like to pick in the tomogram, repeat this process multiple times giving a new output folder each time.
+8. Finally, use the ``tomotwin_tools.py extractref`` script to extract a box from the tomogram (the original, not the denoised/lp60) at the coordinates for each reference. If there are multiple references you would like to pick in the tomogram, repeat this process multiple times giving a new output folder each time.
 
  .. prompt:: bash $
 
