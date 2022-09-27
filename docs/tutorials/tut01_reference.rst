@@ -45,7 +45,7 @@ For the reference based approach you need, of course, references. To pick them f
 
 3. Switch to the :guilabel:`boxmanger` tab and set the :guilabel:`boxsize` to 37, as this this gonna be the box size we will use for extraction
 
-4. Press on the :guilabel:`(+)` symbol to start the picking.
+4. Press on the :guilabel:`⊕` symbol (upper left corner) to start the picking.
 
 5. Identify a potential reference, choose the slice to that its centered and pick it by clicking in the center of the particle. Continue doing that until you think you have enough references
 
