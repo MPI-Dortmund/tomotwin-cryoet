@@ -43,7 +43,7 @@ For the reference based approach you need, of course, references. To pick them f
 
 2. Select :guilabel:`add_layer` tab of the boxmanager toolkit (lower right corner). Press the button for :guilabel:`Create particle layer`.
 
-3. Switch to the :guilabel:`boxmanger` tab and set the :guilabel:`boxsize` to 37, as this this gonna be the box size we will use for extraction
+3. Switch to the :guilabel:`boxmanger` tab and set the :guilabel:`boxsize` to 37, as this gonna be the box size we will use for extraction later on.
 
 4. Press on the :guilabel:`⊕` symbol (upper left corner) to start the picking.
 
