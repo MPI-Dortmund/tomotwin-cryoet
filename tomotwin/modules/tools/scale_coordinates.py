@@ -410,8 +410,14 @@ class ScaleCoordinates(TomoTwinTool):
 
     @staticmethod
     def scale_coords(coords_pth: str, px1: float, px2: float) -> pd.DataFrame:
+        coords_df = pd.read_csv(
+            coords_pth,
+            delim_whitespace=True,
+            header=None,
+            index_col=False,
+            dtype=float,
+        )
 
-        coords_df = pd.read_csv(coords_pth, sep=' ', header=None)
         coords_df.columns = ['X', 'Y', 'Z']
         scaling_factor = px1 / px2
         print('Scaling coordinates by ' + str(scaling_factor) + 'x')
