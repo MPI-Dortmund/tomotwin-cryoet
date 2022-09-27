@@ -34,16 +34,16 @@ For the reference based approach you need, of course, references. To pick them f
 
  .. note::
 
-    For easy identification of your reference particle we recommend to use low-pass filter to 60 angstroms and/or denoising (be sure it has the same pixel size of the tomogram you will pick on).
+    For easy identification of your reference particle we recommend to use low-pass filter to 60Å and/or denoising (be sure it has the same pixel size of the tomogram you will pick on).
 
  .. prompt:: bash $
 
     napari lp60/d01t15.mrc
 
 
-2. Select add_layer tab of the boxmanager toolkit (lower right corner). Press the button for 'Create particle layer'
+2. Select :guilabel:`add_layer` tab of the boxmanager toolkit (lower right corner). Press the button for :guilabel:`Create particle layer`.
 
-3. Switch to the boxmanger tab and set the boxsize to 37, as this this gonna be the box size
+3. Switch to the :guilabel:`boxmanger` tab and set the :guilabel:`boxsize` to 37, as this this gonna be the box size we will use for extraction
 
 4. Press on the (+) symbol to star the picking.
 
