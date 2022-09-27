@@ -374,6 +374,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
+import os
 
 import pandas as pd
 from argparse import ArgumentParser
@@ -429,7 +430,7 @@ class ScaleCoordinates(TomoTwinTool):
         px1 = args.tomotwin_pixel_size
         px2 = args.extraction_pixel_size
         out_name = args.out
-
+        os.makedirs(os.path.dirname(args.out), exist_ok=True)
         scaled_coords = ScaleCoordinates.scale_coords(coords_pth=coords_pth, px1=px1, px2=px2)
 
         scaled_coords.to_csv(out_name, index=False, header=False, sep=' ')
