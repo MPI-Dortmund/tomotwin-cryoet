@@ -30,44 +30,36 @@ TomoTwin should be used to pick on tomograms without denoising or lowpass filter
 
 For the reference based approach you need, of course, references. To pick them follow the next steps:
 
-1. To use a subvolume within the tomogram as a reference, open the tomogram in imod:
-
- .. prompt:: bash $
-
-    3dmod tomo/your_tomo_a10.mrc
-
- For easy identification of your reference particle we recommend to use low-pass filter to 60 angstroms and/or denoising (be sure it has the same pixel size of the tomogram you will pick on).
-
+1. Open your tomogram in napari
 
  .. note::
 
-    **Use multiple references per particle class**
-
-    We recommend to pick multiple (2-3) references per protein of interest, as not all subvolumes work equally well.
-
-    Each reference can be later evaluated seperately using the boxmanager, allowing you to decide which gives the best result for each protein of interest
-
-2. As :guilabel:`Mode` select :guilabel:`model` instead of :guilabel:`movie`, navigate to the central slice of the particle you would like to use as a reference, middle click to place a point on the center of the particle. You can use :guilabel:`Edit` -> :guilabel:`Object` -> :guilabel:`Type` and increase the :guilabel:`Sphere radius for points` to visualize the area that will be used for extraction (radius 18 or 19). Pick 2-3 particles for each protein of interest and repeat this step (creating a seperate mod file) for each protein you'd like to pick in the tomogram.
-
-
-3. Press :kbd:`s` to open the model saving window and save the model as something like :file:`references_a.mod`.
-
-
-4. Exit imod and use the command
+    For easy identification of your reference particle we recommend to use low-pass filter to 60 angstroms and/or denoising (be sure it has the same pixel size of the tomogram you will pick on).
 
  .. prompt:: bash $
 
-    model2point -inp references_a.mod -ou references_a.coords
+    napari lp60/d01t15.mrc
 
- command to convert to a coords file.
 
-5. Finally, use the `tomotwin_tools.py extractref` script to extract a box from the tomogram (the original, not the denoised/lp60) at the coordinates for each reference. If there are multiple references you would like to pick in the tomogram, repeat this process multiple times giving a new output folder each time.
+2. Select add_layer tab of the boxmanager toolkit (lower right corner). Press the button for 'Create particle layer'
+
+3. Switch to the boxmanger tab and set the boxsize to 37, as this this gonna be the box size
+
+4. Press on the (+) symbol to star the picking.
+
+5. Identify a potential reference, choose the slice to that its centered and pick it. Continue doing that until you think you have enough references
+
+6. Optional: If you want to pick another protein class, we recommend to create a sperate particle layer for it (step 2).
+
+7. To save the reference of the selected particle layer (see layer list in napari), click on File -> Save Selected Layer(s). Create a new folder by right click in the dialog and name it for example 'coords'. Now select as "Files of type' the entry 'Box Manager'. Use the filename reference.coords and press 'Save'.
+
+8. Finally, use the `tomotwin_tools.py extractref` script to extract a box from the tomogram (the original, not the denoised/lp60) at the coordinates for each reference. If there are multiple references you would like to pick in the tomogram, repeat this process multiple times giving a new output folder each time.
 
  .. prompt:: bash $
 
     tomotwin_tools.py extractref --tomo tomo/your_tomo_a10.mrc --coords path/to/references.coords --out reference/ --filename protein_a
 
- You will find your extracted references in `reference/protein_a_X.mrc` where X is a running number.
+You will find your extracted references in `reference/protein_a_X.mrc` where X is a running number.
 
 
 3. Embed your Tomogram
