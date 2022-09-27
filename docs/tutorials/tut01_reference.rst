@@ -45,9 +45,17 @@ For the reference based approach you need, of course, references. To pick them f
 
 3. Switch to the :guilabel:`boxmanger` tab and set the :guilabel:`boxsize` to 37, as this this gonna be the box size we will use for extraction
 
-4. Press on the (+) symbol to star the picking.
+4. Press on the :guilabel:`(+)` symbol to start the picking.
 
-5. Identify a potential reference, choose the slice to that its centered and pick it. Continue doing that until you think you have enough references
+5. Identify a potential reference, choose the slice to that its centered and pick it by clicking in the center of the particle. Continue doing that until you think you have enough references
+
+ .. note::
+
+    **Use multiple references per particle class**
+
+    We recommend to pick multiple (2-3) references per protein of interest, as not all subvolumes work equally well.
+
+    Each reference can be later evaluated seperately using the boxmanager, allowing you to decide which gives the best result for each protein of interest
 
 6. Optional: If you want to pick another protein class, we recommend to create a sperate particle layer for it (step 2).
 
