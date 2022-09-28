@@ -35,4 +35,4 @@ Help
 
 Any questions? Problems? Suggestions?
 
-Find help at our `mailing list <https://listserv.gwdg.de/mailman/listinfo/sphire>`_ or `open an issue in GitHub <https://github.com/MPI-Dortmund/tomotwin-cryoet/issues>`_!
+Find help at our `mailing list <https://listserv.gwdg.de/mailman/listinfo/sphire>`_ or `open an issue on GitHub <https://github.com/MPI-Dortmund/tomotwin-cryoet/issues>`_!
