@@ -635,6 +635,7 @@ def _main_():
         label_ext_func=label_filename
     )
 
+
     ########################
     # Init distance function
     ########################
@@ -685,6 +686,7 @@ def _main_():
         save_epoch_seperately=tconf.save_after_improvement
     )
     trainer.set_seed(seed)
+    config["window_size"] = tuple(train_ds.get_triplet_dimension())
     trainer.set_network_config(config)
 
     trainer.train()

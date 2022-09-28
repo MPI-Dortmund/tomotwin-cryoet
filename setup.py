@@ -28,7 +28,8 @@ setup(
         "pytorch-metric-learning",
         "cupy-cuda115",
         "numba",
-        "tabulate"
+        "tabulate",
+        "setuptools_scm"
     ],
     author_email='thorsten.wagner@mpi-dortmund.mpg.de',
     description='Picking procedure for cryo em tomography',

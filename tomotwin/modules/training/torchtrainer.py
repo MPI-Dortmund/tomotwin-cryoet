@@ -780,6 +780,7 @@ class TorchTrainer(Trainer):
         epoch: int = None,
         best_loss: float = None,
         best_f1: float = None,
+        **kwargs
     ):
         """
         Adds some metadata to the model and write the model  to disk
@@ -795,6 +796,8 @@ class TorchTrainer(Trainer):
         :return:
         """
         import tomotwin
+        for key,value in kwargs.items():
+            config[key] = value
         results_dict = {
             "model_state_dict": model.state_dict(),
             "tomotwin_config": config,
@@ -820,7 +823,7 @@ class TorchTrainer(Trainer):
             path,
         )
 
-    def write_model_to_disk(self, path: str, model_to_save, model_name: str, epoch: int):
+    def write_model_to_disk(self, path: str, model_to_save, model_name: str, epoch: int, **kwargs):
         if isinstance(model_to_save, nn.DataParallel):
             model_to_save = model_to_save.module
 
@@ -833,9 +836,10 @@ class TorchTrainer(Trainer):
             best_loss=self.best_val_loss,
             best_f1=self.best_val_f1,
             epoch=epoch,
+            **kwargs,
         )
 
-    def write_results_to_disk(self, path: str, save_each_improvement: bool = False):
+    def write_results_to_disk(self, path: str, save_each_improvement: bool = False, **kwargs):
 
         self.write_model_to_disk(path, self.model, "latest.pth", self.current_epoch)
 
@@ -846,14 +850,14 @@ class TorchTrainer(Trainer):
 
         if self.best_model_loss is not None:
             # The best_model can be None, after a training restart.
-            self.write_model_to_disk(path, self.best_model_loss, "best_loss.pth", self.best_epoch_loss)
+            self.write_model_to_disk(path, self.best_model_loss, "best_loss.pth", self.best_epoch_loss, **kwargs)
 
         if self.best_model_f1 is not None:
             # The best_model can be None, after a training restart.
-            self.write_model_to_disk(path, self.best_model_f1, "best_f1.pth", self.best_epoch_f1)
+            self.write_model_to_disk(path, self.best_model_f1, "best_f1.pth", self.best_epoch_f1, **kwargs)
 
         if save_each_improvement and self.f1_improved:
-            self.write_model_to_disk(path, self.best_model_f1, f"best_f1_{self.best_epoch_f1}.pth", self.best_epoch_f1)
+            self.write_model_to_disk(path, self.best_model_f1, f"best_f1_{self.best_epoch_f1}.pth", self.best_epoch_f1, **kwargs)
 
 
     def get_model(self) -> Any:

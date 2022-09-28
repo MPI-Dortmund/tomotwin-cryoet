@@ -457,5 +457,13 @@ class TripletDataset(Dataset):
 
         return input_triplet
 
+    def get_triplet_dimension(self):
+
+        nptriplet = self.handler.handle(self.training_data[0])
+        assert nptriplet.anchor.shape == nptriplet.positive.shape
+        assert nptriplet.negative.shape == nptriplet.negative.shape
+
+        return nptriplet.anchor.shape
+
     def get_used_triplets(self) -> []:
         return
