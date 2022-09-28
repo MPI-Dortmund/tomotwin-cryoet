@@ -9,6 +9,10 @@ Welcome, this is the user guide for TomoTwin - a deep metric learning based part
 
 In comparision with other tools, TomoTwin comes pre-trained on so far 120 different proteins. By embedding tomograms in an information-rich, high-dimensional space which separates macromolecules according to their 3-dimensional structure, TomoTwin allows users to identify proteins in tomograms de novo without manually creating training data or retraining the network each time a new protein is to be located. That means, you can simply run it for your specific sample without a much additional effort.
 
+.. image:: img/general/workflow.png
+   :align: right
+   :width: 350
+
 TomoTwin provides you two workflows to get your particle picked:
 
 In the **reference based workflow** a single molecule is picked for each protein of interest and used as a target to localize other instances of the protein. We provide a :ref:`step-by-step tutorial <tutorial-reference>` to make it easy for you to run it on your own dataset.
