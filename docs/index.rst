@@ -11,7 +11,7 @@ In comparision with other tools, TomoTwin comes pre-trained on so far 120 differ
 
 TomoTwin provides you two workflows to get your particle picked:
 
-In the **reference based workflow** a single molecule is picked for each protein of interest and used as a target to localize other instances of the protein. We provide a :ref:`step-by-step tutorial <tutorial-reference>`step-by-step tutorial to make it easy for you to run it on your own dataset.
+In the **reference based workflow** a single molecule is picked for each protein of interest and used as a target to localize other instances of the protein. We provide a :ref:`step-by-step tutorial <tutorial-reference>` to make it easy for you to run it on your own dataset.
 
 
 The **clustering workflow**  where macromolecular structures of interest are identified on a 2D manifold. The is approach is s till under active development to streamline it as much as possible. We will provide a tutorial soon.
