@@ -14,7 +14,7 @@ TomoTwin provides you two workflows to get your particle picked:
 In the **reference based workflow** a single molecule is picked for each protein of interest and used as a target to localize other instances of the protein. We provide a :ref:`step-by-step tutorial <tutorial-reference>` to make it easy for you to run it on your own dataset.
 
 
-The **clustering workflow**  where macromolecular structures of interest are identified on a 2D manifold. The is approach is s till under active development to streamline it as much as possible. We will provide a tutorial soon.
+The **clustering workflow**  where macromolecular structures of interest are identified on a 2D manifold. The is approach is still under active development to streamline it as much as possible for you. We will provide a tutorial soon.
 
 
 All that said, TomoTwin is still in an early stage and there is certainly a lot of room for improvements. New models will soon improve the localization of soluable proteins even further. Future work might bring support for filaments and membrane proteins as well. So bare with us - we keep you posted  :-)
