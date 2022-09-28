@@ -52,7 +52,7 @@ master_doc = 'index'
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
-html_logo = 'img/general/TomoTwin_grey_transparent_tight.png'
+html_logo = 'img/general/TomoTwin_white_transparent_tight.png'
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
