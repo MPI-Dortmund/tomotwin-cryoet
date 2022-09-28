@@ -13,7 +13,7 @@ In comparision with other tools, TomoTwin comes pre-trained on so far 120 differ
    :align: right
    :width: 350
 
-TomoTwin provides you two workflows to get your particle picked:
+TomoTwin provides you two workflows to get your particles picked:
 
 In the **reference based workflow** a single molecule is picked for each protein of interest and used as a target to localize other instances of the protein. We provide a :ref:`step-by-step tutorial <tutorial-reference>` to make it easy for you to run it on your own dataset.
 
