@@ -5,10 +5,13 @@ Welcome to TomoTwin's User Guide!
    :align: right
    :width: 350
 
-Welcome, this is the user guide for TomoTwin - a particle picking procedure for cryoEM.
+Welcome, this is the user guide for TomoTwin - a deep metric learning based particle picking procedure for cryo-ET.
+
+In comparision with other tools, TomoTwin does comes pre-trained. That means, you don't need to try it for your specific sample.
+
+Instead, TomoTwin provides you two workflows to get your particle picked:
 
 
-TomoTwin uses provides you two basic
 
 User Guide: full table of contents
 ==================================
