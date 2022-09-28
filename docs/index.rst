@@ -1,10 +1,6 @@
 Welcome to TomoTwin's User Guide!
 ==================================
 
-.. image:: img/general/TomoTwin_grey_transparent_cropped.png
-   :align: right
-   :width: 350
-
 Welcome, this is the user guide for TomoTwin - a deep metric learning based particle picking procedure for cryo-ET.
 
 In comparision with other tools, TomoTwin comes pre-trained on so far 120 different proteins. By embedding tomograms in an information-rich, high-dimensional space which separates macromolecules according to their 3-dimensional structure, TomoTwin allows users to identify proteins in tomograms de novo without manually creating training data or retraining the network each time a new protein is to be located. That means, you can simply run it for your specific sample without a much additional effort.
