@@ -1,7 +1,7 @@
 Welcome to TomoTwin's User Guide!
 ==================================
 
-.. image:: img/general/TomoTwin_black_transparent_cropped.png
+.. image:: img/general/logo_grey.png
    :align: right
    :width: 350
 
