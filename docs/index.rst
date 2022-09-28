@@ -11,7 +11,7 @@ In comparision with other tools, TomoTwin comes pre-trained on so far 120 differ
 
 .. image:: img/general/workflow.png
    :align: right
-   :width: 350
+   :width: 300
 
 TomoTwin provides you two workflows to get your particles picked:
 
