@@ -73,6 +73,8 @@ class Info(TomoTwinTool):
             print("Best loss:", checkpoint['best_loss'])
             print("Best F1:", checkpoint['best_f1'])
             print("Epoch:", checkpoint['epoch'])
+            if 'tt_version_train' in checkpoint:
+                print("TomoTwin Version:", checkpoint['tt_version_train'])
             print("")
             print("#######################")
             print("Saved TomoTwin config:")
