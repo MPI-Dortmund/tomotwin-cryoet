@@ -1,3 +1,5 @@
+.. _tutorial-reference:
+
 Tutorial 1: Reference based particle picking
 ============================================
 
