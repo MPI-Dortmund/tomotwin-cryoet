@@ -391,7 +391,6 @@ class EmbedArgParseUI(EmbedUI):
         self.volumes = None
         self.batchsize = None
         self.output = None
-        self.window_size = None
         self.stride = None
         self.mode = None
         self.zrange = None
@@ -411,7 +410,6 @@ class EmbedArgParseUI(EmbedUI):
 
         if "tomogram" in sys.argv[1]:
             self.mode = EmbedMode.TOMO
-            self.window_size = args.windowsize
             self.stride = args.stride
             self.zrange = args.zrange
             if len(self.stride) == 1:
@@ -424,7 +422,6 @@ class EmbedArgParseUI(EmbedUI):
             output_path=self.output,
             mode=self.mode,
             batchsize=self.batchsize,
-            window_size=self.window_size,
             stride=self.stride,
             zrange=self.zrange
         )
@@ -507,14 +504,6 @@ class EmbedArgParseUI(EmbedUI):
             type=str,
             required=True,
             help="All output files are written in that path.",
-        )
-
-        parser.add_argument(
-            "-w",
-            "--windowsize",
-            type=int,
-            default=37,
-            help="Size of the sliding window",
         )
 
         parser.add_argument(

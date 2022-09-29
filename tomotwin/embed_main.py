@@ -409,6 +409,15 @@ def volume_embedding(volume_pths: List[str], embedor: Embedor):
 
     return embeddings
 
+def get_window_size(model_path: str) -> int:
+    import torch
+    checkpoint = torch.load(model_path)
+    if 'window_size' in checkpoint["tomotwin_config"]:
+        return int(checkpoint["tomotwin_config"]['window_size'][0])
+    else:
+        print("Can't find window size in model. Use window size of 37.")
+        return 37
+
 def _main_():
     ########################
     # Get configuration from user interface
@@ -427,11 +436,11 @@ def _main_():
         workers=12,#multiprocessing.cpu_count(),
     )
 
-
+    window_size = get_window_size(conf.model_path)
     if conf.mode == EmbedMode.TOMO:
         tomo = -1*io.read_mrc(conf.volumes_path) # -1 to invert the contrast
         if conf.zrange:
-            hb = int((conf.window_size - 1) // 2)
+            hb = int((window_size - 1) // 2)
             minz = max(0,conf.zrange[0] - hb)
             maxz = min(conf.zrange[1] + hb, tomo.shape[0])
             conf.zrange = (minz, maxz)  # here we need to take make sure that the box size is subtracted etc.
@@ -456,7 +465,7 @@ def _main_():
         df.index.name = "index"
         df.attrs["tt_version_embed"] = tomotwin.__version__
         df.attrs['filepath'] = conf.volumes_path
-        df.attrs["window_size"] = conf.window_size
+        df.attrs["window_size"] = window_size
         df.attrs["stride"] = conf.stride
         df.attrs['tomogram_input_shape'] = tomo.shape
         df.attrs["tomotwin_config"] = embedor.tomotwin_config

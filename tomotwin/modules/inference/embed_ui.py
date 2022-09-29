@@ -406,7 +406,6 @@ class EmbedConfiguration:
     output_path: str
     mode: EmbedMode
     batchsize: int
-    window_size: bool = None
     stride: int = None
     zrange: Tuple[int,int] = None
 
