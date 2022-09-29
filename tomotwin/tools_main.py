@@ -387,15 +387,18 @@ def get_tool_list() -> List[TomoTwinTool]:
     from tomotwin.modules.tools.scale_coordinates import ScaleCoordinates
     from tomotwin.modules.tools.info import Info
     from tomotwin.modules.tools.umap import UmapTool
+    from tomotwin.modules.tools.median_embedding import MedianTool
     scale_coords_tool = ScaleCoordinates()
     extract_ref_tool = ExtractReference()
     umap_tool = UmapTool()
     info_tool = Info()
+    median_tool = MedianTool()
 
     tools.append(extract_ref_tool)
     tools.append(scale_coords_tool)
     tools.append(info_tool)
     tools.append(umap_tool)
+    tools.append(median_tool)
 
     return tools
 
