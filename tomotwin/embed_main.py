@@ -446,7 +446,7 @@ def _main_():
             conf.zrange = (minz, maxz)  # here we need to take make sure that the box size is subtracted etc.
 
         boxer = SlidingWindowBoxer(
-            box_size=conf.window_size,
+            box_size=window_size,
             stride=conf.stride,
             zrange=conf.zrange
         )
