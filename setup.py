@@ -2,7 +2,8 @@ from setuptools import setup
 
 setup(
     name='tomotwin',
-    use_scm_version=True,
+    use_scm_version={'write_to': 'tomotwin/__init__.py'},#True,
+
     setup_requires=['setuptools_scm'],
     python_requires='>=3.7.0',
     packages=[
