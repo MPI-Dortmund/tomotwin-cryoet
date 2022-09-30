@@ -19,7 +19,7 @@ class FilterTool(TomoTwinTool):
 
         parser = parentparser.add_parser(
             self.get_command_name(),
-            help="Calculates the median embedding of a embedding file. That seems to be useful to detect background region.",
+            help="Filters the embedding file for relevant embeddings. Handy for median denoising",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
 
@@ -29,7 +29,7 @@ class FilterTool(TomoTwinTool):
         parser.add_argument('-m', '--map', type=str, required=True,
                             help='Map file for median embedding')
 
-        parser.add_argument('-t', '--threshold', type=str, required=True,
+        parser.add_argument('-t', '--threshold', type=float, required=True,
                             help='All embeddings higher than this similarty threshold are discarded')
 
         parser.add_argument('-o', '--output', type=str, required=True,
@@ -43,9 +43,10 @@ class FilterTool(TomoTwinTool):
         each reference in map_results seperately
         """
         filtered_embeddings = []
-        map_results.df.drop(['X', 'Y', 'Z'], axis=1)
-        for reference in map_results:
-            mask = map_results[reference] > threshold
+        map_results_no_coords = map_results.drop(['X', 'Y', 'Z'], axis=1)
+        for ref_index, reference in enumerate(map_results_no_coords):
+            print(f"Filter reference {map_results_no_coords.attrs['references'][ref_index]} (Map column: {reference})")
+            mask = map_results_no_coords[reference] < threshold
             mask = mask.to_numpy()
             filtered_embeddings.append(embeddings.iloc[mask])
 
@@ -64,4 +65,4 @@ class FilterTool(TomoTwinTool):
             ref_name = os.path.splitext(os.path.basename(tomo_map.attrs['references'][emb_index]))[0]
             out=os.path.join(args.output,f"{embedding_filename}_filtered_{ref_name}.temb")
             emb.to_pickle(out)
-            print(f"Wrote {out}")
+            print(f"Wrote {out} - removed {100 - int(len(emb)/len(tomo_embeddings)*100)}% embedding points")
