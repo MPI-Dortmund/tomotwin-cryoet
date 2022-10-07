@@ -1,10 +1,13 @@
 Installation and Download
 =========================
 
+Installation
+^^^^^^^^^^^^^
+
 There are three main steps to install TomoTwin:
 
 1. Install TomoTwin
-^^^^^^^^^^^^^^^^
+""""""""""""""""""""
 
 .. prompt:: bash $
 
@@ -14,7 +17,7 @@ There are three main steps to install TomoTwin:
     pip install git+https://github.com/MPI-Dortmund/tomotwin-cryoet@dev
 
 2. Install Napari
-^^^^^^^^^^^^^^
+"""""""""""""""""""
 
 Here we assume that you don't have napari installed. Until the new release from Napari, we need to build it via github as we require the latest changes. Please do:
 
@@ -33,7 +36,7 @@ You can install `napari-boxmanager` via [pip]:
     pip install napari-boxmanager
 
 3. Link Napari
-^^^^^^^^^^^
+"""""""""""""""""""
 
 This is an optional step, but for convinience reasons we link an adapted napari call into the tomotwin environment. With that you don't need to switch environments when working with tomotwin. While this is optional, I assume during the tutorials that you did this step. Here is what you need to do:
 
@@ -44,6 +47,15 @@ This is an optional step, but for convinience reasons we link an adapted napari 
     conda activate napari-tomotwin
     echo -e "#\!/usr/bin/bash\nnapari_exe='$(which napari)'\n\${napari_exe} \${@} -w napari-boxmanager __all__" > ${napari_link_file}
     chmod +x ${napari_link_file}
+
+Download
+^^^^^^^^^
+
+:Last update: 05.2022
+
+:Number of proteins: 120
+
+:Link: `https <https://owncloud.gwdg.de/index.php/s/PmothfUVKh4NSfD>`_
 
 System requirements
 ^^^^^^^^^^^^^^^^^^^

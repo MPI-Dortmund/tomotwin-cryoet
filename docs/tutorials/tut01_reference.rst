@@ -75,15 +75,13 @@ You will find your extracted references in `reference/protein_a_X.mrc` where X i
 3. Embed your Tomogram
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Download the latest tomotwin model here:
-
-https://owncloud.gwdg.de/index.php/s/vfjKoBZc4YtPaGT
+I assume that you already have downloaded the general model.
 
 To embed your tomogram using two GPUs do:
 
 .. prompt:: bash $
 
-    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -m tomotwin_model_p120_052022.pth -v your_tomo_a10.mrc -b 256 -o your_tomo_a10/embed/tomo/ -w 37 -s 2
+    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -m LATEST_TOMOTWIN_MODEL.pth -v your_tomo_a10.mrc -b 256 -o your_tomo_a10/embed/tomo/ -w 37 -s 2
 
 
 4. Embed your reference
@@ -93,7 +91,7 @@ Now you can embed your reference:
 
 .. prompt:: bash $
 
-    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py subvolumes -m tomotwin_model_p120_052022.pth -v reference/*.mrc -b 12 -o your_tomo_a10/embed/reference/
+    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py subvolumes -m LATEST_TOMOTWIN_MODEL.pth -v reference/*.mrc -b 12 -o your_tomo_a10/embed/reference/
 
 
 5. Map your tomogram
