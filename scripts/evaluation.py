@@ -318,10 +318,10 @@ class SubvolumeEvaluator():
 
 class LocateOptimEvaluator():
 
-    def __init__(self, positions_path: str, locate_results_path: str, sizes_pth: str, stepsize_optim_similarity: float = 0.05):
+    def __init__(self, positions_path: str, locate_results_path: str, sizes_pth: str, stepsize_optim_similarity: float = 0.05, size=37):
         self.positions_path = positions_path
         self.locate_results_path = locate_results_path
-        self.size = 37
+        self.size = size
         self.iou_thresh = 0.6
         self.size_dict= None
         if sizes_pth:
@@ -439,18 +439,29 @@ class LocateOptimEvaluator():
     def run(self) -> Dict:
         stats = {}
 
-        positions = pd.read_csv(self.positions_path, sep=" ")
-        if len(positions.columns)<7:
+        positions = pd.read_csv(self.positions_path, delim_whitespace=True, header=None)
+
+        if len(positions.columns)==1:
             print("Read position with ',' sperator")
             positions = pd.read_csv(self.positions_path, sep=",")
-        positions.columns = ["class", "X", "Y", "Z", "rz", "rx", "ry"]
+
+        locate_results = pd.read_pickle(self.locate_results_path)
+        unique_class_labels = np.sort(np.unique(locate_results['predicted_class']))
+
+        if len(unique_class_labels) == 1 and len(positions.columns) == 3:
+            # Single class run...
+            print("Single class run!")
+            positions['class'] = "0000"
+            locate_results.attrs['references'] = ["0000"]
+            positions.columns = ['X','Y',"Z",'class']
+        else:
+            positions.columns = ["class", "X", "Y", "Z", "rz", "rx", "ry"]
         gt_data_classes = np.unique(positions["class"])
         gt_data_classes = [gt.upper() for gt in gt_data_classes]
 
         positions = _add_size(positions, self.size, self.size_dict)
 
-        locate_results = pd.read_pickle(self.locate_results_path)
-        unique_class_labels = np.sort(np.unique(locate_results['predicted_class']))
+
         for id in tqdm.tqdm(unique_class_labels,desc="Optimize"):
             dfc = locate_results[locate_results["predicted_class"] == id]
             try:
@@ -577,9 +588,17 @@ def _main_():
         locate_path = args.locate
         optim = args.optim
         sizes_pth = args.size
+        size = 37
+        if args.size and args.size.isdigit():
+            sizes_pth = None
+            size = int(args.size)
 
         if optim:
-            evaluator = LocateOptimEvaluator(positions_path=positions_path, locate_results_path=locate_path, sizes_pth=sizes_pth, stepsize_optim_similarity=args.stepsize_optim_similarity)
+            evaluator = LocateOptimEvaluator(positions_path=positions_path,
+                                             locate_results_path=locate_path,
+                                             sizes_pth=sizes_pth,
+                                             stepsize_optim_similarity=args.stepsize_optim_similarity,
+                                             size=size)
         else:
             evaluator = LocateEvaluator(positions_path=positions_path, locate_results_path=locate_path)
         stats = evaluator.run()
