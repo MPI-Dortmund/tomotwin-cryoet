@@ -51,7 +51,8 @@ def create_position_parser(parser_parent):
         "-s",
         "--size",
         type=str,
-        required=True,
+        default=None,
+        required=False,
         help="Path to json file with box sizes for each reference"
     )
 
@@ -322,7 +323,9 @@ class LocateOptimEvaluator():
         self.locate_results_path = locate_results_path
         self.size = 37
         self.iou_thresh = 0.6
-        self.size_dict = get_size_dict_json(sizes_pth)
+        self.size_dict= None
+        if sizes_pth:
+            self.size_dict = get_size_dict_json(sizes_pth)
         self.stepsize_optim_similarity = stepsize_optim_similarity
 
 
