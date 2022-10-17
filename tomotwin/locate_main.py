@@ -383,7 +383,7 @@ from typing import List
 import pandas as pd
 import tomotwin
 
-from tomotwin.modules.inference.locate_ui import LocateUI, LocateMode
+from tomotwin.modules.inference.locate_ui import LocateUI, LocateMode, LocateConfiguration
 from tomotwin.modules.inference.argparse_locate_ui import LocateArgParseUI
 from tomotwin.modules.inference.findmaxima_locator import FindMaximaLocator
 from tomotwin.modules.inference.locator import Locator
@@ -412,9 +412,7 @@ def extract_subclass_df(map: pd.DataFrame) -> List[pd.DataFrame]:
         sub_dfs.append(sub)
     return sub_dfs
 
-def run(ui: LocateUI):
-    ui.run()
-    conf = ui.get_locate_configuration()
+def run(conf: LocateConfiguration):
     out_path = conf.output_path
     os.makedirs(out_path, exist_ok=True)
     map = readprobs(conf.map_path)
@@ -487,7 +485,9 @@ def run(ui: LocateUI):
 
 def _main_():
     ui = LocateArgParseUI()
-    run(ui=ui)
+    ui.run()
+    conf = ui.get_locate_configuration()
+    run(conf=conf)
 
 
 
