@@ -48,8 +48,8 @@ This is an optional step, but for convinience reasons we link an adapted napari 
     echo -e "#\!/usr/bin/bash\nnapari_exe='$(which napari)'\n\${napari_exe} \${@} -w napari-boxmanager __all__" > ${napari_link_file}
     chmod +x ${napari_link_file}
 
-Download
-^^^^^^^^^
+Download latest model
+^^^^^^^^^^^^^^^^^^^^^
 
 :Last update: 05.2022
 
