@@ -380,7 +380,7 @@ import numpy as np
 import tomotwin
 from tomotwin.modules.inference.mapper import Mapper
 from tomotwin.modules.inference.distance_mapper import DistanceMapper
-from tomotwin.modules.inference.map_ui import MapUI, MapMode
+from tomotwin.modules.inference.map_ui import MapUI, MapMode, MapConfiguration
 from tomotwin.modules.inference.argparse_map_ui import MapArgParseUI
 from tomotwin.modules.common.distances import DistanceManager
 
@@ -416,9 +416,7 @@ def map(
     return mapper.map(embeddings=volumes, references=reference)
 
 
-def run(ui: MapUI):
-    ui.run()
-    conf = ui.get_map_configuration()
+def run(conf: MapConfiguration):
     reference_embeddings_path = (
         conf.reference_embeddings_path
     )
@@ -496,7 +494,9 @@ def run(ui: MapUI):
 
 def _main_():
     ui = MapArgParseUI()
-    run(ui=ui)
+    ui.run()
+    conf = ui.get_map_configuration()
+    run(conf)
 
 
 if __name__ == "__main__":
