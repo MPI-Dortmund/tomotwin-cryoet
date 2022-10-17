@@ -22,7 +22,7 @@ setup(
     ],
     url='https://github.com/MPI-Dortmund/tomotwin-cryoet',
     license='Mozilla Public License Version 2.0',
-    author='Gavin Rice, Thorsten Wagner',
+    author='Gavin Rice, Thorsten Wagner, Markus Stabrin',
     install_requires=[
         "mrcfile",
         "tensorboard",
