@@ -449,6 +449,10 @@ def run(ui: MapUI):
         distance = dm.get_distance(volume_embeddings.attrs["tomotwin_config"]["distance"])
         distance_func = distance.calc_np
 
+        from tomotwin.modules.inference.reference_refinement import ReferenceRefiner
+        refiner = ReferenceRefiner()
+
+
         clf = DistanceMapper(distance_function=distance_func, similarty=distance.is_similarity())
 
         distances = map(
