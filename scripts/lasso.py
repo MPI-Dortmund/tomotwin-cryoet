@@ -84,6 +84,8 @@ def get_parser() -> argparse.ArgumentParser:
                         help='Path to tomogram embedding')
     parser.add_argument('-p', '--pointsize', type=float, default=0.001,
                         help='Path to tomogram embedding')
+    parser.add_argument('-o', '--outdir', type=str, default=None,
+                        help='Output directory')
     return parser
 
 def _main_():
@@ -95,10 +97,13 @@ def _main_():
     emb_data = pd.read_pickle(pth_embedding)
     references = []
     references_names = []
-    root = Tk()
-    root.update()
-    out_dir = filedialog.askdirectory(mustexist=False)
-    root.destroy()
+    if args.outdir is None:
+        root = Tk()
+        root.update()
+        out_dir = filedialog.askdirectory(mustexist=False)
+        root.destroy()
+    else:
+        out_dir = args.outdir
     os.makedirs(out_dir,exist_ok=True)
 
     print(f"Length umap", len(emb_umap))
@@ -116,7 +121,7 @@ def _main_():
 
 
     def accept(event):
-        if event.key == "enter":
+        if "enter" in event.key:
             indicies = selector.get_indicis_full_data().tolist()
             emb_data_selection = emb_data.iloc[indicies]
             emb_data_selection = emb_data_selection.drop(columns=["X", "Y", "Z","filepath"], errors="ignore")
