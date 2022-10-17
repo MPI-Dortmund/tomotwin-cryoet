@@ -496,7 +496,7 @@ def _main_():
     ui = MapArgParseUI()
     ui.run()
     conf = ui.get_map_configuration()
-    run(conf)
+    run(conf=conf)
 
 
 if __name__ == "__main__":
