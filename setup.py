@@ -1,4 +1,9 @@
 from setuptools import setup
+# read the contents of your README file
+from os import path
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name='tomotwin',
@@ -33,7 +38,7 @@ setup(
     ],
     author_email='thorsten.wagner@mpi-dortmund.mpg.de',
     description='Picking procedure for cryo em tomography',
-    long_description='',
+    long_description=long_description,
     long_description_content_type='text/markdown',
     entry_points={
         'console_scripts': [
