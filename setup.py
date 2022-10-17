@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='tomotwin',
-    use_scm_version={'write_to': 'tomotwin/__init__.py'},#True,
+    use_scm_version={'write_to': 'tomotwin/__init__.py'},
 
     setup_requires=['setuptools_scm'],
     python_requires='>=3.7.0',
@@ -16,7 +16,7 @@ setup(
         'tomotwin.modules.common.findmax',
     ],
     url='',
-    license='MIT',
+    license='Mozilla Public License Version 2.0',
     author='Gavin Rice, Thorsten Wagner',
     install_requires=[
         "mrcfile",
