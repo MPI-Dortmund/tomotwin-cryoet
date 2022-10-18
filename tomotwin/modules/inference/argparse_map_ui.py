@@ -403,6 +403,7 @@ class MapArgParseUI(MapUI):
         self.output_pth = args.output
         if "distance" in sys.argv[1]:
             self.mode = MapMode.DISTANCE
+            self.skip_refinement = args.skip_refinement
 
     def get_map_configuration(self) -> MapConfiguration:
         conf = MapConfiguration(
@@ -410,6 +411,7 @@ class MapArgParseUI(MapUI):
             volume_embeddings_path=self.volume_pth,
             output_path=self.output_pth,
             mode=self.mode,
+            skip_refinement=self.skip_refinement
         )
         return conf
 
@@ -432,6 +434,13 @@ class MapArgParseUI(MapUI):
             type=str,
             required=True,
             help="Path to volume embeddings file",
+        )
+
+        parser.add_argument(
+            "--skip_refinement",
+            action='store_true',
+            default=False,
+            help="Skip the reference refinement",
         )
 
         parser.add_argument(

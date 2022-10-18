@@ -400,6 +400,7 @@ class MapConfiguration:
     volume_embeddings_path: str
     output_path: str
     mode: MapMode
+    skip_refinement: bool
 
 
 class MapUI(ABC):

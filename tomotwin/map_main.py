@@ -383,6 +383,7 @@ from tomotwin.modules.inference.distance_mapper import DistanceMapper
 from tomotwin.modules.inference.map_ui import MapUI, MapMode
 from tomotwin.modules.inference.argparse_map_ui import MapArgParseUI
 from tomotwin.modules.common.distances import DistanceManager
+from tomotwin.modules.inference.reference_refinement import ReferenceRefiner
 
 import os
 from pandas.api.types import is_numeric_dtype
@@ -449,11 +450,21 @@ def run(ui: MapUI):
         distance = dm.get_distance(volume_embeddings.attrs["tomotwin_config"]["distance"])
         distance_func = distance.calc_np
 
-        from tomotwin.modules.inference.reference_refinement import ReferenceRefiner
-        refiner = ReferenceRefiner()
+
 
 
         clf = DistanceMapper(distance_function=distance_func, similarty=distance.is_similarity())
+
+
+        if not conf.skip_refinement:
+            clf.quiet = True
+            refiner = ReferenceRefiner(
+                mapper=clf,
+                sample_size=500
+            )
+
+            reference_embeddings_np = refiner.refine_references(references=reference_embeddings_np,embeddings=volume_embeddings_np, iterations=7)
+            clf.quiet = False
 
         distances = map(
             mapper=clf,
