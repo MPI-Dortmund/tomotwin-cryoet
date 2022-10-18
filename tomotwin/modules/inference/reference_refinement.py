@@ -375,96 +375,69 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import argparse
-import sys
-from tomotwin.modules.inference.map_ui import (
-    MapUI,
-    MapConfiguration,
-    MapMode,
-)
+import numpy as np
+from tomotwin.modules.inference.distance_mapper import DistanceMapper
+import tqdm
 
+class ReferenceRefiner:
 
-class MapArgParseUI(MapUI):
-    """
-    Argparse interface for the map command
-    """
+    def __init__(
+            self,
+            mapper: DistanceMapper,
+            sample_size: int = 500
+    ):
+        self.mapper = mapper
+        self.sample_size = sample_size
 
-    def __init__(self):
-        self.reference_pth = None
-        self.volume_pth = None
-        self.output_pth = None
-        self.mode = None
+    def sample_embeddings_indicis(self, distances: np.array, N: int=500) -> np.array:
+        distances = distances.squeeze()
+        return np.argsort(distances)[-N:]
 
-    def run(self, args=None) -> None:
-        parser = self.create_parser()
-        args = parser.parse_args(args)
-        self.reference_pth = args.references
-        self.volume_pth = args.volumes
-        self.output_pth = args.output
-        if "distance" in sys.argv[1]:
-            self.mode = MapMode.DISTANCE
-            self.skip_refinement = args.skip_refinement
-
-    def get_map_configuration(self) -> MapConfiguration:
-        conf = MapConfiguration(
-            reference_embeddings_path=self.reference_pth,
-            volume_embeddings_path=self.volume_pth,
-            output_path=self.output_pth,
-            mode=self.mode,
-            skip_refinement=self.skip_refinement
-        )
-        return conf
-
-    @staticmethod
-    def create_distance_parser(parser):
+    def sim_matrix(self,embeddings: np.array) -> np.array:
         """
-        Create parser for distance subcommand
+        Calculates the pairwise similarity matrix
         """
-        parser.add_argument(
-            "-r",
-            "--references",
-            type=str,
-            required=True,
-            help="Path to reference embeddings file",
-        )
+        mat = np.zeros(shape=[embeddings.shape[0],embeddings.shape[0]])
+        for i in range(embeddings.shape[0]):
+            for j in range(i+1,embeddings.shape[0]):
+                sim = self.mapper.distance_function(np.atleast_2d(embeddings[i,:]),np.atleast_2d(embeddings[j,:]))
+                mat[i,j] = sim
+                mat[j,i] = sim
 
-        parser.add_argument(
-            "-v",
-            "--volumes",
-            type=str,
-            required=True,
-            help="Path to volume embeddings file",
-        )
+        return mat
 
-        parser.add_argument(
-            "--skip_refinement",
-            action='store_true',
-            default=False,
-            help="Skip the reference refinement",
-        )
-
-        parser.add_argument(
-            "-o",
-            "--output",
-            type=str,
-            required=True,
-            help="Path to output folder.",
-        )
-
-    def create_parser(self) -> argparse.ArgumentParser:
+    def refine_reference(self, reference: np.array, embeddings: np.array) -> np.array:
         """
-        Create parser for the map command
+        # Refines a single reference in 3 steps
+        # 1. calculate distance to embeddings
+        # 2. take the N closest embeddings
+        # 3. select the least minimal average distance to all others
         """
 
-        parser_parent = argparse.ArgumentParser(
-            description="Interface to calculate embeddings for TomoTwin"
-        )
-        subparsers = parser_parent.add_subparsers(help="sub-command help")
-        parser_embed_volume = subparsers.add_parser(
-            "distance",
-            help="Map volumes by distance to the references.",
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        )
-        self.create_distance_parser(parser_embed_volume)
+        distances = self.mapper.map(embeddings=embeddings, references=reference)
+        embeddings_indicis = self.sample_embeddings_indicis(distances=distances,N=self.sample_size)
+        embeddings_subset = embeddings[embeddings_indicis]
+        mat = self.sim_matrix(embeddings_subset)
+        mat[mat == 0] = np.nan
+        avgs = np.nanmean(mat,axis=0)
+        refined_reference = embeddings_subset[np.argmax(avgs)]
 
-        return parser_parent
+        return np.atleast_2d(refined_reference)
+
+    def refine_references(self, references: np.array, embeddings: np.array, iterations: int = 5) -> np.array:
+        '''
+        Refines multiple references at once
+        '''
+
+        refined = np.copy(references)
+        converged = [False]*len(refined)
+        for _ in tqdm.tqdm(range(iterations),desc="Medoid reference refinement"):
+            for ref_i, ref in enumerate(refined):
+                if not converged[ref_i]:
+                    refined_i = self.refine_reference(np.atleast_2d(ref), embeddings)
+                    old_dist_ref = self.mapper.distance_function(np.atleast_2d(refined_i), np.atleast_2d(refined[ref_i, :]))
+                    if np.abs(old_dist_ref-1.0)<0.0001:
+                        converged[ref_i] = True
+                    refined[ref_i, :] = refined_i
+        return refined
+

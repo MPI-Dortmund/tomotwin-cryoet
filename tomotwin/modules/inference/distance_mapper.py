@@ -387,7 +387,7 @@ class DistanceMapper(Mapper):
     """
 
     def __init__(
-        self, distance_function: Callable[[np.array, np.array], float], similarty=False
+        self, distance_function: Callable[[np.array, np.array], float], similarty: bool=False, quiet: bool=False
     ):
         """
         :param distance_function: Distance function that takes one row of the references (first array) and
@@ -396,6 +396,7 @@ class DistanceMapper(Mapper):
         """
         self.distance_function = distance_function
         self.is_similarty = similarty
+        self.quiet = quiet
 
 
 
@@ -437,7 +438,7 @@ class DistanceMapper(Mapper):
         del embeddings
         del embedding_chunks
 
-        for ref_index in tqdm.tqdm(range(references.shape[0]), desc="Map references"):
+        for ref_index in tqdm.tqdm(range(references.shape[0]), desc="Map references", disable=self.quiet):
             distances[ref_index, :] = self.map_reference(reference=references[ref_index,:], embedding_chunks=shared_memory_chunks)
 
         return distances
