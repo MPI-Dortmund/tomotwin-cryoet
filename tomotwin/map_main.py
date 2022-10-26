@@ -510,6 +510,10 @@ def run(conf: MapConfiguration):
 def _main_():
     ui = MapArgParseUI()
     ui.run()
+
+    from tomotwin.modules.common.utils import check_for_updates
+    check_for_updates()
+
     conf = ui.get_map_configuration()
     run(conf=conf)
 

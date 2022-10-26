@@ -580,6 +580,10 @@ def _main_():
     ui = TrainingArgParseUI()
 
     ui.run()
+
+    from tomotwin.modules.common.utils import check_for_updates
+    check_for_updates()
+
     tconf = ui.get_training_configuration()
 
     os.makedirs(tconf.output_path, exist_ok=True)

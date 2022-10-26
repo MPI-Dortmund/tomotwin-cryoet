@@ -505,6 +505,9 @@ def run(ui: PickUI) -> None:
     ui.run()
     conf = ui.get_pick_configuration()
 
+    from tomotwin.modules.common.utils import check_for_updates
+    check_for_updates()
+
     # Get picks for target reference
     locate_results = pd.read_pickle(conf.locate_results_path)
     print()

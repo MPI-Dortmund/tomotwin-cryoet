@@ -486,6 +486,10 @@ def run(conf: LocateConfiguration):
 def _main_():
     ui = LocateArgParseUI()
     ui.run()
+
+    from tomotwin.modules.common.utils import check_for_updates
+    check_for_updates()
+
     conf = ui.get_locate_configuration()
     run(conf=conf)
 

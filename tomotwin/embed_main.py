@@ -426,6 +426,10 @@ def _main_():
     ui = EmbedArgParseUI()
 
     ui.run()
+
+    from tomotwin.modules.common.utils import check_for_updates
+    check_for_updates()
+
     conf = ui.get_embed_configuration()
     os.makedirs(conf.output_path, exist_ok=True)
 
