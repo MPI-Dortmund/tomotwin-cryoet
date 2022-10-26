@@ -30,6 +30,7 @@ User Guide: full table of contents
 
    installation
    tutorials/tutorials_overview
+   changes
 
 Help
 ====
