@@ -5,7 +5,7 @@ def check_for_updates():
     """
     try:
         import tomotwin
-        import urllib
+        import urllib.request
         import json
 
         with urllib.request.urlopen(
@@ -30,6 +30,8 @@ def check_for_updates():
                     "https://tomotwin-cryoet.readthedocs.io/en/stable/changes.html",
                 )
                 print("###############################################")
+            else:
+                print("Latest version of TomoTwin is installed :-)")
     except Exception as e:
         print("###############################################")
         print("Skip version check, as it failed with the following error:")
