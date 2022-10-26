@@ -592,7 +592,7 @@ def _main_():
     sys.stdout = f
     f = open(pth_log_err, 'a')
     sys.stderr = f
-    print("TomoTwin Version:", version('tomotwin'))
+    print("TomoTwin Version:", version('tomotwin-cryoet'))
 
 
     ########################
