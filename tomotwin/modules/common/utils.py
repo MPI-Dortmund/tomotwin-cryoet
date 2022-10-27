@@ -31,7 +31,11 @@ def check_for_updates():
                 )
                 print("###############################################")
             else:
-                print("Latest version of TomoTwin is installed :-)")
+
+                if version.parse(current_version).is_devrelease or version.parse(current_version).is_prerelease:
+                    print("Uuuuh! You are brave and running a development version of TomoTwin. "+u'\u2665 \u2665'+" Thanks for testing" +u'\u2665 \u2665')
+                else:
+                    print("Latest version of TomoTwin is installed :-)")
     except Exception as e:
         print("###############################################")
         print("Skip version check, as it failed with the following error:")
