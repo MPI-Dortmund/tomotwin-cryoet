@@ -45,7 +45,7 @@ This is an optional step, but for convinience reasons we link an adapted napari 
     conda activate tomotwin
     napari_link_file=$(realpath $(dirname $(which tomotwin_embed.py))/napari)
     conda activate napari-tomotwin
-    echo -e "#\!/usr/bin/bash\nnapari_exe='$(which napari)'\n\${napari_exe} \${@} -w napari-boxmanager __all__" > ${napari_link_file}
+    echo -e "#\!/usr/bin/bash\nnapari_exe='$(which napari)'\n\${napari_exe} \"\${@}\" -w napari-boxmanager __all__" > ${napari_link_file}
     chmod +x ${napari_link_file}
 
 Download latest model
