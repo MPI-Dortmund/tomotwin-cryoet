@@ -7,7 +7,7 @@ In this tutorial we describe how to use TomoTwin for picking in tomograms using 
 
  .. note::
 
-    ** Example Dataset **
+    **Example Dataset**
 
     To check if everything is working you can use our demo for `EMPIAR 10499 <https://www.ebi.ac.uk/empiar/EMPIAR-10499/>`_. For this demo the pixelsize is already reasonable, you can skip step 1 of the tutorial. The folder :file:`reference_output` contains the results when we run it locally. The file :file:`run.sh` contains all commands we run.
 
