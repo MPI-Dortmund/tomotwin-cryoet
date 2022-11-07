@@ -55,7 +55,7 @@ Download latest model
 
 :Number of proteins: 120
 
-:Link: `https <https://owncloud.gwdg.de/index.php/s/PmothfUVKh4NSfD>`_
+:Link: `https <https://ftp.gwdg.de/pub/misc/sphire/TomoTwin/models/tomotwin_model_p120_052022_loss.pth>`_
 
 System requirements
 ^^^^^^^^^^^^^^^^^^^
