@@ -49,7 +49,7 @@ For the reference based approach you need, of course, references. To pick them f
 
  .. prompt:: bash $
 
-    napari lp60/d01t15.mrc
+    napari your_tomo_a10.mrc
 
 
 2. Select :guilabel:`add_layer` tab of the boxmanager toolkit (lower right corner). Press the button for :guilabel:`Create particle layer`.
