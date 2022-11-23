@@ -418,6 +418,13 @@ def get_window_size(model_path: str) -> int:
         print("Can't find window size in model. Use window size of 37.")
         return 37
 
+def get_file_md5(path: str) -> str:
+    import hashlib
+    with open(path, 'rb') as f:
+        data = f.read()
+    md5hash = hashlib.md5(data).hexdigest()
+    return md5hash
+
 def _main_():
     ########################
     # Get configuration from user interface
@@ -469,6 +476,8 @@ def _main_():
         df.index.name = "index"
         df.attrs["tt_version_embed"] = tomotwin.__version__
         df.attrs['filepath'] = conf.volumes_path
+        df.attrs['modelpth'] = conf.model_path
+        df.attrs['modelmd5'] = get_file_md5(conf.model_path)
         df.attrs["window_size"] = window_size
         df.attrs["stride"] = conf.stride
         df.attrs['tomogram_input_shape'] = tomo.shape
