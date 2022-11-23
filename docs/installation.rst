@@ -19,15 +19,14 @@ There are three main steps to install TomoTwin:
 2. Install Napari
 """""""""""""""""""
 
-Here we assume that you don't have napari installed. Until the new release from Napari, we need to build it via github as we require the latest changes. Please do:
+Here we assume that you don't have napari installed. Please do:
 
 .. prompt:: bash $
 
     mamba create -y -n napari-tomotwin -c conda-forge python=3.10
     conda activate napari-tomotwin
-    pip install 'napari[all]'
-    pip uninstall napari
-    pip install git+https://github.com/napari/napari
+    pip install 'napari[all]'==0.4.17
+
 
 You can install `napari-boxmanager` via [pip]:
 
