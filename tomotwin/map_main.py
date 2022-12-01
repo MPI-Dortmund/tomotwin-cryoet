@@ -501,6 +501,7 @@ def run(conf: MapConfiguration):
 
         # Add additional meta information
         classes_df.attrs["references"] = ref_names
+        classes_df.attrs["skip_refinement"] = conf.skip_refinement
         pth = os.path.join(output_path, "map.tmap")
         classes_df.to_pickle(pth)
         print(f"Wrote output to {pth}")
