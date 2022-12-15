@@ -381,8 +381,11 @@ import sys
 import numpy as np
 from typing import List
 import pandas as pd
-import tomotwin
+import mrcfile
+from scipy.ndimage import zoom
+import tqdm
 
+import tomotwin
 from tomotwin.modules.inference.locate_ui import LocateUI, LocateMode, LocateConfiguration
 from tomotwin.modules.inference.argparse_locate_ui import LocateArgParseUI
 from tomotwin.modules.inference.findmaxima_locator import FindMaximaLocator
@@ -497,19 +500,17 @@ def run(conf: LocateConfiguration):
     located_particles.to_pickle(os.path.join(out_path, f"located.tloc"))
 
     # Write picking headmaps
-    import mrcfile
-    from scipy.ndimage import zoom
-    import tqdm
-    for ref_i, ref_name in tqdm.tqdm(enumerate(map_attrs['references']),desc="Write heatmaps"):
-        with mrcfile.new(
-                os.path.join(out_path, ref_name + ".mrc"), overwrite=True
-        ) as mrc:
-            vol = class_vols[ref_i]
-            vol = vol.astype(np.float32)
-            vol = zoom(vol, 2)
-            vol = np.pad(vol, ((18,18), (18,18), (18, 18)), 'constant')
-            vol = vol.swapaxes(0, 2)
-            mrc.set_data(vol)
+    if conf.write_heatmaps:
+        for ref_i, ref_name in tqdm.tqdm(enumerate(map_attrs['references']),desc="Write heatmaps"):
+            with mrcfile.new(
+                    os.path.join(out_path, ref_name + ".mrc"), overwrite=True
+            ) as mrc:
+                vol = class_vols[ref_i]
+                vol = vol.astype(np.float32)
+                vol = zoom(vol, 2)
+                vol = np.pad(vol, ((18,18), (18,18), (18, 18)), 'constant')
+                vol = vol.swapaxes(0, 2)
+                mrc.set_data(vol)
 
 
 def _main_():
