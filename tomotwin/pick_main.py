@@ -374,6 +374,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
+import typing
 
 from tomotwin.modules.inference.pick_ui import PickUI
 from tomotwin.modules.inference.argparse_pick_ui import PickArgParseUI, PickConfiguration
@@ -381,7 +382,9 @@ import pandas as pd
 import os
 import numpy as np
 from pyStarDB import sp_pystardb as star
-
+from tomotwin.modules.common.io.reader_writer import CoordinateWriter
+from tomotwin.modules.common.io.star_format import StarFormat
+from tomotwin.modules.common.io.coords_format import CoordsFormat
 class InvalidLocateResults(Exception):
     ...
 
@@ -450,7 +453,7 @@ def write_cbox(coordinates: pd.DataFrame, boxsize: int, path : str) -> None:
 
     sfile.write_star_file(overwrite=True, tags=['global', 'cryolo', 'cryolo_include'])
 
-def write_coords(results: pd.DataFrame, filepath):
+def write_coords(results: pd.DataFrame, filepath: str):
     results[["X", "Y", "Z"]].to_csv(filepath, index=False, header=None, sep=" ")
 
 def filter_results(locate_results : pd.DataFrame, conf: PickConfiguration) -> pd.DataFrame:
@@ -474,7 +477,7 @@ def filter_results(locate_results : pd.DataFrame, conf: PickConfiguration) -> pd
         locate_results = locate_results[locate_results["size"] <= conf.max_size]
     return locate_results
 
-def write_results(locate_results: pd.DataFrame, output_path: str, target: str) -> None:
+def write_results(locate_results: pd.DataFrame, writer: typing.List[CoordinateWriter], output_path: str, target: str) -> None:
     '''
     Write results to disk
     :param locate_results: Dataframe with picking results
@@ -485,14 +488,9 @@ def write_results(locate_results: pd.DataFrame, output_path: str, target: str) -
     if len(locate_results)==0:
         raise InvalidLocateResults("Locate results are empty")
     os.makedirs(output_path, exist_ok=True)
-    write_coords(locate_results, os.path.join(output_path, f"{target}.coords"))
-    if "width" not in locate_results:
-        print("'width' column is missing in locate results. Use default box size of 37")
-        size = 37
-    else:
-        size = np.unique(locate_results["width"])[0]
 
-    write_cbox(locate_results, size, os.path.join(output_path, f"{target}.cbox"))
+    for w in writer:
+        w.write(locate_results, os.path.join(output_path, f"{os.path.splitext(target)[0]}{w.get_extension()}"))
 
 
 
@@ -524,6 +522,11 @@ def run(ui: PickUI) -> None:
     for target in targets:
         print(f"  - {target}")
 
+    # Setup writer
+    writer: typing.List[CoordinateWriter] = []
+    writer.append(StarFormat())
+    writer.append(CoordsFormat())
+
     for target in targets:
         if target not in references:
             print(f"Target {target} is not a known reference. Skip")
@@ -535,7 +538,10 @@ def run(ui: PickUI) -> None:
         locate_results_target = filter_results(locate_results_target, conf)
         print(f"Target: {target} - Write {len(locate_results_target)} positions to disk.")
         try:
-            write_results(locate_results_target,conf.output_path, target=target)
+            write_results(locate_results=locate_results_target,
+                          writer=writer,
+                          output_path=conf.output_path,
+                          target=target)
         except InvalidLocateResults:
             print("Skip.")
 

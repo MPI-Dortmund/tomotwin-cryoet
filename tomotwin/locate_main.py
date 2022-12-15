@@ -443,9 +443,11 @@ def run(conf: LocateConfiguration):
 
     from concurrent.futures import ProcessPoolExecutor as Pool
     with Pool(conf.processes) as pool:
-        class_frames = list(pool.map(locator.locate,sub_dfs))
+        class_frames_and_vols = list(pool.map(locator.locate,sub_dfs))
 
     size_dict=None
+    class_frames = [t[0] for t in class_frames_and_vols]
+    class_vols = [t[1] for t in class_frames_and_vols]
 
     if conf.boxsize is None:
         conf.boxsize = window_size
@@ -465,7 +467,18 @@ def run(conf: LocateConfiguration):
         class_name = class_frame.attrs["name"]
         before_nms = len(class_frame)
         if size_dict is not None:
-            size = size_dict[class_name]
+            try:
+                size = size_dict[class_name]
+            except KeyError:
+                print(f"Can't find boxsize for {class_name}. Try to use extract PDB id and use this")
+                from tomotwin.modules.common.preprocess import label_filename
+                pdb = label_filename(class_name)
+                if pdb.lower() in size_dict:
+                    size = size_dict[pdb.lower()]
+                elif pdb in size_dict:
+                    size = size_dict[pdb]
+                else:
+                    raise KeyError(f"Can't find size for {class_name} in boxsize dictionary")
         else:
             size = conf.boxsize
 
@@ -482,6 +495,22 @@ def run(conf: LocateConfiguration):
         located_particles.attrs[meta_key] = map_attrs[meta_key]
 
     located_particles.to_pickle(os.path.join(out_path, f"located.tloc"))
+
+    # Write picking headmaps
+    import mrcfile
+    from scipy.ndimage import zoom
+    import tqdm
+    for ref_i, ref_name in tqdm.tqdm(enumerate(map_attrs['references']),desc="Write heatmaps"):
+        with mrcfile.new(
+                os.path.join(out_path, ref_name + ".mrc"), overwrite=True
+        ) as mrc:
+            vol = class_vols[ref_i]
+            vol = vol.astype(np.float32)
+            vol = zoom(vol, 2)
+            vol = np.pad(vol, ((18,18), (18,18), (18, 18)), 'constant')
+            vol = vol.swapaxes(0, 2)
+            mrc.set_data(vol)
+
 
 def _main_():
     ui = LocateArgParseUI()
