@@ -465,7 +465,8 @@ class LocateOptimEvaluator():
         for id in tqdm.tqdm(unique_class_labels,desc="Optimize"):
             dfc = locate_results[locate_results["predicted_class"] == id]
             try:
-                class_name = label_filename(locate_results.attrs['references'][id])
+                reference_name = locate_results.attrs['references'][id]
+                class_name = label_filename(reference_name)
             except AttributeError:
                 print("Skip. Not valid class:", locate_results.attrs['references'][id])
                 continue
@@ -476,7 +477,7 @@ class LocateOptimEvaluator():
                 continue
 
             best_stats = self.optim(dfc, positions) #self.get_stats(df, positions)
-            stats[class_name] = best_stats
+            stats[reference_name] = best_stats
         return stats
 
 class LocateEvaluator():
