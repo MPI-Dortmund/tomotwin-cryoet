@@ -403,7 +403,7 @@ class ScaleCoordinates(TomoTwinTool):
                             help='Coords file to scale')
         parser.add_argument('--tomotwin_pixel_size', type=float, required=True,
                             help='Pixel size of tomograms picked with TomoTwin')
-        parser.add_argument('--out', type=str, required=True,
+        parser.add_argument('--out', type=str, required=False, default=None,
                             help='output filename')
         parser.add_argument('--extraction_pixel_size', type=float, required=True,
                             help='Pixel size of tomograms to use for extraction')
@@ -431,6 +431,9 @@ class ScaleCoordinates(TomoTwinTool):
         px2 = args.extraction_pixel_size
         out_name = args.out
         os.makedirs(os.path.dirname(args.out), exist_ok=True)
+        if os.path.isdir(out_name):
+            out_name = os.path.join(out_name, os.path.splitext(os.path.basename(coords_pth))[0])
+
         scaled_coords = ScaleCoordinates.scale_coords(coords_pth=coords_pth, px1=px1, px2=px2)
 
         scaled_coords.to_csv(out_name, index=False, header=False, sep=' ')
