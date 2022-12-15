@@ -502,7 +502,6 @@ class FindMaximaLocator(Locator):
                      stride: Tuple[int],
                      tolerance: float,
                      global_min: float,
-                     output: str
                      ) -> pd.DataFrame:
         particle_df, vol = FindMaximaLocator.apply_findmax(map_output=map,
                                                            class_id=class_id,
@@ -511,23 +510,14 @@ class FindMaximaLocator(Locator):
                                                            tolerance=tolerance,
                                                            global_min=global_min,
                                                            tqdm_pos=class_id)
-        #print("Done")
-        if output is not None:
-            with mrcfile.new(
-                    os.path.join(output, map.attrs['ref_name'] + ".mrc"), overwrite=True
-            ) as mrc:
-                vol = vol.astype(np.float32)
-                vol = vol.swapaxes(0, 2)
-                mrc.set_data(vol)
 
-        #print("Done")
-        return particle_df.copy(deep=True)
+        return particle_df.copy(deep=True), vol
 
 
-    def locate(self, map: pd.DataFrame) -> pd.DataFrame:
+    def locate(self, map: pd.DataFrame) -> Tuple[pd.DataFrame,np.array]:
 
         print("start locate ", map.attrs['ref_name'])
-        df_class = FindMaximaLocator.locate_class(map.attrs['ref_index'], map, self.window_size, self.stride, self.tolerance, self.global_min, self.output)
+        df_class, vol = FindMaximaLocator.locate_class(map.attrs['ref_index'], map, self.window_size, self.stride, self.tolerance, self.global_min)
         df_class.attrs["name"] = map.attrs['ref_name']
         print("Located", df_class.attrs["name"], len(df_class))
-        return df_class
+        return df_class, vol
