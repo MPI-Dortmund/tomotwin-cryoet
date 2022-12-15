@@ -404,6 +404,7 @@ class LocateConfiguration:
     mode: LocateMode
     global_min: float
     processes: int
+    write_heatmaps: bool
 
 class LocateUI(ABC):
     """Interface to define"""

@@ -385,13 +385,12 @@ class LocateArgParseUI(LocateUI):
     def __init__(self):
         self.map_path = None
         self.output_path = None
-        self.pthresh = None
-        self.dthresh = None
         self.tolerance = None
         self.boxsize = None
         self.mode = None
         self.global_min = None
         self.processes = 4
+        self.write_heatmaps = False
 
     def run(self, args=None) -> None:
         parser = self.create_parser()
@@ -405,6 +404,7 @@ class LocateArgParseUI(LocateUI):
             self.mode = LocateMode.FINDMAX
             self.global_min = args.global_min
             self.processes = args.processes
+            self.write_heatmaps = args.write_heatmaps
 
 
 
@@ -417,7 +417,8 @@ class LocateArgParseUI(LocateUI):
             boxsize=self.boxsize,
             tolerance=self.tolerance,
             global_min=self.global_min,
-            processes=self.processes
+            processes=self.processes,
+            write_heatmaps=self.write_heatmaps
         )
         return conf
 
@@ -466,6 +467,13 @@ class LocateArgParseUI(LocateUI):
             type=int,
             default=4,
             help="Number of parallel processed references. More processes require more memory.",
+        )
+
+        parser.add_argument(
+            "--write_heatmaps",
+            action='store_true',
+            default=False,
+            help="If true, a heatmap is written for every reference. Default is false, as they require some space and are not necessary for the further process.",
         )
 
     def create_parser(self) -> argparse.ArgumentParser:
