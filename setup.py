@@ -18,6 +18,7 @@ setup(
         'tomotwin.modules.tools',
         'tomotwin.modules.common',
         'tomotwin.modules.common.findmax',
+        'tomotwin.modules.common.io',
     ],
     url='https://github.com/MPI-Dortmund/tomotwin-cryoet',
     license='Mozilla Public License Version 2.0',
