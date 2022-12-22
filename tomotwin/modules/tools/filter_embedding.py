@@ -65,4 +65,4 @@ class FilterTool(TomoTwinTool):
             ref_name = os.path.splitext(os.path.basename(tomo_map.attrs['references'][emb_index]))[0]
             out=os.path.join(args.output,f"{embedding_filename}_filtered_{ref_name}.temb")
             emb.to_pickle(out)
-            print(f"Wrote {out} - removed {100 - int(len(emb)/len(tomo_embeddings)*100)}% embedding points")
+            print(f"Wrote {out} - removed {100 - len(emb)/len(tomo_embeddings)*100:.2f}% embedding points")
