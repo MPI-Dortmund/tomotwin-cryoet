@@ -1,6 +1,12 @@
 from typing import Protocol
 import pandas as pd
 import os
+import numpy as np
+
+class ImageReader(Protocol):
+
+    def read(self, pth: str) -> np.array:
+        """Reads image data"""
 
 class CoordinateWriter(Protocol):
 

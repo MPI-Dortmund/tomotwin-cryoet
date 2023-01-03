@@ -378,10 +378,11 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 import mrcfile
 import numpy as np
 
-
-def read_mrc(pth: str) -> np.array:
-    try:
-        vol = mrcfile.open(pth, mode="r", permissive=True)
-    except ValueError as e:
-        raise Exception(f"Failed reading {pth}") from e
-    return vol.data
+class MrcFormat:
+    @staticmethod
+    def read(pth: str) -> np.array:
+        try:
+            vol = mrcfile.open(pth, mode="r", permissive=True)
+        except ValueError as e:
+            raise Exception(f"Failed reading {pth}") from e
+        return vol.data

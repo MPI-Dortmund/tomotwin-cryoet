@@ -379,7 +379,7 @@ from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedM
 from tomotwin.modules.inference.embedor import TorchEmbedor, Embedor
 from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
 from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
-import tomotwin.modules.common.io as io
+from tomotwin.modules.common.io.mrc_format import MrcFormat
 from typing import List, Dict
 import numpy as np
 import os
@@ -404,7 +404,7 @@ def sliding_window_embedding(
 
 
 def volume_embedding(volume_pths: List[str], embedor: Embedor):
-    volume_dataset = FileNameVolumeDataset(volumes=volume_pths, filereader=io.read_mrc)
+    volume_dataset = FileNameVolumeDataset(volumes=volume_pths, filereader=MrcFormat.read)
     embeddings = embedor.embed(volume_dataset)
 
     return embeddings
@@ -449,7 +449,7 @@ def _main_():
 
     window_size = get_window_size(conf.model_path)
     if conf.mode == EmbedMode.TOMO:
-        tomo = -1*io.read_mrc(conf.volumes_path) # -1 to invert the contrast
+        tomo = -1*MrcFormat.read(conf.volumes_path) # -1 to invert the contrast
         if conf.zrange:
             hb = int((window_size - 1) // 2)
             minz = max(0,conf.zrange[0] - hb)
