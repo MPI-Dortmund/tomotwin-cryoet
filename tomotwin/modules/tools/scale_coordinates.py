@@ -429,10 +429,13 @@ class ScaleCoordinates(TomoTwinTool):
         coords_pth = args.coords
         px1 = args.tomotwin_pixel_size
         px2 = args.extraction_pixel_size
+
         out_name = args.out
-        os.makedirs(os.path.dirname(args.out), exist_ok=True)
+        if os.path.splitext(out_name)[1] == '':
+            os.makedirs(args.out, exist_ok=True)
         if os.path.isdir(out_name):
             out_name = os.path.join(out_name, os.path.splitext(os.path.basename(coords_pth))[0])
+
 
         scaled_coords = ScaleCoordinates.scale_coords(coords_pth=coords_pth, px1=px1, px2=px2)
 
