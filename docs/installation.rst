@@ -29,7 +29,7 @@ You can install `napari-boxmanager` via [pip]:
 
 .. prompt:: bash $
 
-    pip install napari-boxmanager
+    pip install napari-boxmanager==0.3.0b8
 
 3. Link Napari
 """""""""""""""""""
