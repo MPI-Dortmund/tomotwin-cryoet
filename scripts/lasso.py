@@ -112,8 +112,11 @@ def _main_():
     emb_umap_selection = emb_umap.sample(n=min(len(emb_umap),500000))
 
     data = emb_umap_selection.to_numpy()
-
-    subplot_kw = dict(xlim=(-15, 15), ylim=(-15, 15), autoscale_on=False)
+    minx = np.min(data[:, 0])
+    maxx = np.max(data[:, 0])
+    miny = np.min(data[:, 1])
+    maxy = np.max(data[:, 1])
+    subplot_kw = dict(xlim=(minx, maxx), ylim=(miny, maxy), autoscale_on=False)
     fig, ax = plt.subplots(subplot_kw=subplot_kw)
 
     pts = ax.scatter(data[:, 0], data[:, 1], s=args.pointsize)
@@ -148,7 +151,7 @@ def _main_():
 
     fig.canvas.mpl_connect("key_press_event", accept)
     ax.set_title("Press enter to accept selected points.")
-
+    plt.tight_layout()
     plt.show()
 
 if __name__ == '__main__':
