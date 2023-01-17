@@ -22,6 +22,7 @@ There are three main steps to install TomoTwin:
 Here we assume that you don't have napari installed. Please do:
 
 .. prompt:: bash $
+
     mamba create -y -n napari-tomotwin -c conda-forge python=3.10 napari=0.4.17 pyqt pip
     conda activate napari-tomotwin
 
