@@ -31,7 +31,6 @@ def calculate_umap(
     fit_sample = embeddings.sample(n=min(len(embeddings) ,fit_sample_size), random_state=17)
     fit_sample = fit_sample.drop(['filepath', 'Z', 'Y', 'X'], axis=1, errors='ignore')
     all_data = embeddings.drop(['filepath', 'Z', 'Y', 'X'] ,axis=1, errors='ignore')
-
     reducer = cuml.UMAP(
         n_neighbors=200,
         n_components=2,
@@ -58,13 +57,15 @@ def calculate_umap(
     return umap_labels
 
 def create_segmentation_map(embeddings):
-    # get size of tomo from embeddings by adding padding back in
     print("Create segmentation map")
     embeddings = pd.read_pickle(embeddings)
+    Z = embeddings.attrs['tomogram_input_shape'][0]
+    Y = embeddings.attrs['tomogram_input_shape'][1]
+    X = embeddings.attrs['tomogram_input_shape'][2]
     embeddings = embeddings.reset_index(drop=True)
     segmentation_mask = embeddings[['Z', 'Y', 'X']].copy()
     segmentation_mask = segmentation_mask.reset_index()
-    empty_array = np.zeros(shape=(200, 512, 512))
+    empty_array = np.zeros(shape=(Z, Y, X))
     for row in segmentation_mask.itertuples(index=True, name='Pandas'):
         X = int(row.X)
         Y = int(row.Y)
