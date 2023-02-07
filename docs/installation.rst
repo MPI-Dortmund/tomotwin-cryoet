@@ -40,9 +40,10 @@ This is an optional step, but for convinience reasons we link an adapted napari 
 .. prompt:: bash $
 
     conda activate tomotwin
-    napari_link_file=$(realpath $(dirname $(which tomotwin_embed.py))/napari_boxmanager)
+    tomotwin_dir=$(realpath $(dirname $(which tomotwin_embed.py)))
+    napari_link_file=${tomotwin_dir}/napari_boxmanager)
     conda activate napari-tomotwin
-    echo -e "#\!/usr/bin/bash\nnapari_exe='$(which napari_boxmanager)'\n\${napari_exe} \"\${@}\""> ${napari_link_file}
+    echo -e "#\!/usr/bin/bash\nexport NAPARI_EXE=$(which napari)\nnapari_exe='$(which napari_boxmanager)'\n\${napari_exe} \"\${@}\""&gt; ${napari_link_file}
     chmod +x ${napari_link_file}
 
 
