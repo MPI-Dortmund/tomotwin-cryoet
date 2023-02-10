@@ -45,7 +45,7 @@ def calculate_umap(
     reducer.fit(fit_sample_data)
     if subset == True:
         print("Only transforming a subset for visualization")
-        embedding = reducer.fit(fit_sample)
+        embedding = reducer.fit(fit_sample_data)
         fit_sample['umap_0'] = embedding.embedding_[:, 0]
         fit_sample['umap_1'] = embedding.embedding_[:, 1]
         umap_labels = fit_sample[['umap_0', 'umap_1']].copy()
