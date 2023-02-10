@@ -32,6 +32,8 @@ def calculate_umap(
     embeddings = pd.read_pickle(embeddings)
     embeddings = embeddings.reset_index(drop=True)
     fit_sample = embeddings.sample(n=min(len(embeddings) ,fit_sample_size), random_state=17)
+    fit_sample_data = fit_sample.drop(['filepath', 'Z', 'Y', 'X'], axis=1, errors='ignore')
+    all_data = embeddings.drop(['filepath', 'Z', 'Y', 'X'] ,axis=1, errors='ignore')
     reducer = cuml.UMAP(
         n_neighbors=200,
         n_components=2,
@@ -40,7 +42,7 @@ def calculate_umap(
         random_state=19
     )
     print(f"Fit umap on {len(fit_sample)} samples")
-    reducer.fit(fit_sample)
+    reducer.fit(fit_sample_data)
     if subset == True:
         print("Only transforming a subset for visualization")
         embedding = reducer.fit(fit_sample)
