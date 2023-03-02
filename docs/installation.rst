@@ -36,7 +36,7 @@ You can install `napari-boxmanager` via [pip]:
 3. Link Napari
 """""""""""""""""""
 
-This is an optional step, but for convinience reasons we link an adapted napari call into the tomotwin environment. With that you don't need to switch environments when working with tomotwin. While this is optional, I assume during the tutorials that you did this step. Here is what you need to do:
+This is an optional step, but for convenience reasons we link an adapted napari call into the tomotwin environment. With that you don't need to switch environments when working with tomotwin. While this is optional, I assume during the tutorials that you did this step. Here is what you need to do:
 
 .. prompt:: bash $
 
