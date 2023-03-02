@@ -4,6 +4,8 @@ Installation and Download
 Installation
 ^^^^^^^^^^^^^
 
+We recommend to use the conda client `mamba <https://mamba.readthedocs.io/>`_ for installation. You should use `mambaforge <https://mamba.readthedocs.io/en/latest/installation.html>`_ for installation of mamba. Alternatively you can replace ``mamba`` with ``conda`` in the commands below.
+
 There are three main steps to install TomoTwin:
 
 1. Install TomoTwin
@@ -11,7 +13,6 @@ There are three main steps to install TomoTwin:
 
 .. prompt:: bash $
 
-    conda install mamba -n base -c conda-forge
     mamba create -n tomotwin -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.9 pytorch==1.12 torchvision pandas scipy numpy matplotlib pytables cuML=22.06 cudatoolkit=11.6 'protobuf>3.20' tensorboard  optuna mysql-connector-python
     conda activate tomotwin
     pip install tomotwin-cryoet
