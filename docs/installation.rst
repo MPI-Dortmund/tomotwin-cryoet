@@ -31,7 +31,7 @@ You can install `napari-boxmanager` via [pip]:
 
 .. prompt:: bash $
 
-    pip install napari-boxmanager==0.3.0b13
+    pip install napari-boxmanager
 
 3. Link Napari
 """""""""""""""""""
