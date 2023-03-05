@@ -375,17 +375,30 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-from tomotwin.modules.training.argparse_ui import TrainingArgParseUI, TrainingConfiguration
+from typing import List, Tuple, Dict, Callable
+import os
+import sys
+import random
+import tqdm
+import numpy as np
+from pytorch_metric_learning import miners, losses
+
+
+from tomotwin.modules.training.argparse_ui import (
+    TrainingArgParseUI,
+    TrainingConfiguration,
+)
 from tomotwin.modules.training.filenametripletprovider import (
     FilenameMatchingTripletProvider,
 )
-from tomotwin.modules.training.filenamematchingtripletprovidernopdb import FilenameMatchingTripletProviderNoPDB
+from tomotwin.modules.common.utils import check_for_updates
+from tomotwin.modules.training.filenamematchingtripletprovidernopdb import (
+    FilenameMatchingTripletProviderNoPDB,
+)
 from tomotwin.modules.training.torchtrainer import TorchTrainer, TripletDataset
 from tomotwin.modules.training.LossPyML import LossPyML
 from tomotwin.modules.common.distances import DistanceManager
 from tomotwin.modules.training.mrctriplethandler import MRCTripletHandler
-from pytorch_metric_learning import miners, losses
-from typing import Dict, Callable
 from tomotwin.modules.common import distances, exceptions
 from tomotwin.modules.common.preprocess import label_filename
 
@@ -400,51 +413,62 @@ from tomotwin.modules.training.transforms import (
 from tomotwin.modules.training.filepathtriplet import FilePathTriplet
 from tomotwin.modules.networks.networkmanager import NetworkManager
 
-from typing import List, Tuple
-import os
-import sys
-import random
-import tqdm
-import numpy as np
 try:
     from importlib_metadata import version
 except ModuleNotFoundError:
     from importlib.metadata import version
 
-def get_augmentations(aug_train_shift_distance: int = 2, use_pdb_as_anchor: bool = True) -> Tuple[AugmentationPipeline, AugmentationPipeline]:
-    aug_anchor= None
+
+def get_augmentations(
+    aug_train_shift_distance: int = 2, use_pdb_as_anchor: bool = True
+) -> Tuple[AugmentationPipeline, AugmentationPipeline]:
+    """
+    :param aug_train_shift_distance: Augmentation shifts
+    :param use_pdb_as_anchor: If true, only pdbs are used as anchors.
+    :return: Training and validation pipeline
+    """
+    aug_anchor = None
     if use_pdb_as_anchor:
         aug_anchor = AugmentationPipeline(
             # [(CenterCrop, 0.3), (AddNoise, 0.3), (Blur, 0.3), (Rotate, 0.5), (Shift, 0.3)]
-            augs=[Rotate(axes=(0, 1)),
-                  VoxelDropout(ratio=(0.05, 0.2)),
-                  RotateFull(axes=(1, 2)),  # x-y rotations
-                  ],
-            probs=[0.3,
-                   0.3,
-                   0.3,
-                   ],
+            augs=[
+                Rotate(axes=(0, 1)),
+                VoxelDropout(ratio=(0.05, 0.2)),
+                RotateFull(axes=(1, 2)),  # x-y rotations
+            ],
+            probs=[
+                0.3,
+                0.3,
+                0.3,
+            ],
         )
     aug_volumes = AugmentationPipeline(
         augs=[
             VoxelDropout(ratio=(0.05, 0.2)),
             RotateFull(axes=(1, 2)),
-            Shift(axis=0, min_shift=-aug_train_shift_distance, max_shift=aug_train_shift_distance),
-            Shift(axis=1, min_shift=-aug_train_shift_distance, max_shift=aug_train_shift_distance),
-            Shift(axis=2, min_shift=-aug_train_shift_distance, max_shift=aug_train_shift_distance),
-            AddNoise(sigma=(0,0.3))
+            Shift(
+                axis=0,
+                min_shift=-aug_train_shift_distance,
+                max_shift=aug_train_shift_distance,
+            ),
+            Shift(
+                axis=1,
+                min_shift=-aug_train_shift_distance,
+                max_shift=aug_train_shift_distance,
+            ),
+            Shift(
+                axis=2,
+                min_shift=-aug_train_shift_distance,
+                max_shift=aug_train_shift_distance,
+            ),
+            AddNoise(sigma=(0, 0.3)),
         ],
-        probs=[0.3,
-               0.3,
-               0.3,
-               0.3,
-               0.3,
-               0.9
-               ],
+        probs=[0.3, 0.3, 0.3, 0.3, 0.3, 0.9],
     )
     if aug_anchor is None:
         aug_anchor = aug_volumes
     return aug_anchor, aug_volumes
+
 
 def train_test_split_anchor_positive(
     data: List[FilePathTriplet], split: float = 0.8
@@ -493,24 +517,26 @@ def train_test_split_anchor_positive(
             valid_triplets.append(triplet)
     return train_triplets, valid_triplets
 
-def generate_triplets(tconf: TrainingConfiguration) -> Tuple[List[FilePathTriplet], List[FilePathTriplet]]:
-    '''
+
+def generate_triplets(
+    tconf: TrainingConfiguration,
+) -> Tuple[List[FilePathTriplet], List[FilePathTriplet]]:
+    """
     Generates the train/test triplets
     :param tconf: Training configuration
     :return: Two lists of FilePathTriplets. One for training, one for testing.
-    '''
+    """
     if tconf.pdb_path:
         tripletprov = FilenameMatchingTripletProvider(
             path_pdb=tconf.pdb_path,
             path_volume=tconf.volume_path,
             max_neg=tconf.max_neg,
             mask_pdb="**/*.mrc",
-            mask_volumes="**/*.mrc"
+            mask_volumes="**/*.mrc",
         )
     else:
         tripletprov = FilenameMatchingTripletProviderNoPDB(
-            path_volume=tconf.volume_path,
-            mask_volumes="**/*.mrc"
+            path_volume=tconf.volume_path, mask_volumes="**/*.mrc"
         )
 
     master_list = tripletprov.get_triplets()
@@ -531,45 +557,55 @@ def generate_triplets(tconf: TrainingConfiguration) -> Tuple[List[FilePathTriple
                 path_volume=tconf.validvolumes,
                 max_neg=tconf.max_neg,
                 mask_pdb="**/*.mrc",
-                mask_volumes="**/*.mrc"
+                mask_volumes="**/*.mrc",
             )
         else:
             tripletprov = FilenameMatchingTripletProviderNoPDB(
-                path_volume=tconf.validvolumes,
-                mask_volumes="**/*.mrc"
+                path_volume=tconf.validvolumes, mask_volumes="**/*.mrc"
             )
         test_triplets = tripletprov.get_triplets()
 
     return train_triplets, test_triplets
 
 
-
-def get_loss_func(net_conf: Dict, train_conf: Dict, distance: distances.Distance) -> Callable:
+def get_loss_func(
+    net_conf: Dict, train_conf: Dict, distance: distances.Distance
+) -> Callable:
+    """
+    :param net_conf: Network confiiguration dict
+    :param train_conf: Training configuration dict
+    :param distance: Distance measure
+    :return: Loss function
+    """
     if train_conf["loss"] == "ArcFaceLoss":
-        loss_func = losses.ArcFaceLoss(num_classes=train_conf["num_classes"],
-                                       margin=train_conf["af_margin"],
-                                       distance=distance,
-                                       scale=train_conf["af_scale"],
-                                       embedding_size=net_conf["output_channels"])
+        loss_func = losses.ArcFaceLoss(
+            num_classes=train_conf["num_classes"],
+            margin=train_conf["af_margin"],
+            distance=distance,
+            scale=train_conf["af_scale"],
+            embedding_size=net_conf["output_channels"],
+        )
     elif train_conf["loss"] == "SphereFaceLoss":
-        loss_func = losses.SphereFaceLoss(num_classes=train_conf["num_classes"],
-                                          margin=train_conf["sf_margin"],
-                                          distance=distance,
-                                          scale=train_conf["sf_scale"],
-                                          embedding_size=net_conf["output_channels"])
+        loss_func = losses.SphereFaceLoss(
+            num_classes=train_conf["num_classes"],
+            margin=train_conf["sf_margin"],
+            distance=distance,
+            scale=train_conf["sf_scale"],
+            embedding_size=net_conf["output_channels"],
+        )
 
     elif train_conf["loss"] == "TripletLoss":
         loss_func = losses.TripletMarginLoss(
-            margin=train_conf["tl_margin"],
-            distance=distance
+            margin=train_conf["tl_margin"], distance=distance
         )
     else:
         raise exceptions.UnknownLoss("Specified loss not known")
 
     return loss_func
 
+
 def _main_():
-    seed = 17 #seed value
+    seed = 17  # seed value
     np.random.seed(seed)
     random.seed(seed)
 
@@ -581,23 +617,21 @@ def _main_():
 
     ui.run()
 
-    from tomotwin.modules.common.utils import check_for_updates
     check_for_updates()
 
     tconf = ui.get_training_configuration()
 
     os.makedirs(tconf.output_path, exist_ok=True)
 
-    pth_log_out = os.path.join(tconf.output_path,'out.txt')
-    pth_log_err = os.path.join(tconf.output_path, 'err.txt')
+    pth_log_out = os.path.join(tconf.output_path, "out.txt")
+    pth_log_err = os.path.join(tconf.output_path, "err.txt")
     print("Redirecting stdout to", pth_log_out)
     print("Redirecting stderr to", pth_log_err)
-    f = open(pth_log_out, 'a')
+    f = open(pth_log_out, "a")
     sys.stdout = f
-    f = open(pth_log_err, 'a')
+    f = open(pth_log_err, "a")
     sys.stderr = f
-    print("TomoTwin Version:", version('tomotwin-cryoet'))
-
+    print("TomoTwin Version:", version("tomotwin-cryoet"))
 
     ########################
     # Generate Triplets
@@ -620,8 +654,9 @@ def _main_():
     aug_args = {"use_pdb_as_anchor": tconf.pdb_path is not None}
     if "aug_train_shift_distance" in config["train_config"]:
         print("Use shift:", config["train_config"]["aug_train_shift_distance"])
-        aug_args["aug_train_shift_distance"] = config["train_config"]["aug_train_shift_distance"]
-
+        aug_args["aug_train_shift_distance"] = config["train_config"][
+            "aug_train_shift_distance"
+        ]
 
     aug_anchor, aug_volumes = get_augmentations(**aug_args)
 
@@ -630,15 +665,14 @@ def _main_():
         handler=MRCTripletHandler(),
         augmentation_anchors=aug_anchor,
         augmentation_volumes=aug_volumes,
-        label_ext_func=label_filename
+        label_ext_func=label_filename,
     )
 
     test_ds = TripletDataset(
         training_data=test_triplets,
         handler=MRCTripletHandler(),
-        label_ext_func=label_filename
+        label_ext_func=label_filename,
     )
-
 
     ########################
     # Init distance function
@@ -658,18 +692,22 @@ def _main_():
     ########################
     miner = None
     if config["train_config"]["miner"]:
-        miner = miners.TripletMarginMiner(margin=config["train_config"]["miner_margin"], type_of_triplets="semihard")
+        miner = miners.TripletMarginMiner(
+            margin=config["train_config"]["miner_margin"], type_of_triplets="semihard"
+        )
 
-    loss_func = get_loss_func(net_conf=config["network_config"], train_conf=config["train_config"], distance=distance)
-
-
+    loss_func = get_loss_func(
+        net_conf=config["network_config"],
+        train_conf=config["train_config"],
+        distance=distance,
+    )
 
     ########################
     # Create trainer and start training
     ########################
     only_negative_labels = []
-    if 'only_negative_labels' in config['train_config']:
-        only_negative_labels = config['train_config']['only_negative_labels']
+    if "only_negative_labels" in config["train_config"]:
+        only_negative_labels = config["train_config"]["only_negative_labels"]
     trainer = TorchTrainer(
         epochs=tconf.num_epochs,
         batchsize=int(config["train_config"]["batchsize"]),
@@ -687,7 +725,7 @@ def _main_():
         optimizer=config["train_config"]["optimizer"],
         weight_decay=config["train_config"]["weight_decay"],
         patience=config["train_config"]["patience"],
-        save_epoch_seperately=tconf.save_after_improvement
+        save_epoch_seperately=tconf.save_after_improvement,
     )
     trainer.set_seed(seed)
     config["window_size"] = tuple(train_ds.get_triplet_dimension())
