@@ -1,5 +1,6 @@
 import unittest
 from tomotwin.pick_main import write_results, InvalidLocateResults
+from tomotwin.modules.common.io.coords_format import CoordsFormat
 import pandas as pd
 import tempfile
 
@@ -10,7 +11,7 @@ class MyTestCase(unittest.TestCase):
             d = {"X":[],"Y":[],"Z":[], "width": []}
             df = pd.DataFrame(d)
             with tempfile.TemporaryDirectory() as tmpdirname:
-                write_results(df,tmpdirname,-1)
+                write_results(df,[CoordsFormat()], tmpdirname,"blub")
 
 
 if __name__ == '__main__':

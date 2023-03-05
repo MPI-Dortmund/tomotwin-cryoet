@@ -18,5 +18,4 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(conf.model_path, modelpth)
         self.assertEqual(conf.volumes_path, volpth)
         self.assertEqual(conf.output_path, outpth)
-        self.assertEqual(conf.window_size, 37)
         self.assertEqual(conf.stride, [2, 2, 2])

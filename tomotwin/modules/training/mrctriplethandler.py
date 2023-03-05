@@ -379,7 +379,7 @@ import numpy as np
 
 from tomotwin.modules.training.triplethandler import TripletHandler, FilePathTriplet
 from tomotwin.modules.training.numpytriplet import NumpyTriplet
-import tomotwin.modules.common.io as io
+from tomotwin.modules.common.io.mrc_format import MrcFormat
 import tomotwin.modules.common.preprocess as preprocess
 
 
@@ -391,7 +391,7 @@ class MRCTripletHandler(TripletHandler):
 
     @staticmethod
     def read_mrc_and_norm(pth: str) -> np.array:
-        vol = io.read_mrc(pth)
+        vol = MrcFormat.read(pth)
         vol = preprocess.norm(vol)
         return vol
 
