@@ -16,7 +16,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        conda install -y -c pytorch -c rapidsai -c nvidia python=3.9 pytorch==1.11 torchvision pandas scipy numpy matplotlib pytables rapids=22.04 -c conda-forge
+        conda install -y -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.9 pytorch==1.12 torchvision pandas scipy numpy matplotlib pytables cuML=22.06 cudatoolkit=11.6 'protobuf>3.20' tensorboard  optuna mysql-connector-python
         $CONDA/bin/python -m -y pip install --upgrade pip
         $CONDA/bin/pip install -y pylint
         $CONDA/bin/pip install -y .
