@@ -375,37 +375,46 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 import typing
-
-from tomotwin.modules.inference.pick_ui import PickUI
-from tomotwin.modules.inference.argparse_pick_ui import PickArgParseUI, PickConfiguration
-import pandas as pd
 import os
+import pandas as pd
 import numpy as np
 from pyStarDB import sp_pystardb as star
+
+from tomotwin.modules.inference.pick_ui import PickUI
+from tomotwin.modules.inference.argparse_pick_ui import (
+    PickArgParseUI,
+    PickConfiguration,
+)
 from tomotwin.modules.common.io.reader_writer import CoordinateWriter
 from tomotwin.modules.common.io.star_format import StarFormat
 from tomotwin.modules.common.io.coords_format import CoordsFormat
-class InvalidLocateResults(Exception):
-    ...
+from tomotwin.modules.common.utils import check_for_updates
 
-def write_cbox(coordinates: pd.DataFrame, boxsize: int, path : str) -> None:
-    '''
+
+class InvalidLocateResults(Exception):
+    """
+    Custrom exception for invalid locate results file
+    """
+
+
+def write_cbox(coordinates: pd.DataFrame, boxsize: int, path: str) -> None:
+    """
     Write results as CBOX to disk
     :param coordinates: Picking results
     :param boxsize: Box size that should be use
     :param path: Path of the new CBOX file
-    '''
+    """
 
     def coords_to_np_array(xyz: pd.DataFrame, boxsize: int) -> np.array:
         num_boxes = len(xyz)
         num_fields = 11
         coords = np.zeros(shape=(num_boxes, num_fields))
 
-        i=0
+        i = 0
         for _, row in xyz.iterrows():
             c = float(row["metric_best"])
-            coords[i, 0] = row["X"]-(boxsize/2)
-            coords[i, 1] = row["Y"]-(boxsize/2)
+            coords[i, 0] = row["X"] - (boxsize / 2)
+            coords[i, 1] = row["Y"] - (boxsize / 2)
             coords[i, 2] = row["Z"]
             coords[i, 3] = boxsize
             coords[i, 4] = boxsize
@@ -415,59 +424,70 @@ def write_cbox(coordinates: pd.DataFrame, boxsize: int, path : str) -> None:
             coords[i, 8] = c
             coords[i, 9] = None
             coords[i, 10] = None
-            i=i+1
-
+            i = i + 1
 
         return coords
 
-
     columns = []
-    columns.append('_CoordinateX')
-    columns.append('_CoordinateY')
-    columns.append('_CoordinateZ')
-    columns.append('_Width')
-    columns.append('_Height')
-    columns.append('_Depth')
-    columns.append('_EstWidth')
-    columns.append('_EstHeight')
-    columns.append('_Confidence')
-    columns.append('_NumBoxes')
-    columns.append('_Angle')
-
+    columns.append("_CoordinateX")
+    columns.append("_CoordinateY")
+    columns.append("_CoordinateZ")
+    columns.append("_Width")
+    columns.append("_Height")
+    columns.append("_Depth")
+    columns.append("_EstWidth")
+    columns.append("_EstHeight")
+    columns.append("_Confidence")
+    columns.append("_NumBoxes")
+    columns.append("_Angle")
 
     coords = coords_to_np_array(coordinates, boxsize)
 
     include_slices = [a for a in np.unique(coords[:, 2]).tolist() if not np.isnan(a)]
 
-
     sfile = star.StarFile(path)
 
-    version_df = pd.DataFrame([["1.0"]], columns=['_cbox_format_version'])
-    sfile.update('global', version_df, False)
+    version_df = pd.DataFrame([["1.0"]], columns=["_cbox_format_version"])
+    sfile.update("global", version_df, False)
 
     df = pd.DataFrame(coords, columns=columns)
-    sfile.update('cryolo', df, True)
+    sfile.update("cryolo", df, True)
 
-    include_df = pd.DataFrame(include_slices, columns=['_slice_index'])
-    sfile.update('cryolo_include', include_df, True)
+    include_df = pd.DataFrame(include_slices, columns=["_slice_index"])
+    sfile.update("cryolo_include", include_df, True)
 
-    sfile.write_star_file(overwrite=True, tags=['global', 'cryolo', 'cryolo_include'])
+    sfile.write_star_file(overwrite=True, tags=["global", "cryolo", "cryolo_include"])
 
-def write_coords(results: pd.DataFrame, filepath: str):
+
+def write_coords(results: pd.DataFrame, filepath: str) -> None:
+    """
+    Write picking results in .coords format.
+
+    :param results: Picking results
+    :param filepath: Filepath where the coords file is written to
+    :return: None
+    """
     results[["X", "Y", "Z"]].to_csv(filepath, index=False, header=None, sep=" ")
 
-def filter_results(locate_results : pd.DataFrame, conf: PickConfiguration) -> pd.DataFrame:
-    '''
+
+def filter_results(
+    locate_results: pd.DataFrame, conf: PickConfiguration
+) -> pd.DataFrame:
+    """
     Applies several filter like best metric or min and max size.
     :param locate_results: Picking results
     :param conf: Configuration that contains all thresholds
     :return: Filtered picking results
-    '''
+    """
     # Apply similarity threshold
     if conf.min_metric:
-        locate_results = locate_results[locate_results["metric_best"] >= conf.min_metric]
+        locate_results = locate_results[
+            locate_results["metric_best"] >= conf.min_metric
+        ]
     if conf.max_metric:
-        locate_results = locate_results[locate_results["metric_best"] <= conf.max_metric]
+        locate_results = locate_results[
+            locate_results["metric_best"] <= conf.max_metric
+        ]
 
     # Apply min max size filter
     if conf.min_size:
@@ -477,40 +497,49 @@ def filter_results(locate_results : pd.DataFrame, conf: PickConfiguration) -> pd
         locate_results = locate_results[locate_results["size"] <= conf.max_size]
     return locate_results
 
-def write_results(locate_results: pd.DataFrame, writer: typing.List[CoordinateWriter], output_path: str, target: str) -> None:
-    '''
+
+def write_results(
+    locate_results: pd.DataFrame,
+    writer: typing.List[CoordinateWriter],
+    output_path: str,
+    target: str,
+) -> None:
+    """
     Write results to disk
     :param locate_results: Dataframe with picking results
     :param output_path: Path where to write results
     :param target: Target name
-    '''
+    """
 
-    if len(locate_results)==0:
+    if len(locate_results) == 0:
         raise InvalidLocateResults("Locate results are empty")
     os.makedirs(output_path, exist_ok=True)
 
     for w in writer:
-        w.write(locate_results, os.path.join(output_path, f"{os.path.splitext(target)[0]}{w.get_extension()}"))
-
+        w.write(
+            locate_results,
+            os.path.join(
+                output_path, f"{os.path.splitext(target)[0]}{w.get_extension()}"
+            ),
+        )
 
 
 def run(ui: PickUI) -> None:
-    '''
+    """
     Runs the picking pipeline
     :param ui: Settings from the UI
-    '''
+    """
     # Load pickle
     ui.run()
     conf = ui.get_pick_configuration()
 
-    from tomotwin.modules.common.utils import check_for_updates
     check_for_updates()
 
     # Get picks for target reference
     locate_results = pd.read_pickle(conf.locate_results_path)
     print()
     print("Found the following references:")
-    references = locate_results.attrs['references']
+    references = locate_results.attrs["references"]
     for ref in references:
         print(f"  - {ref}")
 
@@ -536,12 +565,16 @@ def run(ui: PickUI) -> None:
         locate_results_target = locate_results[selection_target]
 
         locate_results_target = filter_results(locate_results_target, conf)
-        print(f"Target: {target} - Write {len(locate_results_target)} positions to disk.")
+        print(
+            f"Target: {target} - Write {len(locate_results_target)} positions to disk."
+        )
         try:
-            write_results(locate_results=locate_results_target,
-                          writer=writer,
-                          output_path=conf.output_path,
-                          target=target)
+            write_results(
+                locate_results=locate_results_target,
+                writer=writer,
+                output_path=conf.output_path,
+                target=target,
+            )
         except InvalidLocateResults:
             print("Skip.")
 
@@ -549,7 +582,6 @@ def run(ui: PickUI) -> None:
 def _main_():
     ui = PickArgParseUI()
     run(ui=ui)
-
 
 
 if __name__ == "__main__":
