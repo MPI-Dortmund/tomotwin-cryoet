@@ -390,6 +390,7 @@ def get_tool_list() -> List[TomoTwinTool]:
     from tomotwin.modules.tools.median_embedding import MedianTool
     from tomotwin.modules.tools.filter_embedding import FilterTool
     from tomotwin.modules.tools.embedding_mask import EmbeddingMaskTool
+    from tomotwin.modules.tools.make_target import MakeTargetEmbeddings
 
     scale_coords_tool = ScaleCoordinates()
     extract_ref_tool = ExtractReference()
@@ -398,6 +399,7 @@ def get_tool_list() -> List[TomoTwinTool]:
     median_tool = MedianTool()
     fiter_tool = FilterTool()
     embedding_mask_tool = EmbeddingMaskTool()
+    make_target_tool = MakeTargetEmbeddings()
 
     tools.append(extract_ref_tool)
     tools.append(scale_coords_tool)
@@ -406,6 +408,7 @@ def get_tool_list() -> List[TomoTwinTool]:
     tools.append(median_tool)
     tools.append(fiter_tool)
     tools.append(embedding_mask_tool)
+    tools.append(make_target_tool)
 
     return tools
 
