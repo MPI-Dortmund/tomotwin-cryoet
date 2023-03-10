@@ -8,9 +8,9 @@ from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
 
 
-class SegmentationMaskTool(TomoTwinTool):
+class EmbeddingMaskTool(TomoTwinTool):
     def get_command_name(self) -> str:
-        return 'embedding mask'
+        return 'embedding_mask'
 
     def create_parser(self, parentparser : ArgumentParser) -> ArgumentParser:
         '''
@@ -20,7 +20,7 @@ class SegmentationMaskTool(TomoTwinTool):
 
         parser = parentparser.add_parser(
             self.get_command_name(),
-            help="Calculates a umap for the lasso  tool",
+            help="Generates an embedding mask for use in the clustering workflow with Napari",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         parser.add_argument('-i', '--input', type=str, required=True,
@@ -31,8 +31,9 @@ class SegmentationMaskTool(TomoTwinTool):
 
         return parser
 
-    def create_segmentation_map(embeddings):
-        print("Create segmentation map")
+    def create_embedding_mask(
+            self, embeddings: pd.DataFrame):
+        print("Create embedding mask")
         Z = embeddings.attrs['tomogram_input_shape'][0]
         Y = embeddings.attrs['tomogram_input_shape'][1]
         X = embeddings.attrs['tomogram_input_shape'][2]
@@ -54,7 +55,7 @@ class SegmentationMaskTool(TomoTwinTool):
         print("Read data")
         embeddings = pd.read_pickle(args.input)
         print("Generate segmentation mask")
-        segmentation_layer = create_segmentation_map(embeddings=embeddings)
+        segmentation_layer = self.create_embedding_mask(embeddings=embeddings)
         print("Write results to disk")
         os.makedirs(args.output, exist_ok=True)
         with mrcfile.new(
