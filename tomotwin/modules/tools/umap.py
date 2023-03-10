@@ -41,6 +41,8 @@ class UmapTool(TomoTwinTool):
 
         parser.add_argument('--chunk_size', type=int, default=900000,
                             help='Chunk size for transform all data')
+        parser.add_argument('--write_csv', action="store_true",
+                            help='Write umap as CSV to disk. This is needed clustering workflow.')
 
         return parser
 
@@ -96,5 +98,14 @@ class UmapTool(TomoTwinTool):
 
         os.makedirs(out_pth,exist_ok=True)
         fname = os.path.splitext(os.path.basename(args.input))[0]
-        pd.DataFrame(umap_embeddings).to_pickle(os.path.join(out_pth,fname+".tumap"))
+        df_embeddings = pd.DataFrame(umap_embeddings)
+        print("Write embeedings to disk")
+        df_embeddings.to_pickle(os.path.join(out_pth,fname+".tumap"))
+        print("Write model to disk")
         pickle.dump(fitted_umap, open(os.path.join(out_pth,fname+"_umap_model.pkl"), "wb"))
+
+        if args.write_csv:
+            print("Write umap as csv to disk")
+            df_embeddings = df_embeddings.rename({"0":"umap_0", "1": "umap_1"})
+            df_embeddings.to_csv(os.path.join(out_pth,fname+"_umap.csv"), index=False)
+        print("Done")
