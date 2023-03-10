@@ -71,7 +71,7 @@ def create_segmentation_map(embeddings):
         Y = int(row.Y)
         Z = int(row.Z)
         label = int(row.index)
-        empty_array[Z, Y, X] = label + 1
+        empty_array[(Z):(Z+2), (Y):(Y+2), (X):(X+2)] = label + 1
     segmentation_array = empty_array.astype(np.float32)
 
     return segmentation_array
