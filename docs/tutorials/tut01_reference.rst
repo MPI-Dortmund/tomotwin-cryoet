@@ -49,12 +49,12 @@ For the reference based approach you need, of course, references. To pick them f
 
  .. prompt:: bash $
 
-    napari your_tomo_a10.mrc
+    napari_boxmanager your_tomo_a10.mrc
 
 
-2. Select :guilabel:`add_layer` tab of the boxmanager toolkit (lower right corner). Press the button for :guilabel:`Create particle layer`.
+2. Select :guilabel:`organize_layer` tab of the boxmanager toolkit (lower right corner). Press the button :guilabel:`Create particle layer`.
 
-3. Switch to the :guilabel:`boxmanger` tab and set the :guilabel:`boxsize` to 37, as this gonna be the box size we will use for extraction later on.
+3. Switch to the :guilabel:`boxmanager` tab and set the :guilabel:`boxsize` to 37, as this gonna be the box size we will use for extraction later on.
 
 4. Identify a potential reference, choose the slice so that its centered and pick it by clicking in the center of the particle. Continue doing that until you think you have enough references
 
@@ -62,7 +62,7 @@ For the reference based approach you need, of course, references. To pick them f
 
     **Use multiple references per particle class**
 
-    We recommend to pick multiple (2-3) references per protein of interest, as not all subvolumes work equally well.
+    We recommend to pick multiple (3-4) references per protein of interest, as not all subvolumes work equally well.
 
     Each reference can be later evaluated separately using the boxmanager, allowing you to decide which gives the best result for each protein of interest
 
@@ -122,8 +122,7 @@ Run `tomotwin_locate` to locate particles:
 .. note::
 
     **Similarity maps**
-
-    In the output folder :file:`out/locate/` you will find a similarity map.mrc for each reference - just in case you are interested, this is akin to a location confidence heatmap for each protein.
+    You can add the option ``--write_heatmaps`` to the locate command. If you do this you will find a similarity map for each reference in :file:`your_tomo_a10/locate/` - just in case you are interested, this is akin to a location confidence heatmap for each protein.
 
 7. Inspect your particles with the boxmanager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -133,7 +132,7 @@ Open your particles with the following command or drag the files into an open na
 
 .. prompt:: bash $
 
-    napari tomo/your_tomo_a10.mrc out/locate/located.tloc
+    napari_boxmanager tomo/your_tomo_a10.mrc out/locate/located.tloc
 
 .. image:: ../img/tutorial_1/start.png
    :width: 650

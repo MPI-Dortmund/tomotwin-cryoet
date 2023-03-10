@@ -4,6 +4,8 @@ Installation and Download
 Installation
 ^^^^^^^^^^^^^
 
+We recommend to use the conda client `mamba <https://mamba.readthedocs.io/>`_ for installation. You should use `mambaforge <https://mamba.readthedocs.io/en/latest/installation.html>`_ for installation of mamba. Alternatively you can replace ``mamba`` with ``conda`` in the commands below.
+
 There are three main steps to install TomoTwin:
 
 1. Install TomoTwin
@@ -11,7 +13,6 @@ There are three main steps to install TomoTwin:
 
 .. prompt:: bash $
 
-    conda install mamba -n base -c conda-forge
     mamba create -n tomotwin -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.9 pytorch==1.12 torchvision pandas scipy numpy matplotlib pytables cuML=22.06 cudatoolkit=11.6 'protobuf>3.20' tensorboard  optuna mysql-connector-python
     conda activate tomotwin
     pip install tomotwin-cryoet
@@ -30,20 +31,22 @@ You can install `napari-boxmanager` via [pip]:
 
 .. prompt:: bash $
 
-    pip install napari-boxmanager==0.3.0b8
+    pip install napari-boxmanager
 
 3. Link Napari
 """""""""""""""""""
 
-This is an optional step, but for convinience reasons we link an adapted napari call into the tomotwin environment. With that you don't need to switch environments when working with tomotwin. While this is optional, I assume during the tutorials that you did this step. Here is what you need to do:
+This is an optional step, but for convenience reasons we link an adapted napari call into the tomotwin environment. With that you don't need to switch environments when working with tomotwin. While this is optional, I assume during the tutorials that you did this step. Here is what you need to do:
 
 .. prompt:: bash $
 
     conda activate tomotwin
-    napari_link_file=$(realpath $(dirname $(which tomotwin_embed.py))/napari_boxmanager)
+    tomotwin_dir=$(realpath $(dirname $(which tomotwin_embed.py)))
+    napari_link_file=${tomotwin_dir}/napari_boxmanager
     conda activate napari-tomotwin
-    echo -e "#\!/usr/bin/bash\nnapari_exe='$(which napari_boxmanager)'\n\${napari_exe} \"\${@}\""> ${napari_link_file}
+    echo -e "#\!/usr/bin/bash\nexport NAPARI_EXE=$(which napari)\nnapari_exe='$(which napari_boxmanager)'\n\${napari_exe} \"\${@}\""> ${napari_link_file}
     chmod +x ${napari_link_file}
+    conda activate tomotwin
 
 
 Download latest model

@@ -403,7 +403,7 @@ class MapArgParseUI(MapUI):
         self.output_pth = args.output
         if "distance" in sys.argv[1]:
             self.mode = MapMode.DISTANCE
-            self.skip_refinement = args.skip_refinement
+            self.skip_refinement = not args.refine
 
     def get_map_configuration(self) -> MapConfiguration:
         conf = MapConfiguration(
@@ -437,10 +437,10 @@ class MapArgParseUI(MapUI):
         )
 
         parser.add_argument(
-            "--skip_refinement",
+            "--refine",
             action='store_true',
             default=False,
-            help="Skip the reference refinement",
+            help="Do reference refinement",
         )
 
         parser.add_argument(

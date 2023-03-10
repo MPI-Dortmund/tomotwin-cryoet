@@ -39,7 +39,7 @@ class UmapTool(TomoTwinTool):
         parser.add_argument('--fit_sample_size', type=int, default=400000,
                             help='Sample size using for the fit of the umap')
 
-        parser.add_argument('--chunk_size', type=int, default=900000,
+        parser.add_argument('--chunk_size', type=int, default=400000,
                             help='Chunk size for transform all data')
         parser.add_argument('--write_csv', action="store_true",
                             help='Write umap as CSV to disk. This is needed clustering workflow.')
