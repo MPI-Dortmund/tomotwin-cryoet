@@ -389,12 +389,15 @@ def get_tool_list() -> List[TomoTwinTool]:
     from tomotwin.modules.tools.umap import UmapTool
     from tomotwin.modules.tools.median_embedding import MedianTool
     from tomotwin.modules.tools.filter_embedding import FilterTool
+    from tomotwin.modules.tools.segmentation_mask import SegmentationMaskTool
+
     scale_coords_tool = ScaleCoordinates()
     extract_ref_tool = ExtractReference()
     umap_tool = UmapTool()
     info_tool = Info()
     median_tool = MedianTool()
     fiter_tool = FilterTool()
+    segmentation_mask_tool = SegmentationMaskTool()
 
     tools.append(extract_ref_tool)
     tools.append(scale_coords_tool)
@@ -402,6 +405,7 @@ def get_tool_list() -> List[TomoTwinTool]:
     tools.append(umap_tool)
     tools.append(median_tool)
     tools.append(fiter_tool)
+    tools.append(segmentation_mask_tool)
 
     return tools
 
