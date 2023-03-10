@@ -106,6 +106,6 @@ class UmapTool(TomoTwinTool):
 
         if args.write_csv:
             print("Write umap as csv to disk")
-            df_embeddings = df_embeddings.rename({"0":"umap_0", "1": "umap_1"})
+            df_embeddings.columns = [f"umap_{i}" for i in range(umap_embeddings.shape[1])]
             df_embeddings.to_csv(os.path.join(out_pth,fname+"_umap.csv"), index=False)
         print("Done")
