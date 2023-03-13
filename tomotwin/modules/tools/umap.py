@@ -100,12 +100,12 @@ class UmapTool(TomoTwinTool):
         fname = os.path.splitext(os.path.basename(args.input))[0]
         df_embeddings = pd.DataFrame(umap_embeddings)
         print("Write embeedings to disk")
+        df_embeddings.columns = [f"umap_{i}" for i in range(umap_embeddings.shape[1])]
         df_embeddings.to_pickle(os.path.join(out_pth,fname+".tumap"))
         print("Write model to disk")
         pickle.dump(fitted_umap, open(os.path.join(out_pth,fname+"_umap_model.pkl"), "wb"))
 
         if args.write_csv:
             print("Write umap as csv to disk")
-            df_embeddings.columns = [f"umap_{i}" for i in range(umap_embeddings.shape[1])]
             df_embeddings.to_csv(os.path.join(out_pth,fname+"_umap.csv"), index=False)
         print("Done")
