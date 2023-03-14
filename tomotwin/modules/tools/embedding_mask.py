@@ -59,7 +59,7 @@ class EmbeddingMaskTool(TomoTwinTool):
         print("Write results to disk")
         os.makedirs(args.output, exist_ok=True)
         with mrcfile.new(
-                os.path.join(args.output, os.path.splitext(os.path.basename(args.input))[0] + "_embedding_mask.mrci"),
+                os.path.join(args.output, os.path.splitext(os.path.basename(args.input))[0] + "_label_mask.mrci"),
                 overwrite=True) as mrc:
             mrc.set_data(segmentation_layer)
         print("Done")
