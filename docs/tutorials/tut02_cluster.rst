@@ -30,7 +30,16 @@ We are working on a streamlined version of the clustering workflow. Will follow 
 
     napari your_tomo_a10.mrc out/visualization/your_tomo_a10_embeddings_label_mask.mrci
 
-:guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster UMAP embeddings`
+:guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster UMAP embeddings`
+
+Choose the :guilabel:`Path to UMAP` by clicking on :guilabel:`Select file`.
+
+Click :guilabel:`Load`
+
+HERE MORE DETAILS CLUSTERING EXPLANATION
+
+:guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Save cluster targets`
+
 
 
 5. Map your tomogram
