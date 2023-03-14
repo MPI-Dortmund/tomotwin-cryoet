@@ -43,3 +43,8 @@ The map command will calculate the pairwise distances/similarity between the tar
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Content comes here :-)
+
+8. Scale your coordinates
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: text_modules/scale.rst
