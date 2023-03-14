@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import mrcfile
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
-
+from tqdm import tqdm
 
 
 class EmbeddingMaskTool(TomoTwinTool):
@@ -20,7 +20,7 @@ class EmbeddingMaskTool(TomoTwinTool):
 
         parser = parentparser.add_parser(
             self.get_command_name(),
-            help="Generates an embedding mask for use in the clustering workflow with Napari",
+            help="Generates an label mask for use in the clustering workflow with Napari",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         parser.add_argument('-i', '--input', type=str, required=True,
@@ -41,7 +41,7 @@ class EmbeddingMaskTool(TomoTwinTool):
         segmentation_mask = embeddings[['Z', 'Y', 'X']].copy()
         segmentation_mask = segmentation_mask.reset_index()
         empty_array = np.zeros(shape=(Z, Y, X))
-        for row in segmentation_mask.itertuples(index=True, name='Pandas'):
+        for row in tqdm(segmentation_mask.itertuples(index=True, name='Pandas'), total=len(segmentation_mask)):
             X = int(row.X)
             Y = int(row.Y)
             Z = int(row.Z)
@@ -54,7 +54,7 @@ class EmbeddingMaskTool(TomoTwinTool):
     def run(self, args):
         print("Read data")
         embeddings = pd.read_pickle(args.input)
-        print("Generate segmentation mask")
+        print("Generate label mask")
         segmentation_layer = self.create_embedding_mask(embeddings=embeddings)
         print("Write results to disk")
         os.makedirs(args.output, exist_ok=True)
