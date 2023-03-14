@@ -17,24 +17,7 @@ In this tutorial we describe how to use TomoTwin for picking in tomograms using 
 1. Downscale your Tomogram to 10 Å
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-TomoTwin was trained on tomograms with a pixelsize of 10Å. While in practice we've used it with pixel sizes ranging from 9.2 to 13.6, it is probably ideal to run it at a pixel size close to 10Å.  For that you may need to downscale your tomogram. You can do that by fourier shrink your tomogram with EMAN2. Lets say you have a Tomogram with a pixelsize of 5.9359 angstrom. The fouriershrink factor is then 10/5.9359 = 1.684
-
-
-
-.. prompt:: bash $
-
-    e2proc3d.py --apix=5.9359 --fouriershrink=1.684 your_tomo.mrc your_tomo_a10.mrc
-
-
-
-TomoTwin should be used to pick on tomograms without denoising or lowpass filtering. But you may use these tomograms to find the coordinates of your particle of interest for use as a reference. In this case, you should make sure the denoised/lowpass filtered tomogram has the same pixel size as the one you will pick on.
-
- .. note::
-
-    **What if my protein is too big for a box size of 37x37x37 pixels?**
-
-    Because TomoTwin was trained on many proteins at once, we needed to find a box size that worked for all proteins. Therefore, all proteins were used with a pixel size of 10Å and a box size of 37 pixels. Because of this, you must extract your reference with a box size of 37 pixels. If your protein is too large for ths box at 10Å/pix (much larger than a ribosome) then you should scale the pixel size of your tomogram until it fits rather than changing the box size. Likewise if your protein is so small that at 10Å/pix it only fills one to two pixels of the box, you should scale your tomogram pixel size until the particle is bigger, however we've found that for proteins down to 100 kDa, 10Å/pix is sufficient for the 37 box.
-
+.. include:: text_modules/downscale.rst
 
 2. Pick and extract your reference
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -82,13 +65,7 @@ You will find your extracted references in `reference/protein_a_X.mrc` where X i
 3. Embed your Tomogram
 ^^^^^^^^^^^^^^^^^^^^^^
 
-I assume that you already have downloaded the general model.
-
-To embed your tomogram using two GPUs do:
-
-.. prompt:: bash $
-
-    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -m LATEST_TOMOTWIN_MODEL.pth -v your_tomo_a10.mrc -b 256 -o your_tomo_a10/embed/tomo/ -s 2
+.. include:: text_modules/embed.rst
 
 
 4. Embed your reference
@@ -113,16 +90,7 @@ The map command will calculate the pairwise distances/similarity between the ref
 6. Localize potential particles
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Run `tomotwin_locate` to locate particles:
-
-.. prompt:: bash $
-
-    tomotwin_locate.py findmax -m your_tomo_a10/map/map.tmap -o your_tomo_a10/locate/
-
-.. note::
-
-    **Similarity maps**
-    You can add the option ``--write_heatmaps`` to the locate command. If you do this you will find a similarity map for each reference in :file:`your_tomo_a10/locate/` - just in case you are interested, this is akin to a location confidence heatmap for each protein.
+.. include:: text_modules/locate.rst
 
 7. Inspect your particles with the boxmanager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
