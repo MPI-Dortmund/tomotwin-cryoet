@@ -26,7 +26,12 @@ We are working on a streamlined version of the clustering workflow. Will follow 
 
     tomotwin_tools.py embedding_mask -i out/embed/tomo/tiltseries_rec_embeddings.temb -o out/visualization/
 
-More content comes here :-)
+.. prompt:: bash $
+
+    napari your_tomo_a10.mrc out/visualization/your_tomo_a10_embeddings_label_mask.mrci
+
+:guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster UMAP embeddings`
+
 
 5. Map your tomogram
 ^^^^^^^^^^^^^^^^^^^^
