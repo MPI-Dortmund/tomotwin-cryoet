@@ -33,6 +33,12 @@ You can install `napari-boxmanager` via [pip]:
 
     pip install napari-boxmanager
 
+Additionally you need the `napari-tomotwin` plugin [pip]:
+
+.. prompt:: bash $
+
+    pip install napari-tomotwin
+
 3. Link Napari
 """""""""""""""""""
 
@@ -45,6 +51,7 @@ This is an optional step, but for convenience reasons we link an adapted napari 
     napari_link_file=${tomotwin_dir}/napari_boxmanager
     conda activate napari-tomotwin
     echo -e "#\!/usr/bin/bash\nexport NAPARI_EXE=$(which napari)\nnapari_exe='$(which napari_boxmanager)'\n\${napari_exe} \"\${@}\""> ${napari_link_file}
+    ln -rs $(which napari) ${napari}
     chmod +x ${napari_link_file}
     conda activate tomotwin
 
