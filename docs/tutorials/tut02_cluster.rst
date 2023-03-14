@@ -22,7 +22,11 @@ We are working on a streamlined version of the clustering workflow. Will follow 
 4. Find target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Content comes here :-)
+.. prompt:: bash $
+
+    tomotwin_tools.py embedding_mask -i out/embed/tomo/tiltseries_rec_embeddings.temb -o out/visualization/
+
+More content comes here :-)
 
 5. Map your tomogram
 ^^^^^^^^^^^^^^^^^^^^
