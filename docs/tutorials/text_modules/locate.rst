@@ -2,7 +2,7 @@ Run `tomotwin_locate` to locate particles:
 
 .. prompt:: bash $
 
-    tomotwin_locate.py findmax -m your_tomo_a10/map/map.tmap -o your_tomo_a10/locate/
+    tomotwin_locate.py findmax -m out/map/map.tmap -o out/locate/
 
 .. note::
 
