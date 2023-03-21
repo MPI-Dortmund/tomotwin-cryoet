@@ -37,6 +37,7 @@ class EmbeddingMaskTool(TomoTwinTool):
         Z = embeddings.attrs['tomogram_input_shape'][0]
         Y = embeddings.attrs['tomogram_input_shape'][1]
         X = embeddings.attrs['tomogram_input_shape'][2]
+        stride = embeddings.attrs['stride'][0]
         embeddings = embeddings.reset_index(drop=True)
         segmentation_mask = embeddings[['Z', 'Y', 'X']].copy()
         segmentation_mask = segmentation_mask.reset_index()
@@ -46,7 +47,7 @@ class EmbeddingMaskTool(TomoTwinTool):
             Y = int(row.Y)
             Z = int(row.Z)
             label = int(row.index)
-            empty_array[(Z):(Z + 2), (Y):(Y + 2), (X):(X + 2)] = label + 1
+            empty_array[(Z):(Z + stride), (Y):(Y + stride), (X):(X + stride)] = label + 1
         segmentation_array = empty_array.astype(np.float32)
 
         return segmentation_array
