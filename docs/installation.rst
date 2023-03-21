@@ -33,11 +33,12 @@ You can install `napari-boxmanager` via [pip]:
 
     pip install napari-boxmanager
 
-Additionally you need the `napari-tomotwin` plugin [pip]:
+Additionally you need the `napari-tomotwin` and the `cluster plotter plugin` plugin via [pip]:
 
 .. prompt:: bash $
 
-    pip install napari-tomotwin
+    pip install git+https://github.com/thorstenwagner/napari-clusters-plotter.git@heatmap_and_force_img
+    pip install git+https://github.com/MPI-Dortmund/napari-tomotwin.git@main
 
 3. Link Napari
 """""""""""""""""""
