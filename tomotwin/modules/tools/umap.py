@@ -34,7 +34,7 @@ class UmapTool(TomoTwinTool):
                             help='Output folder')
         parser.add_argument('-m', '--model', type=str, required=False, default=None,
                             help='Previously fitted model')
-        parser.add_argument('-n', '--ncomponents', type=str, required=False, default=2,
+        parser.add_argument('-n', '--ncomponents', type=int, required=False, default=2,
                             help='Number of components')
         parser.add_argument('--neighbors', type=int, required=False, default=200,
                             help='Previously fitted model')

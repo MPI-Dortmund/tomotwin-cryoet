@@ -15,6 +15,7 @@ We are working on a streamlined version of the clustering workflow. Will follow 
 3. Estimate UMAP manifold
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+The next step is to reduce the dimensions of your embeddings using a UMAP to allow efficient visualization. To calculate a UMAP
 .. prompt:: bash $
 
     tomotwin_tools.py umap -i out/embed/tomo/your_tomo_a10_embeddings.temb -o out/umap/

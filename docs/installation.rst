@@ -37,8 +37,10 @@ Additionally you need the `napari-tomotwin` and the `cluster plotter plugin` plu
 
 .. prompt:: bash $
 
+
     pip install git+https://github.com/thorstenwagner/napari-clusters-plotter.git@heatmap_and_force_img
-    pip install git+https://github.com/MPI-Dortmund/napari-tomotwin.git@main
+    pip install napari-tomotwin
+
 
 3. Link Napari
 """""""""""""""""""
