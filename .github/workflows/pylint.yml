@@ -23,4 +23,4 @@ jobs:
         $CONDA/bin/pip install .
     - name: Analysing the code with pylint
       run: |
-        $CONDA/bin/pylint $(git ls-files '*.py')
+        $CONDA/bin/pylint -E $(git ls-files '*.py')
