@@ -31,7 +31,7 @@ setup(
         "scikit-image",
         "pystardb==0.3.1",
         "pandas >= 1.3",
-        "pytorch-metric-learning",
+        "pytorch-metric-learning==1.6.3",
         "numba",
         "tabulate",
         "setuptools_scm",
