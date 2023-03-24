@@ -1,14 +1,12 @@
 # pylint: skip-file
+from pymol import cmd
+from pymol import util
 import json
 import argparse
 import os
 import numpy as np
-from pymol import cmd
-from pymol import util
 
 def get_sorted_pdbs_and_sizes(pdb_paths):
-
-
     sizes = []
     pdb_ids = []
     for pdb in pdb_paths:

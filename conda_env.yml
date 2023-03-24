@@ -1,0 +1,23 @@
+name: tomotwin
+channels:
+  - conda-forge
+  - pytorch
+  - rapidsai
+  - nvidia
+  - defaults
+dependencies:
+  - python=3.9
+  - pytorch==1.12
+  - torchvision
+  - pandas
+  - scipy
+  - numpy
+  - matplotlib
+  - pytables
+  - cuml=22.06
+  - cudatoolkit=11.6
+  - protobuf[version='>3.20']
+  - tensorboard
+  - optuna
+  - mysql-connector-python
+prefix: /opt/user_software/miniconda3/envs/tomotwin

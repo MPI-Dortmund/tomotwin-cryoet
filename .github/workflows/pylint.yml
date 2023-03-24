@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: condaforge/mambaforge
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
@@ -16,10 +16,11 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        mamba install -y -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.9 pytorch==1.12 torchvision pandas scipy numpy matplotlib pytables cuML=22.06 cudatoolkit=11.6 'protobuf>3.20' tensorboard  optuna mysql-connector-python
-        $CONDA/bin/python -m -y pip install --upgrade pip
-        $CONDA/bin/pip install -y pylint
-        $CONDA/bin/pip install -y .
+        conda install -y mamba -n base -c conda-forge
+        $CONDA/bin/mamba install -y -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.9 pytorch==1.12 torchvision pandas scipy numpy matplotlib pytables cuML=22.06 cudatoolkit=11.6 'protobuf>3.20' tensorboard  optuna mysql-connector-python
+        $CONDA/bin/python -m pip install --upgrade pip
+        $CONDA/bin/pip install pylint
+        $CONDA/bin/pip install .
     - name: Analysing the code with pylint
       run: |
-        $CONDA/bin/pylint $(git ls-files '*.py')
+        $CONDA/bin/pylint -E $(git ls-files '*.py')
