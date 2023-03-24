@@ -19,8 +19,8 @@ jobs:
         conda install -y mamba -n base -c conda-forge
         $CONDA/bin/mamba install -y -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.9 pytorch==1.12 torchvision pandas scipy numpy matplotlib pytables cuML=22.06 cudatoolkit=11.6 'protobuf>3.20' tensorboard  optuna mysql-connector-python
         $CONDA/bin/python -m -y pip install --upgrade pip
-        $CONDA/bin/pip install -y pylint
-        $CONDA/bin/pip install -y .
+        $CONDA/bin/pip install pylint
+        $CONDA/bin/pip install .
     - name: Analysing the code with pylint
       run: |
         $CONDA/bin/pylint $(git ls-files '*.py')
