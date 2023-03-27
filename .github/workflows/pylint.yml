@@ -18,7 +18,7 @@ jobs:
         channel-priority: true
         python-version: ${{ matrix.python-version }}
         channels: conda-forge, pytorch, nvidia
-        environment-file: conda_eny.yml
+        environment-file: conda_env.yml
     - run: conda --version
     - run: which python
     - name: Set up Python ${{ matrix.python-version }}
