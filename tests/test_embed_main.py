@@ -5,6 +5,7 @@ import numpy as np
 from tomotwin.modules.inference.argparse_embed_ui import EmbedConfiguration
 import tempfile
 from tomotwin.modules.inference.volumedata import VolumeDataset
+import mrcfile
 
 class DummyEmbedor(Embedor):
 
@@ -40,8 +41,32 @@ class TestsEmbedMain(unittest.TestCase):
 
             self.assertEqual(True, os.path.exists(os.path.join(tmpdirname,"volume_embeddings.temb")))
 
+    def test_embed_subvolume(self):
+        from tomotwin.embed_main import embed_subvolumes
+
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            embed_conf = EmbedConfiguration(
+                model_path=None,
+                volumes_path="my/fake/volume.mrc",
+                output_path=tmpdirname,
+                mode=None,
+                batchsize=3,
+                stride=1,
+                zrange=None
+            )
+            paths=[os.path.join(tmpdirname,"vola.mrc"),os.path.join(tmpdirname,"volb.mrc")]
+
+            for p in paths:
+                with mrcfile.new(p) as mrc:
+                    mrc.set_data(np.random.rand(50, 50).astype(np.float32))
 
 
+            embed_subvolumes(
+                paths=paths,
+                embedor=DummyEmbedor(),
+                conf=embed_conf
+            )
+            self.assertEqual(True, os.path.exists(os.path.join(tmpdirname, "embeddings.temb")))
 
 if __name__ == '__main__':
     unittest.main()

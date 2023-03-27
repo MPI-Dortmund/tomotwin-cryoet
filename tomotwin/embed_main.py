@@ -458,17 +458,10 @@ def get_file_md5(path: str) -> str:
     except TypeError:
         return None
 
-def embed_subvolumes(embedor: Embedor, conf: EmbedConfiguration) -> pd.DataFrame:
+def embed_subvolumes(paths: List[str], embedor: Embedor, conf: EmbedConfiguration) -> pd.DataFrame:
     '''
     Embeds a set of subvolumes
     '''
-    paths = []
-    for p in conf.volumes_path:
-        if os.path.isfile(p) and p.endswith(".mrc"):
-            paths.append(p)
-        if os.path.isdir(p):
-            foundfiles = glob.glob(os.path.join(p, "*.mrc"))
-            paths.extend(foundfiles)
     embeddings = volume_embedding(paths, embedor=embedor)
     column_names = []
     for i in range(embeddings.shape[1]):
@@ -478,8 +471,9 @@ def embed_subvolumes(embedor: Embedor, conf: EmbedConfiguration) -> pd.DataFrame
     df.index.name = "index"
     df.attrs["modelpth"] = conf.model_path
     df.attrs["modelmd5"] = get_file_md5(conf.model_path)
-    df.to_pickle(os.path.join(conf.output_path, "embeddings.temb"))
-    print("Done")
+    f = os.path.join(conf.output_path, "embeddings.temb")
+    df.to_pickle(f)
+    print(f"Done. Wrote results to {f}")
     return df
 
 
@@ -563,7 +557,14 @@ def _main_():
         tomo = -1 * MrcFormat.read(conf.volumes_path)  # -1 to invert the contrast
         embed_tomogram(tomo, embedor, conf, window_size)
     elif conf.mode == EmbedMode.VOLUMES:
-        embed_subvolumes(embedor, conf)
+        paths = []
+        for p in conf.volumes_path:
+            if os.path.isfile(p) and p.endswith(".mrc"):
+                paths.append(p)
+            if os.path.isdir(p):
+                foundfiles = glob.glob(os.path.join(p, "*.mrc"))
+                paths.extend(foundfiles)
+        embed_subvolumes(paths, embedor, conf)
 
 if __name__ == "__main__":
     _main_()
