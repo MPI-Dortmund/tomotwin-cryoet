@@ -450,10 +450,13 @@ def get_file_md5(path: str) -> str:
     :param path: Path for file
     :return: MD5  checksum.
     '''
-    with open(path, "rb") as f:
-        data = f.read()
-    md5hash = hashlib.md5(data).hexdigest()
-    return md5hash
+    try:
+        with open(path, "rb") as f:
+            data = f.read()
+        md5hash = hashlib.md5(data).hexdigest()
+        return md5hash
+    except TypeError:
+        return None
 
 def embed_subvolumes(embedor: Embedor, conf: EmbedConfiguration) -> pd.DataFrame:
     '''
@@ -480,12 +483,15 @@ def embed_subvolumes(embedor: Embedor, conf: EmbedConfiguration) -> pd.DataFrame
     return df
 
 
-def embed_tomogram(embedor: Embedor, conf: EmbedConfiguration, window_size: int) -> pd.DataFrame:
+def embed_tomogram(
+        tomo: np.array,
+        embedor: Embedor,
+        conf: EmbedConfiguration,
+        window_size: int) -> pd.DataFrame:
     """
     Embeds a tomogram
     :return: DataFrame of embeddings
     """
-    tomo = -1 * MrcFormat.read(conf.volumes_path)  # -1 to invert the contrast
     if conf.zrange:
         hb = int((window_size - 1) // 2)
         minz = max(0, conf.zrange[0] - hb)
@@ -554,7 +560,8 @@ def _main_():
 
     window_size = get_window_size(conf.model_path)
     if conf.mode == EmbedMode.TOMO:
-        embed_tomogram(embedor, conf, window_size)
+        tomo = -1 * MrcFormat.read(conf.volumes_path)  # -1 to invert the contrast
+        embed_tomogram(tomo, embedor, conf, window_size)
     elif conf.mode == EmbedMode.VOLUMES:
         embed_subvolumes(embedor, conf)
 
