@@ -6,7 +6,6 @@ channels:
   - nvidia
   - defaults
 dependencies:
-  - python=3.9
   - pytorch==1.12
   - torchvision
   - pandas
