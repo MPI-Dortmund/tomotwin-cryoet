@@ -386,17 +386,16 @@ from torch import nn
 from torch.utils.data import DataLoader
 import torch
 from torch import optim
-from torch.backends import cudnn as cudnn
+from torch.backends import cudnn
 from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.cuda.amp import GradScaler, autocast
 
+import tomotwin
 from tomotwin.modules.training.trainer import Trainer
 from tomotwin.modules.training.tripletdataset import TripletDataset
 from tomotwin.modules.networks.torchmodel import TorchModel
 from tomotwin.modules.common import preprocess
-
-
 
 
 class TorchTrainer(Trainer):
@@ -421,7 +420,7 @@ class TorchTrainer(Trainer):
         amsgrad: bool = False,
         weight_decay: float = 0,
         patience: int = None,
-        save_epoch_seperately: bool = False
+        save_epoch_seperately: bool = False,
     ):
         """
         :param epochs: Number of epochs
@@ -464,8 +463,6 @@ class TorchTrainer(Trainer):
         self.save_epoch_seperately = save_epoch_seperately
         self.f1_improved = False
         self.loss_improved = False
-
-
 
         # Write graph to tensorboard
         dummy_input = torch.zeros([12, 1, 37, 37, 37])
@@ -556,7 +553,7 @@ class TorchTrainer(Trainer):
         scores = []
         for col in anchors:
             sim = np.matmul(volumes.T, anchors[col])
-            best_f1, best_t = TorchTrainer.get_best_f1(
+            best_f1, _ = TorchTrainer.get_best_f1(
                 anchor_label=col, similarities=sim, sim_labels=sim.index.values
             )
             scores.append(best_f1)
@@ -603,7 +600,12 @@ class TorchTrainer(Trainer):
 
         return TorchTrainer.calc_avg_f1(pd.DataFrame(anchor_emb), pd.DataFrame(vol_emb))
 
-    def run_batch(self, batch):
+    def run_batch(self, batch: Dict):
+        """
+        Run inference on one batch.
+        :param batch: Dictionary with batch data
+        :return: Loss of the batch
+        """
         anchor_vol = batch["anchor"].to(self.device, non_blocking=True)
         positive_vol = batch["positive"].to(self.device, non_blocking=True)
         negative_vol = batch["negative"].to(self.device, non_blocking=True)
@@ -624,6 +626,12 @@ class TorchTrainer(Trainer):
         return loss
 
     def save_best_loss(self, current_val_loss: float, epoch: int) -> None:
+        """
+        Update best model according loss
+        :param current_val_loss: Current validation loss
+        :param epoch: Current epoch
+        :return:  None
+        """
         if current_val_loss < self.best_val_loss:
             self.loss_improved = True
             print(
@@ -634,6 +642,12 @@ class TorchTrainer(Trainer):
             self.best_model_loss = copy.deepcopy(self.model)
 
     def save_best_f1(self, current_val_f1: float, epoch: int) -> None:
+        """
+        Update best model according f1 one score
+        :param current_val_f1: Current f1 score
+        :param epoch: Current epoch
+        :return: None
+        """
         if current_val_f1 > self.best_val_f1:
             self.f1_improved = True
             print(
@@ -664,8 +678,9 @@ class TorchTrainer(Trainer):
 
     def load_checkpoint(self, checkpoint: str) -> None:
         """
+        Load model checkpoint
         :param checkpoint: Path to checkpoint
-        :return:
+        :return: None
         """
 
         try:
@@ -735,11 +750,7 @@ class TorchTrainer(Trainer):
             self.current_epoch = epoch
             train_loss = self.epoch(train_loader=train_loader)
 
-            print(
-                "Epoch: {}/{} - Training Loss: {:.4f}".format(
-                    epoch + 1, self.epochs, train_loss
-                )
-            )
+            print(f"Epoch: {epoch + 1}/{self.epochs} - Training Loss: {train_loss:.4f}")
             self.writer.add_scalar("Loss/train", train_loss, epoch)
 
             # Validation
@@ -757,7 +768,9 @@ class TorchTrainer(Trainer):
             self.writer.flush()
 
             if self.output_path is not None:
-                self.write_results_to_disk(self.output_path, save_each_improvement=self.save_epoch_seperately)
+                self.write_results_to_disk(
+                    self.output_path, save_each_improvement=self.save_epoch_seperately
+                )
 
         return self.model
 
@@ -780,7 +793,7 @@ class TorchTrainer(Trainer):
         epoch: int = None,
         best_loss: float = None,
         best_f1: float = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Adds some metadata to the model and write the model  to disk
@@ -795,13 +808,12 @@ class TorchTrainer(Trainer):
         :param best_f1:  Current best validtion f1 score
         :return:
         """
-        import tomotwin
-        for key,value in kwargs.items():
+        for key, value in kwargs.items():
             config[key] = value
         results_dict = {
             "model_state_dict": model.state_dict(),
             "tomotwin_config": config,
-            "tt_version_train": tomotwin.__version__
+            "tt_version_train": tomotwin.__version__,
         }
         if optimizer is not None:
             results_dict["optimizer_state_dict"] = optimizer.state_dict()
@@ -823,7 +835,16 @@ class TorchTrainer(Trainer):
             path,
         )
 
-    def write_model_to_disk(self, path: str, model_to_save, model_name: str, epoch: int, **kwargs):
+    def write_model_to_disk(
+        self, path: str, model_to_save, model_name: str, epoch: int, **kwargs
+    ):
+        """
+        :param path: Path for folder where the model is saved to.
+        :param model_to_save:  Model to save
+        :param model_name: model filename
+        :param epoch: Epoch of the model
+        :return: None
+        """
         if isinstance(model_to_save, nn.DataParallel):
             model_to_save = model_to_save.module
 
@@ -839,8 +860,9 @@ class TorchTrainer(Trainer):
             **kwargs,
         )
 
-    def write_results_to_disk(self, path: str, save_each_improvement: bool = False, **kwargs):
-
+    def write_results_to_disk(
+        self, path: str, save_each_improvement: bool = False, **kwargs
+    ):
         self.write_model_to_disk(path, self.model, "latest.pth", self.current_epoch)
 
         if self.current_epoch == self.epochs - 1:
@@ -850,15 +872,31 @@ class TorchTrainer(Trainer):
 
         if self.best_model_loss is not None:
             # The best_model can be None, after a training restart.
-            self.write_model_to_disk(path, self.best_model_loss, "best_loss.pth", self.best_epoch_loss, **kwargs)
+            self.write_model_to_disk(
+                path,
+                self.best_model_loss,
+                "best_loss.pth",
+                self.best_epoch_loss,
+                **kwargs,
+            )
 
         if self.best_model_f1 is not None:
             # The best_model can be None, after a training restart.
-            self.write_model_to_disk(path, self.best_model_f1, "best_f1.pth", self.best_epoch_f1, **kwargs)
+            self.write_model_to_disk(
+                path, self.best_model_f1, "best_f1.pth", self.best_epoch_f1, **kwargs
+            )
 
         if save_each_improvement and self.f1_improved:
-            self.write_model_to_disk(path, self.best_model_f1, f"best_f1_{self.best_epoch_f1}.pth", self.best_epoch_f1, **kwargs)
-
+            self.write_model_to_disk(
+                path,
+                self.best_model_f1,
+                f"best_f1_{self.best_epoch_f1}.pth",
+                self.best_epoch_f1,
+                **kwargs,
+            )
 
     def get_model(self) -> Any:
+        """
+        :return: Trained model
+        """
         return self.model

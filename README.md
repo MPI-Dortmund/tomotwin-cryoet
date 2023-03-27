@@ -1,3 +1,6 @@
+
+[![CodeFactor](https://www.codefactor.io/repository/github/mpi-dortmund/tomotwin-cryoet/badge/main)](https://www.codefactor.io/repository/github/mpi-dortmund/tomotwin-cryoet/overview/main)
+
 # TomoTwin
 
 Particle picking in Tomograms using triplet networks and metric learning
