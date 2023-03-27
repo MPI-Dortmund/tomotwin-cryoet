@@ -17,16 +17,16 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
+    - uses: s-weigand/setup-conda@v1
     - name: Install dependencies
-      uses: s-weigand/setup-conda@v1
       run: |
         conda install -y mamba -n base -c conda-forge
         mamba install -y -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.9 pytorch==1.12 torchvision pandas scipy numpy matplotlib pytables cuML=22.06 cudatoolkit=11.6 'protobuf>3.20' tensorboard  optuna mysql-connector-python
         python -m pip install --upgrade pip
         pip install pylint tox tox-gh-actions pytest pytest-coverage
         pip install .
+    - uses: s-weigand/setup-conda@v1
     - name: Debug Info
-      uses: s-weigand/setup-conda@v1
       run: |
         which python
         pip freeze
