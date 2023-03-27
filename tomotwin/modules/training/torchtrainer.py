@@ -570,6 +570,10 @@ class TorchTrainer(Trainer):
         return avg_f1
 
     def classification_f1_score(self, test_loader: DataLoader) -> float:
+        """
+        Calculates classification f1 score
+        :return: F1 score
+        """
         self.model.eval()
         t = tqdm(test_loader, desc="Classification accuracy", leave=False)
         anchor_emb = {}  # pd.DataFrame()
