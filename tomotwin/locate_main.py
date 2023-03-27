@@ -377,20 +377,26 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 import os
 import sys
+import json
+from typing import List
 
 import numpy as np
-from typing import List
 import pandas as pd
 import mrcfile
 from scipy.ndimage import zoom
 import tqdm
 
 import tomotwin
-from tomotwin.modules.inference.locate_ui import LocateUI, LocateMode, LocateConfiguration
+from tomotwin.modules.inference.locate_ui import (
+    LocateUI,
+    LocateMode,
+    LocateConfiguration,
+)
 from tomotwin.modules.inference.argparse_locate_ui import LocateArgParseUI
 from tomotwin.modules.inference.findmaxima_locator import FindMaximaLocator
 from tomotwin.modules.inference.locator import Locator
-
+from tomotwin.modules.common.utils import check_for_updates
+from tomotwin.modules.common.preprocess import label_filename
 
 def readprobs(path: str) -> pd.DataFrame:
     if path.endswith(".txt"):
@@ -401,31 +407,33 @@ def readprobs(path: str) -> pd.DataFrame:
     else:
         print("Format not implemented")
         return None
-    if 'filename' in df_map.columns:
+    if "filename" in df_map.columns:
         df_map.drop(columns=["filename"], inplace=True)
     return df_map
 
 
 def extract_subclass_df(map: pd.DataFrame) -> List[pd.DataFrame]:
     sub_dfs = []
-    for i in range(len(map.attrs['references'])):
-        sub = map[['X', 'Y', 'Z', f"d_class_{i}"]]
-        sub.attrs["ref_name"] = map.attrs['references'][i]
+    for i in range(len(map.attrs["references"])):
+        sub = map[["X", "Y", "Z", f"d_class_{i}"]]
+        sub.attrs["ref_name"] = map.attrs["references"][i]
         sub.attrs["ref_index"] = i
         sub_dfs.append(sub)
     return sub_dfs
+
 
 def run(conf: LocateConfiguration):
     out_path = conf.output_path
     os.makedirs(out_path, exist_ok=True)
     map = readprobs(conf.map_path)
 
-
     if conf.mode == LocateMode.FINDMAX:
         if "stride" in map.attrs:
             stride = map.attrs["stride"]
         else:
-            raise ValueError("Stride unknown. It seems that you are using an invalid model")
+            raise ValueError(
+                "Stride unknown. It seems that you are using an invalid model"
+            )
         if len(stride) == 1:
             stride = stride * 3
 
@@ -434,10 +442,12 @@ def run(conf: LocateConfiguration):
         else:
             raise ValueError("Window size unknown. Stop.")
 
-        locator = FindMaximaLocator(tolerance=conf.tolerance,
-                                    stride=stride,
-                                    window_size=window_size,
-                                    global_min=conf.global_min)
+        locator = FindMaximaLocator(
+            tolerance=conf.tolerance,
+            stride=stride,
+            window_size=window_size,
+            global_min=conf.global_min,
+        )
         locator.output = out_path
 
     sub_dfs = extract_subclass_df(map)
@@ -445,10 +455,11 @@ def run(conf: LocateConfiguration):
     del map
 
     from concurrent.futures import ProcessPoolExecutor as Pool
-    with Pool(conf.processes) as pool:
-        class_frames_and_vols = list(pool.map(locator.locate,sub_dfs))
 
-    size_dict=None
+    with Pool(conf.processes) as pool:
+        class_frames_and_vols = list(pool.map(locator.locate, sub_dfs))
+
+    size_dict = None
     class_frames = [t[0] for t in class_frames_and_vols]
     class_vols = [t[1] for t in class_frames_and_vols]
 
@@ -458,14 +469,12 @@ def run(conf: LocateConfiguration):
         conf.boxsize = int(conf.boxsize)
     except ValueError:
         print("Read boxsize from JSON")
-        import json
         with open(conf.boxsize, "r") as conf_sizes_file:
             size_dict = json.load(conf_sizes_file)
 
-
     for class_id, class_frame in enumerate(class_frames):
-        if len(class_frame)==0:
-            print("No particles for class", class_frame.attrs['name'])
+        if len(class_frame) == 0:
+            print("No particles for class", class_frame.attrs["name"])
             continue
         class_name = class_frame.attrs["name"]
         before_nms = len(class_frame)
@@ -473,21 +482,27 @@ def run(conf: LocateConfiguration):
             try:
                 size = size_dict[class_name]
             except KeyError:
-                print(f"Can't find boxsize for {class_name}. Try to use extract PDB id and use this")
-                from tomotwin.modules.common.preprocess import label_filename
+                print(
+                    f"Can't find boxsize for {class_name}. Try to use extract PDB id and use this"
+                )
+
                 pdb = label_filename(class_name)
                 if pdb.lower() in size_dict:
                     size = size_dict[pdb.lower()]
                 elif pdb in size_dict:
                     size = size_dict[pdb]
                 else:
-                    raise KeyError(f"Can't find size for {class_name} in boxsize dictionary")
+                    raise KeyError(
+                        f"Can't find size for {class_name} in boxsize dictionary"
+                    )
         else:
             size = conf.boxsize
 
         class_frame = Locator.nms(class_frame, size)
         class_frames[class_id] = class_frame
-        print(f"Particles of class {class_name}: {len(class_frame)} (before NMS: {before_nms}) ")
+        print(
+            f"Particles of class {class_name}: {len(class_frame)} (before NMS: {before_nms}) "
+        )
 
     located_particles = pd.concat(class_frames)
 
@@ -497,18 +512,20 @@ def run(conf: LocateConfiguration):
     for meta_key in map_attrs:
         located_particles.attrs[meta_key] = map_attrs[meta_key]
 
-    located_particles.to_pickle(os.path.join(out_path, f"located.tloc"))
+    located_particles.to_pickle(os.path.join(out_path, "located.tloc"))
 
     # Write picking headmaps
     if conf.write_heatmaps:
-        for ref_i, ref_name in tqdm.tqdm(enumerate(map_attrs['references']),desc="Write heatmaps"):
+        for ref_i, ref_name in tqdm.tqdm(
+            enumerate(map_attrs["references"]), desc="Write heatmaps"
+        ):
             with mrcfile.new(
-                    os.path.join(out_path, ref_name + ".mrc"), overwrite=True
+                os.path.join(out_path, ref_name + ".mrc"), overwrite=True
             ) as mrc:
                 vol = class_vols[ref_i]
                 vol = vol.astype(np.float32)
                 vol = zoom(vol, 2)
-                vol = np.pad(vol, ((18,18), (18,18), (18, 18)), 'constant')
+                vol = np.pad(vol, ((18, 18), (18, 18), (18, 18)), "constant")
                 vol = vol.swapaxes(0, 2)
                 mrc.set_data(vol)
 
@@ -517,12 +534,10 @@ def _main_():
     ui = LocateArgParseUI()
     ui.run()
 
-    from tomotwin.modules.common.utils import check_for_updates
     check_for_updates()
 
     conf = ui.get_locate_configuration()
     run(conf=conf)
-
 
 
 if __name__ == "__main__":
