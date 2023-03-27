@@ -26,10 +26,8 @@ jobs:
       run: |
         $CONDA/bin/pylint -E $(git ls-files '*.py')
     - name: Test with tox
-      uses: GabrielBB/xvfb-action@v1
-      with:
-        run: |
-          $CONDA_PTH/bin/python -m tox
+      run: |
+          $CONDA/bin/python -m tox
       env:
         PLATFORM: ${{ matrix.platform }}
     - name: Upload coverage reports to Codecov
