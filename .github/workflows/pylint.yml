@@ -37,10 +37,7 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         pylint -E $(git ls-files '*.py')
-    - name: Test with tox
-      run: |
-        python -m tox
-      env:
-        PLATFORM: ${{ matrix.platform }}
+    - name: Test with pytest
+      run: pytest -v --cov=./ --cov-report=xml
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
