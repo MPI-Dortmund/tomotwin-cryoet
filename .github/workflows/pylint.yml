@@ -29,9 +29,11 @@ jobs:
         which python
         pip freeze
     - name: Analysing the code with pylint
+      uses: s-weigand/setup-conda@v1
       run: |
         pylint -E $(git ls-files '*.py')
     - name: Test with tox
+      uses: s-weigand/setup-conda@v1
       run: |
         python -m tox
       env:
