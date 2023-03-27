@@ -487,11 +487,13 @@ def run(conf: LocateConfiguration):
                 )
 
                 pdb = label_filename(class_name)
-                if pdb.lower() in size_dict:
-                    size = size_dict[pdb.lower()]
-                elif pdb in size_dict:
-                    size = size_dict[pdb]
-                else:
+                try:
+                    if pdb.lower() in size_dict:
+                        pdb_key = pdb.lower()
+                    elif pdb in size_dict:
+                        pdb_key = pdb.lower()
+                    size = size_dict[pdb_key]
+                except KeyError:
                     raise KeyError(
                         f"Can't find size for {class_name} in boxsize dictionary"
                     )
