@@ -374,13 +374,15 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
-from typing import List, Dict
-import numpy as np
+from typing import List
+import hashlib
 import os
 import glob
 import pandas as pd
 import tomotwin
-import hashlib
+
+import torch
+import numpy as np
 
 from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode
 from tomotwin.modules.inference.embedor import TorchEmbedor, Embedor
@@ -388,7 +390,7 @@ from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
 from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
 from tomotwin.modules.common.io.mrc_format import MrcFormat
 from tomotwin.modules.common.utils import check_for_updates
-import torch
+
 
 
 def sliding_window_embedding(
