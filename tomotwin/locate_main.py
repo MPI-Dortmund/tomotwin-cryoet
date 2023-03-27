@@ -501,10 +501,10 @@ def run(conf: LocateConfiguration):
                     elif pdb in size_dict:
                         pdb_key = pdb.lower()
                     size = size_dict[pdb_key]
-                except KeyError:
+                except KeyError as kr:
                     raise KeyError(
                         f"Can't find size for {class_name} in boxsize dictionary"
-                    )
+                    ) from kr
         else:
             size = conf.boxsize
 
