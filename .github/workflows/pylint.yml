@@ -12,10 +12,10 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       with:
         mamba-version: "*"
-        activate-environment: tomotwin
+        activate-environment: base
         channel-priority: true
         python-version: ${{ matrix.python-version }}
-        channels: conda-forge, pytorch, nvidia
+        channels: conda-forge, pytorch, nvidia, rapidsai
         environment-file: conda_env.yml
     - run: conda --version
     - run: which python
