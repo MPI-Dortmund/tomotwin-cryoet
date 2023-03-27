@@ -433,11 +433,11 @@ def extract_subclass_df(map: pd.DataFrame) -> List[pd.DataFrame]:
 def run(conf: LocateConfiguration):
     out_path = conf.output_path
     os.makedirs(out_path, exist_ok=True)
-    map = read_map(conf.map_path)
+    map_result = read_map(conf.map_path)
 
     if conf.mode == LocateMode.FINDMAX:
-        if "stride" in map.attrs:
-            stride = map.attrs["stride"]
+        if "stride" in map_result.attrs:
+            stride = map_result.attrs["stride"]
         else:
             raise ValueError(
                 "Stride unknown. It seems that you are using an invalid model"
@@ -445,8 +445,8 @@ def run(conf: LocateConfiguration):
         if len(stride) == 1:
             stride = stride * 3
 
-        if "window_size" in map.attrs:
-            window_size = map.attrs["window_size"]
+        if "window_size" in map_result.attrs:
+            window_size = map_result.attrs["window_size"]
         else:
             raise ValueError("Window size unknown. Stop.")
 
@@ -458,9 +458,9 @@ def run(conf: LocateConfiguration):
         )
         locator.output = out_path
 
-    sub_dfs = extract_subclass_df(map)
-    map_attrs = map.attrs
-    del map
+    sub_dfs = extract_subclass_df(map_result)
+    map_attrs = map_result.attrs
+    del map_result
 
     from concurrent.futures import ProcessPoolExecutor as Pool
 
