@@ -862,7 +862,14 @@ class TorchTrainer(Trainer):
 
     def write_results_to_disk(
         self, path: str, save_each_improvement: bool = False, **kwargs
-    ):
+    ) -> None:
+        """
+        Write the training results to specified folder
+        :param path: Path to folder to write the data
+        :param save_each_improvement: If true, model for each epoch is saved.
+        :param kwargs:
+        :return: None
+        """
         self.write_model_to_disk(path, self.model, "latest.pth", self.current_epoch)
 
         if self.current_epoch == self.epochs - 1:
