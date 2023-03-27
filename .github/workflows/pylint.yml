@@ -21,6 +21,7 @@ jobs:
         $CONDA/bin/python -m pip install --upgrade pip
         $CONDA/bin/pip install pylint tox tox-gh-actions
         $CONDA/bin/pip install .
+        echo "CONDA_PTH=$CONDA" >> $GITHUB_ENV
     - name: Analysing the code with pylint
       run: |
         $CONDA/bin/pylint -E $(git ls-files '*.py')
@@ -28,8 +29,7 @@ jobs:
       uses: GabrielBB/xvfb-action@v1
       with:
         run: |
-          conda activate base
-          python -m tox
+          $CONDA_PTH/bin/python -m tox
       env:
         PLATFORM: ${{ matrix.platform }}
     - name: Upload coverage reports to Codecov
