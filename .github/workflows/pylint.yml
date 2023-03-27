@@ -28,7 +28,6 @@ jobs:
       run: |
         which python
         pip freeze
-    - run:
     - name: Analysing the code with pylint
       run: |
         pylint -E $(git ls-files '*.py')
