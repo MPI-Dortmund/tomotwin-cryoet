@@ -24,7 +24,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install pylint tox tox-gh-actions pytest pytest-coverage
         pip install .
-        echo "CONDA_PTH=$CONDA" >> $GITHUB_ENV
+    - name: Debug Info
+      run: |
+        which python
+        pip freeze
+    - run:
     - name: Analysing the code with pylint
       run: |
         pylint -E $(git ls-files '*.py')
