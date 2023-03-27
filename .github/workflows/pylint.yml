@@ -24,3 +24,5 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         $CONDA/bin/pylint -E $(git ls-files '*.py')
+    - name: Codecov
+      uses: codecov/codecov-action@v3.1.1
