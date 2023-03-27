@@ -469,7 +469,7 @@ def run(conf: LocateConfiguration):
         conf.boxsize = int(conf.boxsize)
     except ValueError:
         print("Read boxsize from JSON")
-        with open(conf.boxsize, "r") as conf_sizes_file:
+        with open(conf.boxsize, "r", encoding="utf8") as conf_sizes_file:
             size_dict = json.load(conf_sizes_file)
 
     for class_id, class_frame in enumerate(class_frames):
