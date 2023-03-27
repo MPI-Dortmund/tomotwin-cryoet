@@ -398,7 +398,11 @@ from tomotwin.modules.inference.locator import Locator
 from tomotwin.modules.common.utils import check_for_updates
 from tomotwin.modules.common.preprocess import label_filename
 
-def readprobs(path: str) -> pd.DataFrame:
+def read_map(path: str) -> pd.DataFrame:
+    """
+    Read the results after mapping
+    :param path: Path to map
+    """
     if path.endswith(".txt"):
         df_map = pd.read_csv(path)
     elif path.endswith(".pkl") or path.endswith(".tmap"):
@@ -413,6 +417,10 @@ def readprobs(path: str) -> pd.DataFrame:
 
 
 def extract_subclass_df(map: pd.DataFrame) -> List[pd.DataFrame]:
+    '''
+    Extract a dataframe for each reference
+    :param map: Resullt from running map
+    '''
     sub_dfs = []
     for i in range(len(map.attrs["references"])):
         sub = map[["X", "Y", "Z", f"d_class_{i}"]]
@@ -425,7 +433,7 @@ def extract_subclass_df(map: pd.DataFrame) -> List[pd.DataFrame]:
 def run(conf: LocateConfiguration):
     out_path = conf.output_path
     os.makedirs(out_path, exist_ok=True)
-    map = readprobs(conf.map_path)
+    map = read_map(conf.map_path)
 
     if conf.mode == LocateMode.FINDMAX:
         if "stride" in map.attrs:
