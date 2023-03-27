@@ -25,6 +25,7 @@ jobs:
         pip install pylint tox tox-gh-actions pytest pytest-coverage
         pip install .
     - name: Debug Info
+      uses: s-weigand/setup-conda@v1
       run: |
         which python
         pip freeze
