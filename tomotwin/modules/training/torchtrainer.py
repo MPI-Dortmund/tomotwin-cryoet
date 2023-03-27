@@ -491,10 +491,16 @@ class TorchTrainer(Trainer):
         self.model = nn.DataParallel(self.model)
 
     def set_seed(self, seed: int):
+        """
+        Set the seed for random number generators
+        """
         torch.manual_seed(seed)
         torch.seed()
 
     def get_train_test_dataloader(self) -> Tuple[DataLoader, DataLoader]:
+        """
+        Create a dataloaders for the train and validation data
+        """
         train_loader = DataLoader(
             self.training_data,
             batch_size=self.batchsize,
@@ -522,6 +528,9 @@ class TorchTrainer(Trainer):
     def get_best_f1(
         anchor_label: str, similarities: np.array, sim_labels: Iterable
     ) -> Tuple[float, float]:
+        """
+        Caluclate the classification F1 score for a given anchor
+        """
         PDB = os.path.splitext(anchor_label)[0].upper()
         gt_mask = np.array([PDB in p.upper() for p in sim_labels])
         best_f1 = 0
