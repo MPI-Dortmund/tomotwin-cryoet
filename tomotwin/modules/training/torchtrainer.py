@@ -775,12 +775,21 @@ class TorchTrainer(Trainer):
         return self.model
 
     def set_training_data(self, training_data: TripletDataset) -> None:
+        """
+        Set the training data
+        """
         self.training_data = training_data
 
     def set_test_data(self, test_data: TripletDataset) -> None:
+        """
+        Set test (validation) data.
+        """
         self.test_data = test_data
 
-    def set_network_config(self, config):
+    def set_network_config(self, config) -> None:
+        """
+        Set the network config
+        """
         self.network_config = config
 
     @staticmethod
