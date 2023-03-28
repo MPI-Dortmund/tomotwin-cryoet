@@ -38,7 +38,7 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         pylint -E $(git ls-files '*.py')
-    - name: Test with tox
+    - name: Tests
       run: |
         pytest -v --cov=./ --cov-report=xml
       env:
