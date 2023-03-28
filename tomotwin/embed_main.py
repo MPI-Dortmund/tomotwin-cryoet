@@ -374,23 +374,22 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
-from typing import List
+import glob
 import hashlib
 import os
-import glob
-import pandas as pd
-import tomotwin
+from typing import List
 
-import torch
 import numpy as np
+import pandas as pd
+import torch
 
-from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration
-from tomotwin.modules.inference.embedor import TorchEmbedor, Embedor
-from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
-from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
+import tomotwin
 from tomotwin.modules.common.io.mrc_format import MrcFormat
 from tomotwin.modules.common.utils import check_for_updates
-
+from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration
+from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
+from tomotwin.modules.inference.embedor import TorchEmbedor, Embedor
+from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
 
 
 def sliding_window_embedding(
@@ -539,6 +538,7 @@ def make_embeddor(conf: EmbedConfiguration) -> Embedor:
         workers=12,  # multiprocessing.cpu_count(),
     )
     return embedor
+
 
 
 def _main_(conf: EmbedConfiguration):
