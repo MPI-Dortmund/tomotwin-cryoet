@@ -20,8 +20,8 @@ jobs:
         channels: conda-forge, pytorch, nvidia, rapidsai, defaults
         environment-file: conda_env.yml
     - run: conda --version
+    - run: conda init bash
     - run: |
-        conda init bash
         conda activate tomotwin
         which python
     - name: Install dependencies
