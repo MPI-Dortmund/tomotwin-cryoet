@@ -568,5 +568,5 @@ if __name__ == "__main__":
     ui = EmbedArgParseUI()
     ui.run()
     check_for_updates()
-    conf = ui.get_embed_configuration()
-    _main_(conf)
+    config = ui.get_embed_configuration()
+    _main_(config)
