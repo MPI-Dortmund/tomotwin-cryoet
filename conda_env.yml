@@ -1,3 +1,4 @@
+name: tomotwin
 channels:
   - conda-forge
   - pytorch
