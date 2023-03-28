@@ -8,6 +8,9 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9"]
+    defaults:
+      run:
+        shell: bash -el {0}
     steps:
     - uses: actions/checkout@v3
     - name: Set up conda ${{ matrix.python-version }}
@@ -22,7 +25,8 @@ jobs:
     - run: conda --version
     - run: conda init bash
     - run: |
-        source /home/runner/.bashrc
+        which python
+    - run: |
         conda activate tomotwin
         which python
     - name: Install dependencies
