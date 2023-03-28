@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10"]
+        python-version: ["3.9"]
     steps:
     - uses: actions/checkout@v3
     - name: Set up conda ${{ matrix.python-version }}
@@ -17,8 +17,8 @@ jobs:
         activate-environment: tomotwin
         channel-priority: true
         python-version: ${{ matrix.python-version }}
-        channels: conda-forge, pytorch, nvidia
-        environment-file: conda_eny.yml
+        channels: conda-forge, pytorch, nvidia, rapidsai, defaults
+        environment-file: conda_env.yml
     - run: conda --version
     - run: which python
     - name: Install dependencies
