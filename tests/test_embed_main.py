@@ -21,7 +21,39 @@ class DummyEmbedor(Embedor):
 
 class TestsEmbedMain(unittest.TestCase):
 
-    def test_embed_main(self):
+
+    def test_get_file_md5(self):
+        from tomotwin.embed_main import get_file_md5
+        mrcpdb = os.path.join(os.path.dirname(__file__), "../resources/tests/FindMaxLocator/5MRC.mrc")
+        md5_checksum = get_file_md5(mrcpdb)
+        self.assertEqual(md5_checksum,"dc78623e5f17d5eff2f80d254d6f1b92")
+
+
+    def test_embed_main_volumes(self):
+        from tomotwin.embed_main import _main_ as embed_main_func
+        tomo = np.random.randn(50, 50, 50).astype(np.float32)
+
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            volumes = [os.path.join(tmpdirname, "vola.mrc"), os.path.join(tmpdirname, "volb.mrc")]
+            for v in volumes:
+                with mrcfile.new(v) as mrc:
+                    mrc.set_data(tomo)
+
+            tomotwin.embed_main.make_embeddor = MagicMock(return_value=DummyEmbedor())
+            tomotwin.embed_main.get_window_size = MagicMock(return_value=37)
+            embed_conf = EmbedConfiguration(
+                model_path=None,
+                volumes_path=volumes,
+                output_path=tmpdirname,
+                mode=EmbedMode.VOLUMES,
+                batchsize=3,
+                stride=1,
+                zrange=None
+            )
+            embed_main_func(embed_conf)
+            self.assertEqual(True, os.path.exists(os.path.join(tmpdirname, "embeddings.temb")))
+
+    def test_embed_main_tomo(self):
         from tomotwin.embed_main import _main_ as embed_main_func
         tomo = np.random.randn(50, 50, 50).astype(np.float32)
 
