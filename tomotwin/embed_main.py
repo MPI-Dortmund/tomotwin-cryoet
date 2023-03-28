@@ -532,25 +532,20 @@ def embed_tomogram(
     print(f"Wrote embeddings to disk to {os.path.join(conf.output_path, filename)}")
     print("Done.")
 
-def _main_():
-    ########################
-    # Get configuration from user interface
-    ########################
-
-    ui = EmbedArgParseUI()
-
-    ui.run()
-
-    check_for_updates()
-
-    conf = ui.get_embed_configuration()
-    os.makedirs(conf.output_path, exist_ok=True)
-
+def make_embeddor(conf: EmbedConfiguration) -> Embedor:
     embedor = TorchEmbedor(
         weightspth=conf.model_path,
         batchsize=conf.batchsize,
         workers=12,  # multiprocessing.cpu_count(),
     )
+    return embedor
+
+
+def _main_(conf: EmbedConfiguration):
+
+    os.makedirs(conf.output_path, exist_ok=True)
+
+    embedor = make_embeddor(conf)
 
     window_size = get_window_size(conf.model_path)
     if conf.mode == EmbedMode.TOMO:
@@ -567,4 +562,11 @@ def _main_():
         embed_subvolumes(paths, embedor, conf)
 
 if __name__ == "__main__":
-    _main_()
+    ########################
+    # Get configuration from user interface
+    ########################
+    ui = EmbedArgParseUI()
+    ui.run()
+    check_for_updates()
+    conf = ui.get_embed_configuration()
+    _main_(conf)
