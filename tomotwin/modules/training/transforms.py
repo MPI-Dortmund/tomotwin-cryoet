@@ -378,8 +378,8 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
-import scipy.ndimage
 import numpy as np
+import scipy.ndimage
 from numpy.typing import NDArray
 
 

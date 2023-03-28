@@ -374,21 +374,22 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
-import typing
 import os
-import pandas as pd
+import typing
+
 import numpy as np
+import pandas as pd
 from pyStarDB import sp_pystardb as star
 
-from tomotwin.modules.inference.pick_ui import PickUI
+from tomotwin.modules.common.io.coords_format import CoordsFormat
+from tomotwin.modules.common.io.reader_writer import CoordinateWriter
+from tomotwin.modules.common.io.star_format import StarFormat
+from tomotwin.modules.common.utils import check_for_updates
 from tomotwin.modules.inference.argparse_pick_ui import (
     PickArgParseUI,
     PickConfiguration,
 )
-from tomotwin.modules.common.io.reader_writer import CoordinateWriter
-from tomotwin.modules.common.io.star_format import StarFormat
-from tomotwin.modules.common.io.coords_format import CoordsFormat
-from tomotwin.modules.common.utils import check_for_updates
+from tomotwin.modules.inference.pick_ui import PickUI
 
 
 class InvalidLocateResults(Exception):

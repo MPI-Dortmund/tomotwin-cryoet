@@ -374,10 +374,10 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
+import argparse
+import os
 import warnings
 from argparse import ArgumentParser
-import os
-import argparse
 from typing import List
 
 import mrcfile
@@ -386,6 +386,7 @@ import pandas as pd
 import tqdm
 
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
+
 
 class EvenBoxSizeException(Exception):
     ...

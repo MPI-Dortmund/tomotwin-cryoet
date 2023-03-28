@@ -381,11 +381,14 @@ https://github.com/kenshohara/3D-ResNets-PyTorch/blob/master/models/resnet.py
 
 """
 from functools import partial
+from typing import Dict
+
 import torch
 import torch.nn as nn
-from tomotwin.modules.networks.torchmodel import TorchModel
 import torch.nn.functional as F
-from typing import Dict
+
+from tomotwin.modules.networks.torchmodel import TorchModel
+
 
 def make_norm(norm: Dict, num_channels: int) -> nn.Module:
     if norm["module"] == nn.BatchNorm3d:

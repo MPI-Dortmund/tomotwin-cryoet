@@ -377,8 +377,10 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 import torch
 import torch.nn as nn
-from tomotwin.modules.networks.torchmodel import TorchModel
 import torch.nn.functional as F
+
+from tomotwin.modules.networks.torchmodel import TorchModel
+
 
 class Dense_Block(nn.Module):
 

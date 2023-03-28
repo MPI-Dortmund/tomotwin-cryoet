@@ -376,12 +376,13 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 """
 
 from abc import ABC, abstractmethod
+
 import numpy as np
-from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
-from tqdm import tqdm
 import torch
 import torch.nn
+from torch.utils.data import DataLoader
+from torch.utils.data import Dataset
+from tqdm import tqdm
 
 import tomotwin.modules.common.preprocess as pp
 from tomotwin.modules.inference.volumedata import VolumeDataset

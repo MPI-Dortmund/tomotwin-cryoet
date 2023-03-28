@@ -375,15 +375,16 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
+import json
+from typing import Dict
+
 from tomotwin.modules.networks.SiameseNet3D import SiameseNet3D
-from tomotwin.modules.networks.resnet import Resnet
-from tomotwin.modules.networks.densenet import DenseNet3D
 from tomotwin.modules.networks.customtestmodels import FacebookNet
 from tomotwin.modules.networks.customtestmodels import Resnet3D
-from tomotwin.modules.networks.torchmodel import TorchModel
+from tomotwin.modules.networks.densenet import DenseNet3D
 from tomotwin.modules.networks.dnet16 import DNet16
-from typing import Dict
-import json
+from tomotwin.modules.networks.resnet import Resnet
+from tomotwin.modules.networks.torchmodel import TorchModel
 
 
 class NetworkNotExistError(Exception):

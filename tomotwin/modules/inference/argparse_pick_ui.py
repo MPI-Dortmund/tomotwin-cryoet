@@ -375,8 +375,10 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-from tomotwin.modules.inference.pick_ui import PickUI, PickConfiguration
 import argparse
+
+from tomotwin.modules.inference.pick_ui import PickUI, PickConfiguration
+
 
 class PickArgParseUI(PickUI):
 

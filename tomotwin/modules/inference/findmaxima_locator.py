@@ -375,14 +375,13 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import os
-import pandas as pd
-import numpy as np
 from typing import List, Tuple
-import mrcfile
 
-from tomotwin.modules.inference.locator import Locator
+import numpy as np
+import pandas as pd
+
 from tomotwin.modules.common.findmax.findmax import find_maxima
+from tomotwin.modules.inference.locator import Locator
 
 
 class FindMaximaLocator(Locator):
@@ -513,11 +512,11 @@ class FindMaximaLocator(Locator):
 
         return particle_df.copy(deep=True), vol
 
-
-    def locate(self, map: pd.DataFrame) -> Tuple[pd.DataFrame,np.array]:
+    def locate(self, map: pd.DataFrame) -> pd.DataFrame:
 
         print("start locate ", map.attrs['ref_name'])
         df_class, vol = FindMaximaLocator.locate_class(map.attrs['ref_index'], map, self.window_size, self.stride, self.tolerance, self.global_min)
         df_class.attrs["name"] = map.attrs['ref_name']
+        df_class.attrs["heatmap"] = vol
         print("Located", df_class.attrs["name"], len(df_class))
-        return df_class, vol
+        return df_class

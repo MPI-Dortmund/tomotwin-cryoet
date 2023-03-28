@@ -376,10 +376,12 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 """
 
 from abc import ABC, abstractmethod
-import pandas as pd
 from typing import List
+
 import numpy as np
+import pandas as pd
 import tqdm
+
 
 class Locator(ABC):
 

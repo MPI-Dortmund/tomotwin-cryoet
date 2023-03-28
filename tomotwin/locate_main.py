@@ -504,6 +504,16 @@ def run(conf: LocateConfiguration):
     else:
         raise ValueError("Window size unknown. Stop.")
 
+    size_dict = None
+    if conf.boxsize is None:
+        conf.boxsize = window_size
+    try:
+        conf.boxsize = int(conf.boxsize)
+    except ValueError:
+        print("Read boxsize from JSON")
+        with open(conf.boxsize, "r", encoding="utf8") as conf_sizes_file:
+            size_dict = json.load(conf_sizes_file)
+
     locator = FindMaximaLocator(
         tolerance=conf.tolerance,
         stride=stride,
@@ -524,18 +534,11 @@ def run(conf: LocateConfiguration):
         class_frames_and_vols = list(pool.map(locator.locate, sub_dfs))
     ##
 
-    size_dict = None
+
     class_frames = [t for t in class_frames_and_vols]
     class_vols = [t.attrs['heatmap'] for t in class_frames_and_vols if 'heatmap' in t.attrs]
 
-    if conf.boxsize is None:
-        conf.boxsize = window_size
-    try:
-        conf.boxsize = int(conf.boxsize)
-    except ValueError:
-        print("Read boxsize from JSON")
-        with open(conf.boxsize, "r", encoding="utf8") as conf_sizes_file:
-            size_dict = json.load(conf_sizes_file)
+
 
     class_frames = run_non_maximum_suppression(class_frames, conf.boxsize, size_dict=size_dict)
 

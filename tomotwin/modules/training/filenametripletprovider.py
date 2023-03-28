@@ -375,13 +375,16 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-from glob import glob
-from tomotwin.modules.training.tripletprovider import TripletProvider
-from tomotwin.modules.training.filepathtriplet import FilePathTriplet
-from typing import List
-import numpy as np
 import os
+from glob import glob
+from typing import List
+
+import numpy as np
 import tqdm
+
+from tomotwin.modules.training.filepathtriplet import FilePathTriplet
+from tomotwin.modules.training.tripletprovider import TripletProvider
+
 
 class FilenameMatchingTripletProvider(TripletProvider):
     """

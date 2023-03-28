@@ -376,6 +376,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 """
 
 from abc import ABC, abstractmethod
+
 import numpy as np
 
 

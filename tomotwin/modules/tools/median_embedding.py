@@ -1,8 +1,11 @@
-from tomotwin.modules.tools.tomotwintool import TomoTwinTool
-import pandas as pd
-import numpy as np
 import argparse
 import os
+
+import numpy as np
+import pandas as pd
+
+from tomotwin.modules.tools.tomotwintool import TomoTwinTool
+
 
 class MedianTool(TomoTwinTool):
 

@@ -376,20 +376,18 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 """
 import os
 
+import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
-import numpy as np
 
 import tomotwin
-from tomotwin.modules.inference.mapper import Mapper
+from tomotwin.modules.common.distances import DistanceManager
+from tomotwin.modules.common.utils import check_for_updates
+from tomotwin.modules.inference.argparse_map_ui import MapArgParseUI
 from tomotwin.modules.inference.distance_mapper import DistanceMapper
 from tomotwin.modules.inference.map_ui import MapMode, MapConfiguration
-from tomotwin.modules.inference.argparse_map_ui import MapArgParseUI
-from tomotwin.modules.common.distances import DistanceManager
+from tomotwin.modules.inference.mapper import Mapper
 from tomotwin.modules.inference.reference_refinement import ReferenceRefiner
-from tomotwin.modules.common.utils import check_for_updates
-
-
 
 
 class FormatNotImplemented(Exception):

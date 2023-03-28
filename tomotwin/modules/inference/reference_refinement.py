@@ -376,8 +376,10 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 """
 
 import numpy as np
-from tomotwin.modules.inference.distance_mapper import DistanceMapper
 import tqdm
+
+from tomotwin.modules.inference.distance_mapper import DistanceMapper
+
 
 class ReferenceRefiner:
 

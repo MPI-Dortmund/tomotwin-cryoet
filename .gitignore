@@ -3,3 +3,4 @@
 /tomotwin.egg-info
 tomotwin/__init__.py
 VERSION.txt
+/coverage.xml

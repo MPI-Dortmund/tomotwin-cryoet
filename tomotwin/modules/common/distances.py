@@ -375,11 +375,13 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import numpy as np
-from numpy.typing import ArrayLike
-import torch
 from abc import ABC, abstractmethod
+
+import numpy as np
 import pytorch_metric_learning.distances as dist
+import torch
+from numpy.typing import ArrayLike
+
 
 class DistanceDoesNotExistError(Exception):
     '''Exception when distance function does not exist'''

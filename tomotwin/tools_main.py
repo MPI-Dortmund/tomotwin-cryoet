@@ -375,10 +375,12 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-from typing import List
-import sys
 import argparse
+import sys
+from typing import List
+
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
+
 
 def get_tool_list() -> List[TomoTwinTool]:
     tools = []

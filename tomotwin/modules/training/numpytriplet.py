@@ -376,6 +376,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 """
 
 from dataclasses import dataclass
+
 import numpy as np
 
 
