@@ -26,28 +26,21 @@ jobs:
     - run: conda init bash
     - run: |
         which python
-    - run: |
-        conda activate tomotwin
-        which python
     - name: Install dependencies
       run: |
-        conda activate tomotwin
         python -m pip install --upgrade pip
         pip install pylint tox tox-gh-actions pytest pytest-coverage
         pip install .
     - name: Debug Info
       run: |
-        conda activate tomotwin
         which python
         pip freeze
     - name: Analysing the code with pylint
       run: |
-        conda activate tomotwin
         pylint -E $(git ls-files '*.py')
     - name: Test with tox
       run: |
-        conda activate tomotwin
-        python -m tox
+        pytest -v --cov=./ --cov-report=xml
       env:
         PLATFORM: ${{ matrix.platform }}
     - name: Upload coverage reports to Codecov
