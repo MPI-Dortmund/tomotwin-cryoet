@@ -40,7 +40,7 @@ jobs:
         pylint -E $(git ls-files '*.py')
     - name: Tests
       run: |
-        pytest -v --cov=./ --cov-report=xml
+        pytest -v --cov=./ --cov-report=xml --cov-config=.coveragerc
       env:
         PLATFORM: ${{ matrix.platform }}
     - name: Upload coverage reports to Codecov
