@@ -514,12 +514,11 @@ def run(conf: LocateConfiguration):
     class_frames_and_vols = locator.locate(map_result)
     del map_result
 
-    class_frames = [t for t in class_frames_and_vols]
+
     class_vols = [t.attrs['heatmap'] for t in class_frames_and_vols if 'heatmap' in t.attrs]
+    class_frames_and_vols = run_non_maximum_suppression(class_frames_and_vols, conf.boxsize, size_dict=size_dict)
 
-    class_frames = run_non_maximum_suppression(class_frames, conf.boxsize, size_dict=size_dict)
-
-    located_particles = pd.concat(class_frames)
+    located_particles = pd.concat(class_frames_and_vols)
 
     located_particles.attrs["tt_version_locate"] = tomotwin.__version__
 
