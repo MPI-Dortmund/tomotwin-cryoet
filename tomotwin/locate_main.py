@@ -446,30 +446,27 @@ def run_non_maximum_suppression(class_frames, boxsize, size_dict=None) -> pd.Dat
         )
     return class_frames
 
-def write_heatmaps(reference_names: List[str], out_path: str, class_vols: List[np.array]):
+def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.array]) -> None:
+    '''
+    Write heatmaps to disk
+    :param reference_names: Name of the references
+    :param out_path: Folder where the heatmaps will be written to.
+    :param heatmaps: List of heatmaps
+    :return: None
+    '''
+    assert len(reference_names) == len(heatmaps), "Unequal number of references and heatmaps"
     for ref_i, ref_name in tqdm.tqdm(
             enumerate(reference_names), desc="Write heatmaps"
     ):
         with mrcfile.new(
                 os.path.join(out_path, ref_name + ".mrc"), overwrite=True
         ) as mrc:
-            vol = class_vols[ref_i]
+            vol = heatmaps[ref_i]
             vol = vol.astype(np.float32)
             vol = zoom(vol, 2)
             vol = np.pad(vol, ((18, 18), (18, 18), (18, 18)), "constant")
             vol = vol.swapaxes(0, 2)
             mrc.set_data(vol)
-
-def apply_locate_parallel(sub_dfs: List[pd.DataFrame], locator: Locator, num_processes: int) -> List[List[pd.DataFrame]]:
-    """
-    Applies a locator on a map results in parallel.
-    """
-    from concurrent.futures import ProcessPoolExecutor as Pool
-
-    with Pool(num_processes) as pool:
-        class_frames_and_vols = list(pool.map(locator.locate, sub_dfs))
-
-    return class_frames_and_vols
 
 
 def run(conf: LocateConfiguration):
