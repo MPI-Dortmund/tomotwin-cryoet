@@ -43,7 +43,7 @@ class TestsEmbedMain(unittest.TestCase):
         ),
     )
     def test_embed_main_real_subvol_torchembeddor(self):
-        from tomotwin.embed_main import _main_ as embed_main_func
+        from tomotwin.embed_main import run as embed_main_func
 
         tomo = np.random.randn(37, 37, 37).astype(np.float32)
         with tempfile.TemporaryDirectory() as tmpdirname:
@@ -71,7 +71,7 @@ class TestsEmbedMain(unittest.TestCase):
             )
 
     def test_embed_main_volumes(self):
-        from tomotwin.embed_main import _main_ as embed_main_func
+        from tomotwin.embed_main import run as embed_main_func
 
         tomo = np.random.randn(50, 50, 50).astype(np.float32)
 
@@ -101,7 +101,7 @@ class TestsEmbedMain(unittest.TestCase):
             )
 
     def test_embed_main_tomo(self):
-        from tomotwin.embed_main import _main_ as embed_main_func
+        from tomotwin.embed_main import run as embed_main_func
 
         tomo = np.random.randn(50, 50, 50).astype(np.float32)
 
