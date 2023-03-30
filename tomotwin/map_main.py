@@ -374,24 +374,32 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
+import os
 
 import pandas as pd
+from pandas.api.types import is_numeric_dtype
 import numpy as np
+
 import tomotwin
 from tomotwin.modules.inference.mapper import Mapper
 from tomotwin.modules.inference.distance_mapper import DistanceMapper
-from tomotwin.modules.inference.map_ui import MapUI, MapMode, MapConfiguration
+from tomotwin.modules.inference.map_ui import MapMode, MapConfiguration
 from tomotwin.modules.inference.argparse_map_ui import MapArgParseUI
 from tomotwin.modules.common.distances import DistanceManager
 from tomotwin.modules.inference.reference_refinement import ReferenceRefiner
+from tomotwin.modules.common.utils import check_for_updates
 
-import os
-from pandas.api.types import is_numeric_dtype
+
+
 
 class FormatNotImplemented(Exception):
     ...
 
-def read_embeddings(path):
+def read_embeddings(path) -> pd.DataFrame:
+    """
+    Read the embeddings
+    :return: DataFrame with embeddings
+    """
     if path.endswith(".txt"):
         df = pd.read_csv(path)
     elif path.endswith((".pkl",".temb")):
@@ -414,6 +422,13 @@ def read_embeddings(path):
 def map(
     mapper: Mapper, reference: np.array, volumes: np.array
 ) -> np.array:
+    """
+    Return the mapping of a references to a volume
+    :param mapper: Mapper instance
+    :param reference: Embeddings of the references
+    :param volumes: Embeddings of a volume
+    :return: Headmap for potential locations
+    """
     return mapper.map(embeddings=volumes, references=reference)
 
 
@@ -512,7 +527,6 @@ def _main_():
     ui = MapArgParseUI()
     ui.run()
 
-    from tomotwin.modules.common.utils import check_for_updates
     check_for_updates()
 
     conf = ui.get_map_configuration()

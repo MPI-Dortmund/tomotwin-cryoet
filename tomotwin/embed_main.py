@@ -374,24 +374,36 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
-
-from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode
-from tomotwin.modules.inference.embedor import TorchEmbedor, Embedor
-from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
-from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
-from tomotwin.modules.common.io.mrc_format import MrcFormat
-from typing import List, Dict
-import numpy as np
+from typing import List
+import hashlib
 import os
 import glob
 import pandas as pd
 import tomotwin
+
+import torch
+import numpy as np
+
+from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration
+from tomotwin.modules.inference.embedor import TorchEmbedor, Embedor
+from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
+from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
+from tomotwin.modules.common.io.mrc_format import MrcFormat
+from tomotwin.modules.common.utils import check_for_updates
 
 
 
 def sliding_window_embedding(
     tomo: np.array, boxer: Boxer, embedor: Embedor
 ) -> np.array:
+    '''
+    Embeds the tomogram using a sliding window approach
+
+    :param tomo: Tomogram
+    :param boxer: Box provider
+    :param embedor: Embedor to embed the tomogram
+    :return: Embeddings from sliding window
+    '''
     boxes = boxer.box(tomogram=tomo)
     embeddings = embedor.embed(volume_data=boxes)
     positions = []
@@ -404,26 +416,121 @@ def sliding_window_embedding(
 
 
 def volume_embedding(volume_pths: List[str], embedor: Embedor):
-    volume_dataset = FileNameVolumeDataset(volumes=volume_pths, filereader=MrcFormat.read)
+    '''
+    Embeds a complete volume (tomogram))
+    :param volume_pths: List of tomograms
+    :param embedor: Embeddor
+    :return:
+    '''
+    volume_dataset = FileNameVolumeDataset(
+        volumes=volume_pths, filereader=MrcFormat.read
+    )
     embeddings = embedor.embed(volume_dataset)
 
     return embeddings
 
+
 def get_window_size(model_path: str) -> int:
-    import torch
+    '''
+    Extract the window size from the model, otherwise it returns the default
+    :param model_path: Path to model file
+    :return: Window size
+    '''
+
     checkpoint = torch.load(model_path)
-    if 'window_size' in checkpoint["tomotwin_config"]:
-        return int(checkpoint["tomotwin_config"]['window_size'][0])
-    else:
-        print("Can't find window size in model. Use window size of 37.")
-        return 37
+    if "window_size" in checkpoint["tomotwin_config"]:
+        return int(checkpoint["tomotwin_config"]["window_size"][0])
+    print("Can't find window size in model. Use window size of 37.")
+    return 37
+
 
 def get_file_md5(path: str) -> str:
-    import hashlib
-    with open(path, 'rb') as f:
-        data = f.read()
-    md5hash = hashlib.md5(data).hexdigest()
-    return md5hash
+    '''
+    Calculate md5 checkfsum for file
+    :param path: Path for file
+    :return: MD5  checksum.
+    '''
+    try:
+        with open(path, "rb") as f:
+            data = f.read()
+        md5hash = hashlib.md5(data).hexdigest()
+        return md5hash
+    except TypeError:
+        return None
+
+def embed_subvolumes(paths: List[str], embedor: Embedor, conf: EmbedConfiguration) -> pd.DataFrame:
+    '''
+    Embeds a set of subvolumes
+    '''
+    embeddings = volume_embedding(paths, embedor=embedor)
+    column_names = []
+    for i in range(embeddings.shape[1]):
+        column_names.append(str(i))
+    df = pd.DataFrame(data=embeddings, columns=column_names)
+    df.insert(0, "filepath", paths)
+    df.index.name = "index"
+    df.attrs["modelpth"] = conf.model_path
+    df.attrs["modelmd5"] = get_file_md5(conf.model_path)
+    f = os.path.join(conf.output_path, "embeddings.temb")
+    df.to_pickle(f)
+    print(f"Done. Wrote results to {f}")
+    return df
+
+
+def embed_tomogram(
+        tomo: np.array,
+        embedor: Embedor,
+        conf: EmbedConfiguration,
+        window_size: int) -> pd.DataFrame:
+    """
+    Embeds a tomogram
+    :return: DataFrame of embeddings
+    """
+    if conf.zrange:
+        hb = int((window_size - 1) // 2)
+        minz = max(0, conf.zrange[0] - hb)
+        maxz = min(conf.zrange[1] + hb, tomo.shape[0])
+        conf.zrange = (
+            minz,
+            maxz,
+        )  # here we need to take make sure that the box size is subtracted etc.
+
+    boxer = SlidingWindowBoxer(
+        box_size=window_size, stride=conf.stride, zrange=conf.zrange
+    )
+    embeddings = sliding_window_embedding(tomo=tomo, boxer=boxer, embedor=embedor)
+
+    # Write results to disk
+
+    filename = (
+            os.path.splitext(os.path.basename(conf.volumes_path))[0]
+            + "_embeddings.temb"
+    )
+    print("Embeddings have shape:", embeddings.shape)
+    column_names = ["Z", "Y", "X"]
+    for i in range(embeddings.shape[1] - 3):
+        column_names.append(str(i))
+    df = pd.DataFrame(data=embeddings, columns=column_names)
+    df.index.name = "index"
+    df.attrs["tt_version_embed"] = tomotwin.__version__
+    df.attrs["filepath"] = conf.volumes_path
+    df.attrs["modelpth"] = conf.model_path
+    df.attrs["modelmd5"] = get_file_md5(conf.model_path)
+    df.attrs["window_size"] = window_size
+    df.attrs["stride"] = conf.stride
+    df.attrs["tomogram_input_shape"] = tomo.shape
+    df.attrs["tomotwin_config"] = embedor.tomotwin_config
+    if conf.zrange:
+        df.attrs["zrange"] = conf.zrange
+
+    for col in df:
+        if col == "filepath":
+            continue
+        df[col] = df[col].astype(np.float16)
+    df.to_pickle(os.path.join(conf.output_path, filename))
+
+    print(f"Wrote embeddings to disk to {os.path.join(conf.output_path, filename)}")
+    print("Done.")
 
 def _main_():
     ########################
@@ -434,68 +541,22 @@ def _main_():
 
     ui.run()
 
-    from tomotwin.modules.common.utils import check_for_updates
     check_for_updates()
 
     conf = ui.get_embed_configuration()
     os.makedirs(conf.output_path, exist_ok=True)
 
-    embeddings = None
     embedor = TorchEmbedor(
         weightspth=conf.model_path,
         batchsize=conf.batchsize,
-        workers=12,#multiprocessing.cpu_count(),
+        workers=12,  # multiprocessing.cpu_count(),
     )
 
     window_size = get_window_size(conf.model_path)
     if conf.mode == EmbedMode.TOMO:
-        tomo = -1*MrcFormat.read(conf.volumes_path) # -1 to invert the contrast
-        if conf.zrange:
-            hb = int((window_size - 1) // 2)
-            minz = max(0,conf.zrange[0] - hb)
-            maxz = min(conf.zrange[1] + hb, tomo.shape[0])
-            conf.zrange = (minz, maxz)  # here we need to take make sure that the box size is subtracted etc.
-
-        boxer = SlidingWindowBoxer(
-            box_size=window_size,
-            stride=conf.stride,
-            zrange=conf.zrange
-        )
-        embeddings = sliding_window_embedding(tomo=tomo, boxer=boxer, embedor=embedor)
-
-        # Write results to disk
-
-        filename = (
-            os.path.splitext(os.path.basename(conf.volumes_path))[0] + "_embeddings.temb"
-        )
-        print("Embeddings have shape:", embeddings.shape)
-        column_names = ["Z", "Y", "X"]
-        for i in range(embeddings.shape[1]-3):
-            column_names.append(str(i))
-        df = pd.DataFrame(data=embeddings, columns=column_names)
-        df.index.name = "index"
-        df.attrs["tt_version_embed"] = tomotwin.__version__
-        df.attrs['filepath'] = conf.volumes_path
-        df.attrs['modelpth'] = conf.model_path
-        df.attrs['modelmd5'] = get_file_md5(conf.model_path)
-        df.attrs["window_size"] = window_size
-        df.attrs["stride"] = conf.stride
-        df.attrs['tomogram_input_shape'] = tomo.shape
-        df.attrs["tomotwin_config"] = embedor.tomotwin_config
-        if conf.zrange:
-            df.attrs["zrange"] = conf.zrange
-
-        for col in df:
-            if col == 'filepath':
-                continue
-            df[col] = df[col].astype(np.float16)
-        df.to_pickle(os.path.join(conf.output_path, filename))
-
-        print(f"Wrote embeddings to disk to {os.path.join(conf.output_path,filename)}")
-        print("Done.")
-
+        tomo = -1 * MrcFormat.read(conf.volumes_path)  # -1 to invert the contrast
+        embed_tomogram(tomo, embedor, conf, window_size)
     elif conf.mode == EmbedMode.VOLUMES:
-
         paths = []
         for p in conf.volumes_path:
             if os.path.isfile(p) and p.endswith(".mrc"):
@@ -503,19 +564,7 @@ def _main_():
             if os.path.isdir(p):
                 foundfiles = glob.glob(os.path.join(p, "*.mrc"))
                 paths.extend(foundfiles)
-        embeddings = volume_embedding(paths, embedor=embedor)
-        column_names = []
-        for i in range(embeddings.shape[1]):
-            column_names.append(str(i))
-        df = pd.DataFrame(data=embeddings, columns=column_names)
-        df.insert(0, "filepath", paths)
-        df.index.name = "index"
-        df.attrs['modelpth'] = conf.model_path
-        df.attrs['modelmd5'] = get_file_md5(conf.model_path)
-        df.to_pickle(os.path.join(conf.output_path, "embeddings.temb"))
-        print("Done")
-
-
+        embed_subvolumes(paths, embedor, conf)
 
 if __name__ == "__main__":
     _main_()

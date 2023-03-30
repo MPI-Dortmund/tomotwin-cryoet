@@ -7,25 +7,41 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.9"]
     defaults:
       run:
         shell: bash -el {0}
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+    - name: Set up conda ${{ matrix.python-version }}
+      uses: conda-incubator/setup-miniconda@v2
       with:
+        mamba-version: "*"
+        activate-environment: tomotwin
+        channel-priority: true
         python-version: ${{ matrix.python-version }}
+        channels: conda-forge, pytorch, nvidia, rapidsai, defaults
+        environment-file: conda_env.yml
+    - run: conda --version
+    - run: conda init bash
+    - run: |
+        which python
     - name: Install dependencies
       run: |
-        conda install -y mamba -n base -c conda-forge
-        $CONDA/bin/mamba install -y -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.9 pytorch==1.12 torchvision pandas scipy numpy matplotlib pytables cuML=22.06 cudatoolkit=11.6 'protobuf>3.20' tensorboard  optuna mysql-connector-python
-        $CONDA/bin/python -m pip install --upgrade pip
-        $CONDA/bin/pip install pylint
-        $CONDA/bin/pip install .
+        python -m pip install --upgrade pip
+        pip install pylint tox tox-gh-actions pytest pytest-coverage
+        pip install .
+    - name: Debug Info
+      run: |
+        which python
+        pip freeze
     - name: Analysing the code with pylint
       run: |
-        $CONDA/bin/pylint -E $(git ls-files '*.py')
-    - name: Codecov
-      uses: codecov/codecov-action@v3.1.1
+        pylint -E $(git ls-files '*.py')
+    - name: Tests
+      run: |
+        pytest -v --cov=./ --cov-report=xml
+      env:
+        PLATFORM: ${{ matrix.platform }}
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3

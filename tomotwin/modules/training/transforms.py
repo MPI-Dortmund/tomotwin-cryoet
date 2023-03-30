@@ -375,10 +375,11 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import scipy.ndimage
-import numpy as np
 from abc import ABC, abstractmethod
 from typing import List, Tuple
+
+import scipy.ndimage
+import numpy as np
 from numpy.typing import NDArray
 
 
@@ -410,6 +411,10 @@ class AugmentationPipeline:
             return str(aug) + postfix
 
     def transform(self, volume: NDArray) -> NDArray:
+        '''
+        Applies an augmentation pipeline to a volume
+        :return: Augmented subvolume
+        '''
         for aug_index, aug in enumerate(self.augs):
             if self.probs is None:
                 volume = aug(volume)
@@ -422,6 +427,9 @@ class AugmentationPipeline:
         return volume
 
 class VoxelDropout(Augmentation):
+    '''
+    Replaces a random amount of voxels with the volume mean
+    '''
 
     def __init__(self, ratio : Tuple[float,float]):
         self.ratio = ratio
@@ -441,6 +449,9 @@ class VoxelDropout(Augmentation):
         return f"Voxeldropout (Ratio {self.ratio})"
 
 class BlockDropout(Augmentation):
+    '''
+    Sets blocks of random size to 0
+    '''
 
     def __init__(self, blocksize : Tuple[int,int], nblocks : Tuple[int,int]):
         self.blocksize = blocksize
@@ -451,7 +462,7 @@ class BlockDropout(Augmentation):
         rand_nblock = np.random.randint(self.nblocks[0],self.nblocks[0]+1)
 
         for _ in range(rand_nblock):
-            rand_blocksize = np.random.randint(self.blocksize[0],self.blocksize[0]+1)
+            rand_blocksize = np.random.randint(self.blocksize[0],self.blocksize[1]+1)
 
             pos0 = np.random.randint(rand_blocksize, volume.shape[0] - rand_blocksize)
             pos1 = np.random.randint(rand_blocksize, volume.shape[1] - rand_blocksize)
@@ -467,6 +478,9 @@ class BlockDropout(Augmentation):
         return f"BlockDropout (blocksize: {self.blocksize}, nblocks: {self.nblocks})"
 
 class AddNoise(Augmentation):
+    '''
+    Sets blocks of random size to 0
+    '''
     def __init__(self, sigma : Tuple[float,float]):
         self.sigma = sigma
 
@@ -479,6 +493,10 @@ class AddNoise(Augmentation):
         return f"AddNoise (Sigma: {self.sigma})"
 
 class AddMultiplicativeNoise(Augmentation):
+    '''
+    Adds multiplicative noise to a subvolume
+    '''
+
     def __init__(self, sigma : Tuple[float,float]):
         self.sigma = sigma
 
@@ -490,6 +508,10 @@ class AddMultiplicativeNoise(Augmentation):
         return f"AddMultiplicativeNoise (Sigma: {self.sigma})"
 
 class Blur(Augmentation):
+    '''
+    Adds blurring to a subvolume
+    '''
+
     def __init__(self, sigma=0.1):
         self.sigma = sigma
 
@@ -502,6 +524,10 @@ class Blur(Augmentation):
 
 
 class Rotate(Augmentation):
+    '''
+    Does 90 degree rotations around specified axis
+    '''
+
     def __init__(self, axes=(0, 1)):
         self.axes = axes
 
@@ -513,6 +539,10 @@ class Rotate(Augmentation):
         return f"Rotate (Axes: {self.axes})"
 
 class RotateFull(Augmentation):
+    '''
+    Does custrom rotations around the specified axis
+    '''
+
     def __init__(self, axes=(0, 1)):
         self.axes = axes
 
@@ -525,6 +555,10 @@ class RotateFull(Augmentation):
         return f"RotateFull (Axes: {self.axes})"
 
 class Shift(Augmentation):
+    '''
+    Shifts the image by a random amount along the specified axis
+    '''
+
     def __init__(self, axis=0, min_shift=0, max_shift=4):
         self.axis = axis
         self.min_shift = min_shift
@@ -540,15 +574,3 @@ class Shift(Augmentation):
         return shifted.copy()
     def __str__(self):
         return f"Shift (Axis: {self.axis}, MinShift: {self.min_shift}, MaxShift: {self.max_shift})"
-
-
-class Transpose(Augmentation):
-    # could be replaced by the rotate class
-    def __init__(self):
-        self.rot = Rotate(axes=(0, 2))
-
-    def __call__(self, volume: NDArray):
-        transposed = self.rot(volume)
-        return transposed.copy()
-    def __str__(self):
-        return "Transpose"
