@@ -46,13 +46,13 @@ setup(
     entry_points={
         'console_scripts': [
             'tomotwin_train.py = tomotwin.train_main:_main_',
-            'tomotwin_optuna.py = tomotwin.train_optuna:_main_',
             'tomotwin_embed.py = tomotwin.embed_main:_main_',
             'tomotwin_map.py = tomotwin.map_main:_main_',
             'tomotwin_locate.py = tomotwin.locate_main:_main_',
             'tomotwin_pick.py = tomotwin.pick_main:_main_',
             'tomotwin_scripts_evaluate.py = scripts.evaluation:_main_',
             'tomotwin_scripts_lasso.py = scripts.lasso:_main_',
+            'tomotwin_scripts_train_optuna.py = scripts.train_optuna:_main_',
             'tomotwin_dev_matrix.py = scripts.pdb_similarity_matrix:_main_',
             'tomotwin_dev_json2tloc.py = scripts.json2tloc:_main_',
             'tomotwin_dev_molmapbbox.py = scripts.molmapsbbox:_main_',
