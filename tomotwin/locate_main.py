@@ -414,19 +414,6 @@ def read_map(path: str) -> pd.DataFrame:
     return df_map
 
 
-def extract_subclass_df(map: pd.DataFrame) -> List[pd.DataFrame]:
-    '''
-    Extract a dataframe for each reference
-    :param map: Resullt from running map
-    '''
-    sub_dfs = []
-    for i in range(len(map.attrs["references"])):
-        sub = map[["X", "Y", "Z", f"d_class_{i}"]]
-        sub.attrs["ref_name"] = map.attrs["references"][i]
-        sub.attrs["ref_index"] = i
-        sub_dfs.append(sub)
-    return sub_dfs
-
 def run_non_maximum_suppression(class_frames, boxsize, size_dict=None) -> pd.DataFrame:
 
     for class_id, class_frame in enumerate(class_frames):
@@ -519,26 +506,16 @@ def run(conf: LocateConfiguration):
         stride=stride,
         window_size=window_size,
         global_min=conf.global_min,
+        processes=conf.processes
     )
     locator.output = out_path
     map_attrs = map_result.attrs
-    ## should be moved into locator
-    sub_dfs = extract_subclass_df(map_result)
-    ##
+
+    class_frames_and_vols = locator.locate(map_result)
     del map_result
-
-    ## should be done in FindMaxLocator
-    from concurrent.futures import ProcessPoolExecutor as Pool
-
-    with Pool(conf.processes) as pool:
-        class_frames_and_vols = list(pool.map(locator.locate, sub_dfs))
-    ##
-
 
     class_frames = [t for t in class_frames_and_vols]
     class_vols = [t.attrs['heatmap'] for t in class_frames_and_vols if 'heatmap' in t.attrs]
-
-
 
     class_frames = run_non_maximum_suppression(class_frames, conf.boxsize, size_dict=size_dict)
 

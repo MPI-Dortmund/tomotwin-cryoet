@@ -375,6 +375,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
+import multiprocessing
 from typing import List, Tuple
 
 import numpy as np
@@ -391,6 +392,7 @@ class FindMaximaLocator(Locator):
         stride: Tuple[int, int, int],
         window_size: int,
         global_min: float = 0.5,
+        processes: int = None
     ):
         self.stride = stride
         self.window_size = window_size
@@ -399,6 +401,9 @@ class FindMaximaLocator(Locator):
         self.max_size = None
         self.output = None
         self.global_min = global_min
+        self.processes = processes
+        if self.processes is None:
+            self.processes = multiprocessing.cpu_count()
 
     @staticmethod
     def to_volume(
@@ -512,7 +517,7 @@ class FindMaximaLocator(Locator):
 
         return particle_df.copy(deep=True), vol
 
-    def locate(self, map: pd.DataFrame) -> pd.DataFrame:
+    def locate_(self, map: pd.DataFrame) -> pd.DataFrame:
 
         print("start locate ", map.attrs['ref_name'])
         df_class, vol = FindMaximaLocator.locate_class(map.attrs['ref_index'], map, self.window_size, self.stride, self.tolerance, self.global_min)
@@ -520,3 +525,13 @@ class FindMaximaLocator(Locator):
         df_class.attrs["heatmap"] = vol
         print("Located", df_class.attrs["name"], len(df_class))
         return df_class
+
+    def locate(self, map_result : pd.DataFrame) -> List[pd.DataFrame]:
+        sub_dfs = Locator.extract_subclass_df(map_result)
+
+        from concurrent.futures import ProcessPoolExecutor as Pool
+
+        with Pool(self.processes) as pool:
+            class_frames_and_vols = list(pool.map(self.locate_, sub_dfs))
+
+        return class_frames_and_vols
