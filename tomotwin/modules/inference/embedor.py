@@ -438,19 +438,30 @@ class TorchEmbedor(Embedor):
         self.batchsize = batchsize
         self.workers = workers
         self.weightspth = weightspth
+        self.tomotwin_config = None
         print("reading", self.weightspth)
-        network_manager = NetworkManager() # should be a statica call
-        checkpoint = torch.load(self.weightspth)
-        self.tomotwin_config = checkpoint["tomotwin_config"]
-        print("Model config:")
-        print(self.tomotwin_config)
-        self.model = network_manager.create_network(self.tomotwin_config).get_model()
+        self.model = None
+        self.load_weights_()
+
+
+    def load_weights_(self):
+        checkpoint = None
+        if self.weightspth is not None:
+            checkpoint = torch.load(self.weightspth)
+            self.tomotwin_config = checkpoint["tomotwin_config"]
+            print("Model config:")
+            print(self.tomotwin_config)
+        print("Set model")
+        self.model = NetworkManager.create_network(self.tomotwin_config).get_model()
+        print(self.model)
         before_parallel_failed=False
-        try:
-            self.model.load_state_dict(checkpoint["model_state_dict"])
-        except RuntimeError:
-            print("Load before failed")
-            before_parallel_failed=True
+
+        if checkpoint is not None:
+            try:
+                self.model.load_state_dict(checkpoint["model_state_dict"])
+            except RuntimeError:
+                print("Load before failed")
+                before_parallel_failed=True
 
         self.model = torch.nn.DataParallel(self.model)
         if before_parallel_failed:
