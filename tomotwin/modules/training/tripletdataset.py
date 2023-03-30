@@ -377,15 +377,15 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 import random
 from typing import List, Callable
-import torch
-from torch.utils.data import Dataset
+from typing import Protocol
+
 import numpy as np
+import torch
 from numpy.typing import NDArray
+from torch.utils.data import Dataset
 
 from tomotwin.modules.training.filepathtriplet import FilePathTriplet
 from tomotwin.modules.training.triplethandler import TripletHandler
-
-from typing import Protocol
 
 LabelExtractorFunc = Callable[[str], str]
 

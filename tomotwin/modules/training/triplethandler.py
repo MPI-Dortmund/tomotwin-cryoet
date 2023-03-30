@@ -376,6 +376,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 """
 
 from abc import ABC, abstractmethod
+
 from tomotwin.modules.training.filepathtriplet import FilePathTriplet
 from tomotwin.modules.training.numpytriplet import NumpyTriplet
 

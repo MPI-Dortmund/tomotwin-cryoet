@@ -375,9 +375,10 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-from tomotwin.modules.networks.torchmodel import TorchModel
 import torch
 import torch.nn as nn
+
+from tomotwin.modules.networks.torchmodel import TorchModel
 
 
 class FacebookNet(TorchModel):

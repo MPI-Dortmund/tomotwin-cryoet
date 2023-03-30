@@ -374,23 +374,22 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
-from typing import List
+import glob
 import hashlib
 import os
-import glob
-import pandas as pd
-import tomotwin
+from typing import List
 
-import torch
 import numpy as np
+import pandas as pd
+import torch
 
-from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration
-from tomotwin.modules.inference.embedor import TorchEmbedor, Embedor
-from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
-from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
+import tomotwin
 from tomotwin.modules.common.io.mrc_format import MrcFormat
 from tomotwin.modules.common.utils import check_for_updates
-
+from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration
+from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
+from tomotwin.modules.inference.embedor import TorchEmbedor, Embedor
+from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
 
 
 def sliding_window_embedding(
@@ -450,22 +449,18 @@ def get_file_md5(path: str) -> str:
     :param path: Path for file
     :return: MD5  checksum.
     '''
-    with open(path, "rb") as f:
-        data = f.read()
-    md5hash = hashlib.md5(data).hexdigest()
-    return md5hash
+    try:
+        with open(path, "rb") as f:
+            data = f.read()
+        md5hash = hashlib.md5(data).hexdigest()
+        return md5hash
+    except TypeError:
+        return None
 
-def embed_subvolumes(embedor: Embedor, conf: EmbedConfiguration) -> pd.DataFrame:
+def embed_subvolumes(paths: List[str], embedor: Embedor, conf: EmbedConfiguration) -> pd.DataFrame:
     '''
     Embeds a set of subvolumes
     '''
-    paths = []
-    for p in conf.volumes_path:
-        if os.path.isfile(p) and p.endswith(".mrc"):
-            paths.append(p)
-        if os.path.isdir(p):
-            foundfiles = glob.glob(os.path.join(p, "*.mrc"))
-            paths.extend(foundfiles)
     embeddings = volume_embedding(paths, embedor=embedor)
     column_names = []
     for i in range(embeddings.shape[1]):
@@ -475,17 +470,21 @@ def embed_subvolumes(embedor: Embedor, conf: EmbedConfiguration) -> pd.DataFrame
     df.index.name = "index"
     df.attrs["modelpth"] = conf.model_path
     df.attrs["modelmd5"] = get_file_md5(conf.model_path)
-    df.to_pickle(os.path.join(conf.output_path, "embeddings.temb"))
-    print("Done")
+    f = os.path.join(conf.output_path, "embeddings.temb")
+    df.to_pickle(f)
+    print(f"Done. Wrote results to {f}")
     return df
 
 
-def embed_tomogram(embedor: Embedor, conf: EmbedConfiguration, window_size: int) -> pd.DataFrame:
+def embed_tomogram(
+        tomo: np.array,
+        embedor: Embedor,
+        conf: EmbedConfiguration,
+        window_size: int) -> pd.DataFrame:
     """
     Embeds a tomogram
     :return: DataFrame of embeddings
     """
-    tomo = -1 * MrcFormat.read(conf.volumes_path)  # -1 to invert the contrast
     if conf.zrange:
         hb = int((window_size - 1) // 2)
         minz = max(0, conf.zrange[0] - hb)
@@ -532,31 +531,42 @@ def embed_tomogram(embedor: Embedor, conf: EmbedConfiguration, window_size: int)
     print(f"Wrote embeddings to disk to {os.path.join(conf.output_path, filename)}")
     print("Done.")
 
-def _main_():
-    ########################
-    # Get configuration from user interface
-    ########################
-
-    ui = EmbedArgParseUI()
-
-    ui.run()
-
-    check_for_updates()
-
-    conf = ui.get_embed_configuration()
-    os.makedirs(conf.output_path, exist_ok=True)
-
+def make_embeddor(conf: EmbedConfiguration) -> Embedor:
     embedor = TorchEmbedor(
         weightspth=conf.model_path,
         batchsize=conf.batchsize,
         workers=12,  # multiprocessing.cpu_count(),
     )
+    return embedor
+
+
+
+def _main_(conf: EmbedConfiguration):
+
+    os.makedirs(conf.output_path, exist_ok=True)
+
+    embedor = make_embeddor(conf)
 
     window_size = get_window_size(conf.model_path)
     if conf.mode == EmbedMode.TOMO:
-        embed_tomogram(embedor, conf, window_size)
+        tomo = -1 * MrcFormat.read(conf.volumes_path)  # -1 to invert the contrast
+        embed_tomogram(tomo, embedor, conf, window_size)
     elif conf.mode == EmbedMode.VOLUMES:
-        embed_subvolumes(embedor, conf)
+        paths = []
+        for p in conf.volumes_path:
+            if os.path.isfile(p) and p.endswith(".mrc"):
+                paths.append(p)
+            if os.path.isdir(p):
+                foundfiles = glob.glob(os.path.join(p, "*.mrc"))
+                paths.extend(foundfiles)
+        embed_subvolumes(paths, embedor, conf)
 
 if __name__ == "__main__":
-    _main_()
+    ########################
+    # Get configuration from user interface
+    ########################
+    ui = EmbedArgParseUI()
+    ui.run()
+    check_for_updates()
+    config = ui.get_embed_configuration()
+    _main_(config)

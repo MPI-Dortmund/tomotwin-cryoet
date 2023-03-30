@@ -375,10 +375,11 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import torch.nn as nn
-import torch
 import numpy as np
+import torch
+import torch.nn as nn
 from pytorch_metric_learning import miners, losses
+
 
 class LossPyML(nn.Module):
     """

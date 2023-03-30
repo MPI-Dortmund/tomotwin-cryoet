@@ -381,7 +381,6 @@ import sys
 from tomotwin.modules.inference.embed_ui import EmbedUI, EmbedConfiguration, EmbedMode
 
 
-
 class EmbedArgParseUI(EmbedUI):
     """
     Argparse interface to embedor

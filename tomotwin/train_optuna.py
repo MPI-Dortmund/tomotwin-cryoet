@@ -375,32 +375,30 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
+import argparse
+import json
 import os
 import sys
-import argparse
 from typing import Dict
-import optuna
-from optuna.trial import TrialState
-import optuna.samplers as samplers
-from optuna.storages import RetryFailedTrialCallback
-from optuna.pruners import MedianPruner
-from tqdm import tqdm
-import numpy as np
-from pytorch_metric_learning import miners
-from importlib_metadata import version
-import json
 
-from tomotwin.modules.networks.networkmanager import NetworkManager
+import numpy as np
+import optuna
+import optuna.samplers as samplers
+from importlib_metadata import version
+from optuna.pruners import MedianPruner
+from optuna.storages import RetryFailedTrialCallback
+from optuna.trial import TrialState
+from pytorch_metric_learning import miners
+from tqdm import tqdm
+
 from tomotwin.modules.common.distances import DistanceManager
-from tomotwin.modules.training.torchtrainer import TorchTrainer, TripletDataset
+from tomotwin.modules.common.preprocess import label_filename
+from tomotwin.modules.networks.networkmanager import NetworkManager
 from tomotwin.modules.training.LossPyML import LossPyML
-from tomotwin.train_main import get_augmentations, generate_triplets
 from tomotwin.modules.training.argparse_ui import TrainingConfiguration
 from tomotwin.modules.training.mrctriplethandler import MRCTripletHandler
-from tomotwin.modules.common.preprocess import label_filename
-
-
-
+from tomotwin.modules.training.torchtrainer import TorchTrainer, TripletDataset
+from tomotwin.train_main import get_augmentations, generate_triplets
 
 EPOCHS = 3
 MAX_RETRY = 3

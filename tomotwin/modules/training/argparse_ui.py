@@ -375,9 +375,10 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-from .training_ui import TrainingUI, TrainingConfiguration
 import argparse
+
 from tomotwin.modules.common.distances import DistanceManager
+from .training_ui import TrainingUI, TrainingConfiguration
 
 
 class TrainingArgParseUI(TrainingUI):

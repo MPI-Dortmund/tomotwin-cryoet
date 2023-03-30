@@ -379,15 +379,13 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 Used this to understand better:
 https://github.com/jarvislabsai/blog/blob/master/build_resnet34_pytorch/Building%20Resnet%20in%20PyTorch.ipynb
 """
-import torch
-import torch.nn as nn
-from tomotwin.modules.networks.torchmodel import TorchModel
-import torch.nn.functional as F
-import torchvision.transforms as ttrans
 from typing import Dict
 
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
-
+from tomotwin.modules.networks.torchmodel import TorchModel
 
 
 class DNet16(TorchModel):

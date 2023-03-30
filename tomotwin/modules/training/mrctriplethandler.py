@@ -377,11 +377,10 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 import numpy as np
 
-from tomotwin.modules.training.triplethandler import TripletHandler, FilePathTriplet
-from tomotwin.modules.training.numpytriplet import NumpyTriplet
-from tomotwin.modules.common.io.mrc_format import MrcFormat
 import tomotwin.modules.common.preprocess as preprocess
-
+from tomotwin.modules.common.io.mrc_format import MrcFormat
+from tomotwin.modules.training.numpytriplet import NumpyTriplet
+from tomotwin.modules.training.triplethandler import TripletHandler, FilePathTriplet
 
 
 class MRCTripletHandler(TripletHandler):
