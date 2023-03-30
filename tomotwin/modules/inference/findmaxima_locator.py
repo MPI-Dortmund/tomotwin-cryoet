@@ -502,13 +502,13 @@ class FindMaximaLocator(Locator):
 
     @staticmethod
     def locate_class(class_id,
-                     map: pd.DataFrame,
+                     map_output: pd.DataFrame,
                      window_size: int,
                      stride: Tuple[int],
                      tolerance: float,
                      global_min: float,
                      ) -> pd.DataFrame:
-        particle_df, vol = FindMaximaLocator.apply_findmax(map_output=map,
+        particle_df, vol = FindMaximaLocator.apply_findmax(map_output=map_output,
                                                            class_id=class_id,
                                                            window_size=window_size,
                                                            stride=stride,
@@ -518,17 +518,28 @@ class FindMaximaLocator(Locator):
 
         return particle_df.copy(deep=True), vol
 
-    def locate_(self, map: pd.DataFrame) -> pd.DataFrame:
+    def locate_(self, map_output: pd.DataFrame) -> pd.DataFrame:
+        '''
+        Run locate for a specific target
+        :param map_output: Output dataframe from map command
+        :return: dataframe with located positions
+        '''
 
-        print("start locate ", map.attrs['ref_name'])
-        df_class, vol = FindMaximaLocator.locate_class(map.attrs['ref_index'], map, self.window_size, self.stride, self.tolerance, self.global_min)
-        df_class.attrs["name"] = map.attrs['ref_name']
+        print("start locate ", map_output.attrs['ref_name'])
+        df_class, vol = FindMaximaLocator.locate_class(map_output.attrs['ref_index'], map_output, self.window_size,
+                                                       self.stride, self.tolerance, self.global_min)
+        df_class.attrs["name"] = map_output.attrs['ref_name']
         df_class.attrs["heatmap"] = vol
         print("Located", df_class.attrs["name"], len(df_class))
         return df_class
 
-    def locate(self, map_result : pd.DataFrame) -> List[pd.DataFrame]:
-        sub_dfs = Locator.extract_subclass_df(map_result)
+    def locate(self, map_output: pd.DataFrame) -> List[pd.DataFrame]:
+        '''
+        starts the locate process in parallel
+        :param map_output: Output of the map command
+        :return: List of dataframes. One for each target.
+        '''
+        sub_dfs = Locator.extract_subclass_df(map_output)
         with Pool(self.processes) as pool:
             class_frames_and_vols = list(pool.map(self.locate_, sub_dfs))
 
