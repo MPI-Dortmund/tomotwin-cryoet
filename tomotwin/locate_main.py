@@ -467,6 +467,7 @@ def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.
         with mrcfile.new(
                 os.path.join(out_path, ref_name + ".mrc"), overwrite=True
         ) as mrc:
+            print("Write heatmap", os.path.join(out_path, ref_name + ".mrc"))
             vol = heatmaps[ref_i]
             vol = vol.astype(np.float32)
             vol = zoom(vol, 2)

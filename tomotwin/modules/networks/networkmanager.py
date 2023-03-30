@@ -394,25 +394,23 @@ class NetworkNotExistError(Exception):
 class MalformedConfigError(Exception):
     """Expection when there when using malformed configuration files"""
 
-network_identifier_map ={
-}
 
 class NetworkManager:
     """
     Factory for all networks.
     """
+    network_identifier_map = {
+        "SiameseNet".upper(): SiameseNet3D,
+        "ResNet".upper(): Resnet,
+        "Facebook".upper(): FacebookNet,
+        "ResNet3D".upper(): Resnet3D,
+        "DenseNet3D".upper(): DenseNet3D,
+        "DNet16".upper(): DNet16,
+    }
 
-    def __init__(self):
-        NetworkManager.add_network("SiameseNet", SiameseNet3D)
-        NetworkManager.add_network("ResNet", Resnet)
-        NetworkManager.add_network("Facebook", FacebookNet)
-        NetworkManager.add_network("ResNet3D", Resnet3D)
-        NetworkManager.add_network("DenseNet3D", DenseNet3D)
-        NetworkManager.add_network("DNet16", DNet16)
 
     @staticmethod
     def add_network(key: str, netclass: TorchModel) -> None:
-        # NOT NECESSARY
         """
         Add a network to the network identifier map.
 
@@ -420,7 +418,7 @@ class NetworkManager:
         :param netclass: Class for the network
         :return: None
         """
-        network_identifier_map[key.upper()] = netclass
+        NetworkManager.network_identifier_map[key.upper()] = netclass
 
 
     @staticmethod
@@ -442,9 +440,8 @@ class NetworkManager:
             raise MalformedConfigError(
                 "The keyword 'train_config' must be in the config file"
             )
-
-    def load_configuration(self, config_path: str) -> Dict:
-        # CAN BE STATIC
+    @staticmethod
+    def load_configuration(config_path: str) -> Dict:
         """
         Load the configuration
         :param config_path: Path to config file.
@@ -466,10 +463,10 @@ class NetworkManager:
 
         identifier = configuration["identifier"].upper()
 
-        if identifier not in network_identifier_map:
+        if identifier not in NetworkManager.network_identifier_map:
             raise NetworkNotExistError(f"Network '{identifier}' does not exist")
         else:
-            modelclass = network_identifier_map[identifier]
+            modelclass = NetworkManager.network_identifier_map[identifier]
             config = configuration["network_config"]
             if "groups" in config:
                 '''
