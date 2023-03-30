@@ -379,10 +379,6 @@ import json
 from typing import Dict
 
 from tomotwin.modules.networks.SiameseNet3D import SiameseNet3D
-from tomotwin.modules.networks.customtestmodels import FacebookNet
-from tomotwin.modules.networks.customtestmodels import Resnet3D
-from tomotwin.modules.networks.densenet import DenseNet3D
-from tomotwin.modules.networks.dnet16 import DNet16
 from tomotwin.modules.networks.resnet import Resnet
 from tomotwin.modules.networks.torchmodel import TorchModel
 
@@ -402,10 +398,6 @@ class NetworkManager:
     network_identifier_map = {
         "SiameseNet".upper(): SiameseNet3D,
         "ResNet".upper(): Resnet,
-        "Facebook".upper(): FacebookNet,
-        "ResNet3D".upper(): Resnet3D,
-        "DenseNet3D".upper(): DenseNet3D,
-        "DNet16".upper(): DNet16,
     }
 
 
