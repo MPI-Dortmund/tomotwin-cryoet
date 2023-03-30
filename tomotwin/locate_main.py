@@ -377,7 +377,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 import json
 import os
-from typing import List
+from typing import List, Dict
 
 import mrcfile
 import numpy as np
@@ -414,8 +414,14 @@ def read_map(path: str) -> pd.DataFrame:
     return df_map
 
 
-def run_non_maximum_suppression(class_frames, boxsize, size_dict=None) -> pd.DataFrame:
-
+def run_non_maximum_suppression(class_frames: List[pd.DataFrame], boxsize: int, size_dict: Dict[str,int]=None) -> List[pd.DataFrame]:
+    '''
+    Runs nun maximum supression for each target class
+    :param class_frames: Results for each target
+    :param boxsize: Boxsize to use
+    :param size_dict: Alternative to boxsize, a dictionary can be provided that maps the traget name to a boxsize.
+    :return: list of nms applied dataframes
+    '''
     for class_id, class_frame in enumerate(class_frames):
         if len(class_frame) == 0:
             print("No particles for class", class_frame.attrs["name"])
