@@ -1,9 +1,10 @@
-import unittest
 import os
-import json
-from tomotwin.modules.networks.resnet import Resnet
+import unittest
+
 from tomotwin.modules.networks.SiameseNet3D import SiameseNet3D
 from tomotwin.modules.networks.networkmanager import NetworkManager, NetworkNotExistError, MalformedConfigError
+from tomotwin.modules.networks.resnet import Resnet
+
 
 class MyTestCase(unittest.TestCase):
     def test_create_network_resnet(self):
@@ -13,7 +14,7 @@ class MyTestCase(unittest.TestCase):
         config = nw.load_configuration(config_path)
 
         model = nw.create_network(config)
-
+        print(model.__class__)
         is_correct_network = isinstance(model, Resnet)
         self.assertEqual(True, is_correct_network)
 

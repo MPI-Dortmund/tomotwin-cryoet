@@ -377,7 +377,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 import json
 import os
-from typing import List
+from typing import List, Dict
 
 import mrcfile
 import numpy as np
@@ -414,21 +414,14 @@ def read_map(path: str) -> pd.DataFrame:
     return df_map
 
 
-def extract_subclass_df(map: pd.DataFrame) -> List[pd.DataFrame]:
+def run_non_maximum_suppression(class_frames: List[pd.DataFrame], boxsize: int, size_dict: Dict[str,int]=None) -> List[pd.DataFrame]:
     '''
-    Extract a dataframe for each reference
-    :param map: Resullt from running map
+    Runs nun maximum supression for each target class
+    :param class_frames: Results for each target
+    :param boxsize: Boxsize to use
+    :param size_dict: Alternative to boxsize, a dictionary can be provided that maps the traget name to a boxsize.
+    :return: list of nms applied dataframes
     '''
-    sub_dfs = []
-    for i in range(len(map.attrs["references"])):
-        sub = map[["X", "Y", "Z", f"d_class_{i}"]]
-        sub.attrs["ref_name"] = map.attrs["references"][i]
-        sub.attrs["ref_index"] = i
-        sub_dfs.append(sub)
-    return sub_dfs
-
-def run_non_maximum_suppression(class_frames, boxsize, size_dict=None) -> pd.DataFrame:
-
     for class_id, class_frame in enumerate(class_frames):
         if len(class_frame) == 0:
             print("No particles for class", class_frame.attrs["name"])
@@ -459,30 +452,28 @@ def run_non_maximum_suppression(class_frames, boxsize, size_dict=None) -> pd.Dat
         )
     return class_frames
 
-def write_heatmaps(reference_names: List[str], out_path: str, class_vols: List[np.array]):
+def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.array]) -> None:
+    '''
+    Write heatmaps to disk
+    :param reference_names: Name of the references
+    :param out_path: Folder where the heatmaps will be written to.
+    :param heatmaps: List of heatmaps
+    :return: None
+    '''
+    assert len(reference_names) == len(heatmaps), "Unequal number of references and heatmaps"
     for ref_i, ref_name in tqdm.tqdm(
             enumerate(reference_names), desc="Write heatmaps"
     ):
         with mrcfile.new(
                 os.path.join(out_path, ref_name + ".mrc"), overwrite=True
         ) as mrc:
-            vol = class_vols[ref_i]
+            print("Write heatmap", os.path.join(out_path, ref_name + ".mrc"))
+            vol = heatmaps[ref_i]
             vol = vol.astype(np.float32)
             vol = zoom(vol, 2)
             vol = np.pad(vol, ((18, 18), (18, 18), (18, 18)), "constant")
             vol = vol.swapaxes(0, 2)
             mrc.set_data(vol)
-
-def apply_locate_parallel(sub_dfs: List[pd.DataFrame], locator: Locator, num_processes: int) -> List[List[pd.DataFrame]]:
-    """
-    Applies a locator on a map results in parallel.
-    """
-    from concurrent.futures import ProcessPoolExecutor as Pool
-
-    with Pool(num_processes) as pool:
-        class_frames_and_vols = list(pool.map(locator.locate, sub_dfs))
-
-    return class_frames_and_vols
 
 
 def run(conf: LocateConfiguration):
@@ -519,30 +510,19 @@ def run(conf: LocateConfiguration):
         stride=stride,
         window_size=window_size,
         global_min=conf.global_min,
+        processes=conf.processes
     )
     locator.output = out_path
     map_attrs = map_result.attrs
-    ## should be moved into locator
-    sub_dfs = extract_subclass_df(map_result)
-    ##
+
+    class_frames_and_vols = locator.locate(map_result)
     del map_result
 
-    ## should be done in FindMaxLocator
-    from concurrent.futures import ProcessPoolExecutor as Pool
 
-    with Pool(conf.processes) as pool:
-        class_frames_and_vols = list(pool.map(locator.locate, sub_dfs))
-    ##
-
-
-    class_frames = [t for t in class_frames_and_vols]
     class_vols = [t.attrs['heatmap'] for t in class_frames_and_vols if 'heatmap' in t.attrs]
+    class_frames_and_vols = run_non_maximum_suppression(class_frames_and_vols, conf.boxsize, size_dict=size_dict)
 
-
-
-    class_frames = run_non_maximum_suppression(class_frames, conf.boxsize, size_dict=size_dict)
-
-    located_particles = pd.concat(class_frames)
+    located_particles = pd.concat(class_frames_and_vols)
 
     located_particles.attrs["tt_version_locate"] = tomotwin.__version__
 

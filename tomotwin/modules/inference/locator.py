@@ -392,6 +392,20 @@ class Locator(ABC):
         """
 
     @staticmethod
+    def extract_subclass_df(map: pd.DataFrame) -> List[pd.DataFrame]:
+        '''
+        Extract a dataframe for each reference
+        :param map: Resullt from running map
+        '''
+        sub_dfs = []
+        for i in range(len(map.attrs["references"])):
+            sub = map[["X", "Y", "Z", f"d_class_{i}"]]
+            sub.attrs["ref_name"] = map.attrs["references"][i]
+            sub.attrs["ref_index"] = i
+            sub_dfs.append(sub)
+        return sub_dfs
+
+    @staticmethod
     def nms(boxes: pd.DataFrame, size: int, nms_threshold=0.6) -> pd.DataFrame:
         # np.array(len(coords))
         distance_column = f"metric_best"

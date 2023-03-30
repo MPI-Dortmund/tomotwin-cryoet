@@ -540,9 +540,7 @@ def make_embeddor(conf: EmbedConfiguration) -> Embedor:
     return embedor
 
 
-
-def _main_(conf: EmbedConfiguration):
-
+def run(conf: EmbedConfiguration):
     os.makedirs(conf.output_path, exist_ok=True)
 
     embedor = make_embeddor(conf)
@@ -560,8 +558,7 @@ def _main_(conf: EmbedConfiguration):
                 foundfiles = glob.glob(os.path.join(p, "*.mrc"))
                 paths.extend(foundfiles)
         embed_subvolumes(paths, embedor, conf)
-
-if __name__ == "__main__":
+def _main_():
     ########################
     # Get configuration from user interface
     ########################
@@ -569,4 +566,8 @@ if __name__ == "__main__":
     ui.run()
     check_for_updates()
     config = ui.get_embed_configuration()
-    _main_(config)
+    run(config)
+
+
+if __name__ == "__main__":
+    _main_()

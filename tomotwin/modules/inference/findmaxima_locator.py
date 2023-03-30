@@ -375,6 +375,8 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
+import multiprocessing
+from concurrent.futures import ProcessPoolExecutor as Pool
 from typing import List, Tuple
 
 import numpy as np
@@ -391,6 +393,7 @@ class FindMaximaLocator(Locator):
         stride: Tuple[int, int, int],
         window_size: int,
         global_min: float = 0.5,
+        processes: int = None
     ):
         self.stride = stride
         self.window_size = window_size
@@ -399,6 +402,9 @@ class FindMaximaLocator(Locator):
         self.max_size = None
         self.output = None
         self.global_min = global_min
+        self.processes = processes
+        if self.processes is None:
+            self.processes = multiprocessing.cpu_count()
 
     @staticmethod
     def to_volume(
@@ -496,13 +502,13 @@ class FindMaximaLocator(Locator):
 
     @staticmethod
     def locate_class(class_id,
-                     map: pd.DataFrame,
+                     map_output: pd.DataFrame,
                      window_size: int,
                      stride: Tuple[int],
                      tolerance: float,
                      global_min: float,
                      ) -> pd.DataFrame:
-        particle_df, vol = FindMaximaLocator.apply_findmax(map_output=map,
+        particle_df, vol = FindMaximaLocator.apply_findmax(map_output=map_output,
                                                            class_id=class_id,
                                                            window_size=window_size,
                                                            stride=stride,
@@ -512,11 +518,29 @@ class FindMaximaLocator(Locator):
 
         return particle_df.copy(deep=True), vol
 
-    def locate(self, map: pd.DataFrame) -> pd.DataFrame:
+    def locate_(self, map_output: pd.DataFrame) -> pd.DataFrame:
+        '''
+        Run locate for a specific target
+        :param map_output: Output dataframe from map command
+        :return: dataframe with located positions
+        '''
 
-        print("start locate ", map.attrs['ref_name'])
-        df_class, vol = FindMaximaLocator.locate_class(map.attrs['ref_index'], map, self.window_size, self.stride, self.tolerance, self.global_min)
-        df_class.attrs["name"] = map.attrs['ref_name']
+        print("start locate ", map_output.attrs['ref_name'])
+        df_class, vol = FindMaximaLocator.locate_class(map_output.attrs['ref_index'], map_output, self.window_size,
+                                                       self.stride, self.tolerance, self.global_min)
+        df_class.attrs["name"] = map_output.attrs['ref_name']
         df_class.attrs["heatmap"] = vol
         print("Located", df_class.attrs["name"], len(df_class))
         return df_class
+
+    def locate(self, map_output: pd.DataFrame) -> List[pd.DataFrame]:
+        '''
+        starts the locate process in parallel
+        :param map_output: Output of the map command
+        :return: List of dataframes. One for each target.
+        '''
+        sub_dfs = Locator.extract_subclass_df(map_output)
+        with Pool(self.processes) as pool:
+            class_frames_and_vols = list(pool.map(self.locate_, sub_dfs))
+
+        return class_frames_and_vols
