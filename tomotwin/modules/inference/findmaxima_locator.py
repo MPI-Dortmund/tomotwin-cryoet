@@ -376,6 +376,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 """
 
 import multiprocessing
+from concurrent.futures import ProcessPoolExecutor as Pool
 from typing import List, Tuple
 
 import numpy as np
@@ -528,9 +529,6 @@ class FindMaximaLocator(Locator):
 
     def locate(self, map_result : pd.DataFrame) -> List[pd.DataFrame]:
         sub_dfs = Locator.extract_subclass_df(map_result)
-
-        from concurrent.futures import ProcessPoolExecutor as Pool
-
         with Pool(self.processes) as pool:
             class_frames_and_vols = list(pool.map(self.locate_, sub_dfs))
 
