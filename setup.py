@@ -50,7 +50,7 @@ setup(
             'tomotwin_embed.py = tomotwin.embed_main:_main_',
             'tomotwin_map.py = tomotwin.map_main:_main_',
             'tomotwin_locate.py = tomotwin.locate_main:_main_',
-            'tomotwin_pick.py = tomotwin.pick_main',
+            'tomotwin_pick.py = tomotwin.pick_main:_main_',
             'tomotwin_scripts_evaluate.py = scripts.evaluation:_main_',
             'tomotwin_scripts_lasso.py = scripts.lasso:_main_',
             'tomotwin_dev_matrix.py = scripts.pdb_similarity_matrix:_main_',
