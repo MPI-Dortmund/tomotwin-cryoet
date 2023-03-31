@@ -476,7 +476,11 @@ def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.
             mrc.set_data(vol)
 
 
-def run(conf: LocateConfiguration):
+def run(conf: LocateConfiguration) -> None:
+    '''
+    Runs the locate procedure
+    :param conf: Configuration file from a UI
+    '''
     out_path = conf.output_path
     os.makedirs(out_path, exist_ok=True)
     map_result = read_map(conf.map_path)

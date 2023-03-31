@@ -532,6 +532,11 @@ def embed_tomogram(
     print("Done.")
 
 def make_embeddor(conf: EmbedConfiguration) -> Embedor:
+    '''
+    Create the embeddor
+    :param conf: Embed configuratio from an UI
+    :return: Instance of embeddor
+    '''
     embedor = TorchEmbedor(
         weightspth=conf.model_path,
         batchsize=conf.batchsize,
@@ -540,7 +545,11 @@ def make_embeddor(conf: EmbedConfiguration) -> Embedor:
     return embedor
 
 
-def run(conf: EmbedConfiguration):
+def run(conf: EmbedConfiguration) -> None:
+    '''
+    Runs the embed procedure
+    :param conf: Configuration from a UI
+    '''
     os.makedirs(conf.output_path, exist_ok=True)
 
     embedor = make_embeddor(conf)
