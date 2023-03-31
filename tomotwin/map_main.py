@@ -391,6 +391,9 @@ from tomotwin.modules.inference.reference_refinement import ReferenceRefiner
 
 
 class FormatNotImplemented(Exception):
+    '''
+    Exception when an embedding format is not implemented.
+    '''
     ...
 
 def read_embeddings(path) -> pd.DataFrame:
@@ -417,8 +420,8 @@ def read_embeddings(path) -> pd.DataFrame:
     return casted
 
 
-def map(
-    mapper: Mapper, reference: np.array, volumes: np.array
+def run_map(
+        mapper: Mapper, reference: np.array, volumes: np.array
 ) -> np.array:
     """
     Return the mapping of a references to a volume
@@ -430,7 +433,11 @@ def map(
     return mapper.map(embeddings=volumes, references=reference)
 
 
-def run(conf: MapConfiguration):
+def run(conf: MapConfiguration) -> None:
+    '''
+    Runs the map command
+    :param conf: Configration from UI
+    '''
     reference_embeddings_path = (
         conf.reference_embeddings_path
     )
@@ -477,7 +484,7 @@ def run(conf: MapConfiguration):
             reference_embeddings_np = refiner.refine_references(references=reference_embeddings_np,embeddings=volume_embeddings_np, iterations=7)
             clf.quiet = False
 
-        distances = map(
+        distances = run_map(
             mapper=clf,
             reference=reference_embeddings_np,
             volumes=volume_embeddings_np,

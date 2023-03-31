@@ -395,7 +395,6 @@ from typing import List
 import multiprocessing
 from functools import partial
 
-
 @njit
 def _fill_threshold(
     image,

@@ -472,33 +472,28 @@ class FindMaximaLocator(Locator):
         return dat
 
     @staticmethod
-    def apply_findmax(map_output: pd.DataFrame,
-                      class_id: int,
-                      window_size: int,
-                      stride: Tuple[int],
+    def apply_findmax(vol: np.array,
                       tolerance: float,
                       global_min: float,
                       **kwargs
-                      ) -> (pd.DataFrame, np.array):
+                      ) -> List[Tuple]:
+        '''
+        Applies the findmax procedure the 3d volume
+        :param vol: Volume where maximas needs to be detected.
+        :param tolerance: Prominence of the peak
+        :param global_min: global minimum
+        :param kwargs: kwargs arguments
+        :return: List with 3 elements. First element is the maxima position, second element is the size (region growing), third element is maxima value
+        '''
 
-
-
-        vol = FindMaximaLocator.to_volume(map_output, target_class=class_id, window_size=window_size, stride=stride)
-
-        maximas, _ = find_maxima(vol, tolerance, global_min=global_min,tqdm_pos=kwargs.get("tqdm_pos"))
-        print("done", class_id)
+        maximas, _ = find_maxima(vol, tolerance, global_min=global_min, tqdm_pos=kwargs.get("tqdm_pos"))
         del _
 
         maximas = [
             m for m in maximas if m[1] > 1
         ]  # more than one pixel coordinate must be involved.
-        particle_df = FindMaximaLocator.maxima_to_df(
-            maximas, class_id, stride=stride,boxsize=window_size
-        )
 
-        return particle_df, vol
-
-
+        return maximas
 
     @staticmethod
     def locate_class(class_id,
@@ -507,14 +502,19 @@ class FindMaximaLocator(Locator):
                      stride: Tuple[int],
                      tolerance: float,
                      global_min: float,
-                     ) -> pd.DataFrame:
-        particle_df, vol = FindMaximaLocator.apply_findmax(map_output=map_output,
-                                                           class_id=class_id,
-                                                           window_size=window_size,
-                                                           stride=stride,
-                                                           tolerance=tolerance,
-                                                           global_min=global_min,
-                                                           tqdm_pos=class_id)
+                     ) -> Tuple[pd.DataFrame, np.array]:
+        vol = FindMaximaLocator.to_volume(map_output, target_class=class_id, window_size=window_size, stride=stride)
+        maximas = FindMaximaLocator.apply_findmax(vol=vol,
+                                                  class_id=class_id,
+                                                  window_size=window_size,
+                                                  stride=stride,
+                                                  tolerance=tolerance,
+                                                  global_min=global_min,
+                                                  tqdm_pos=class_id)
+        print("done", class_id)
+        particle_df = FindMaximaLocator.maxima_to_df(
+            maximas, class_id, stride=stride, boxsize=window_size
+        )
 
         return particle_df.copy(deep=True), vol
 
