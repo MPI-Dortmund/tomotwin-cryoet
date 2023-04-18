@@ -626,9 +626,9 @@ def _main_():
     pth_log_err = os.path.join(tconf.output_path, "err.txt")
     print("Redirecting stdout to", pth_log_out)
     print("Redirecting stderr to", pth_log_err)
-    f = open(pth_log_out, "a")
+    f = open(pth_log_out, "a", encoding="utf8")
     sys.stdout = f
-    f = open(pth_log_err, "a")
+    f = open(pth_log_err, "a", encoding="utf8")
     sys.stderr = f
     print("TomoTwin Version:", version("tomotwin-cryoet"))
 
