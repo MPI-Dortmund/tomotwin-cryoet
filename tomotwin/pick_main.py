@@ -389,7 +389,6 @@ from tomotwin.modules.inference.argparse_pick_ui import (
     PickArgParseUI,
     PickConfiguration,
 )
-from tomotwin.modules.inference.pick_ui import PickUI
 
 
 class InvalidLocateResults(Exception):
@@ -517,25 +516,21 @@ def write_results(
     os.makedirs(output_path, exist_ok=True)
 
     for w in writer:
+        p = os.path.join(
+            output_path, f"{os.path.splitext(target)[0]}{w.get_extension()}"
+        )
         w.write(
             locate_results,
-            os.path.join(
-                output_path, f"{os.path.splitext(target)[0]}{w.get_extension()}"
-            ),
+            p,
         )
+        print(p)
 
 
-def run(ui: PickUI) -> None:
+def run(conf: PickConfiguration) -> None:
     """
     Runs the picking pipeline
     :param ui: Settings from the UI
     """
-    # Load pickle
-    ui.run()
-    conf = ui.get_pick_configuration()
-
-    check_for_updates()
-
     # Get picks for target reference
     locate_results = pd.read_pickle(conf.locate_results_path)
     print()
@@ -582,7 +577,13 @@ def run(ui: PickUI) -> None:
 
 def _main_():
     ui = PickArgParseUI()
-    run(ui=ui)
+
+    ui.run()
+    conf = ui.get_pick_configuration()
+
+    check_for_updates()
+
+    run(conf=conf)
 
 
 if __name__ == "__main__":
