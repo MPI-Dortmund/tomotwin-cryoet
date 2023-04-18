@@ -451,9 +451,7 @@ class TorchEmbedor(Embedor):
             self.tomotwin_config = checkpoint["tomotwin_config"]
             print("Model config:")
             print(self.tomotwin_config)
-        print("Set model")
         self.model = NetworkManager.create_network(self.tomotwin_config).get_model()
-        print(self.model)
         before_parallel_failed=False
 
         if checkpoint is not None:
