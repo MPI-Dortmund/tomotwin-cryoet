@@ -377,9 +377,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 import os
 import typing
 
-import numpy as np
 import pandas as pd
-from pyStarDB import sp_pystardb as star
 
 from tomotwin.modules.common.io.coords_format import CoordsFormat
 from tomotwin.modules.common.io.reader_writer import CoordinateWriter
@@ -395,68 +393,6 @@ class InvalidLocateResults(Exception):
     """
     Custrom exception for invalid locate results file
     """
-
-
-def write_cbox(coordinates: pd.DataFrame, boxsize: int, path: str) -> None:
-    """
-    Write results as CBOX to disk
-    :param coordinates: Picking results
-    :param boxsize: Box size that should be use
-    :param path: Path of the new CBOX file
-    """
-
-    def coords_to_np_array(xyz: pd.DataFrame, boxsize: int) -> np.array:
-        num_boxes = len(xyz)
-        num_fields = 11
-        coords = np.zeros(shape=(num_boxes, num_fields))
-
-        i = 0
-        for _, row in xyz.iterrows():
-            c = float(row["metric_best"])
-            coords[i, 0] = row["X"] - (boxsize / 2)
-            coords[i, 1] = row["Y"] - (boxsize / 2)
-            coords[i, 2] = row["Z"]
-            coords[i, 3] = boxsize
-            coords[i, 4] = boxsize
-            coords[i, 5] = boxsize
-            coords[i, 6] = float(row["size"])
-            coords[i, 7] = float(row["size"])
-            coords[i, 8] = c
-            coords[i, 9] = None
-            coords[i, 10] = None
-            i = i + 1
-
-        return coords
-
-    columns = []
-    columns.append("_CoordinateX")
-    columns.append("_CoordinateY")
-    columns.append("_CoordinateZ")
-    columns.append("_Width")
-    columns.append("_Height")
-    columns.append("_Depth")
-    columns.append("_EstWidth")
-    columns.append("_EstHeight")
-    columns.append("_Confidence")
-    columns.append("_NumBoxes")
-    columns.append("_Angle")
-
-    coords = coords_to_np_array(coordinates, boxsize)
-
-    include_slices = [a for a in np.unique(coords[:, 2]).tolist() if not np.isnan(a)]
-
-    sfile = star.StarFile(path)
-
-    version_df = pd.DataFrame([["1.0"]], columns=["_cbox_format_version"])
-    sfile.update("global", version_df, False)
-
-    df = pd.DataFrame(coords, columns=columns)
-    sfile.update("cryolo", df, True)
-
-    include_df = pd.DataFrame(include_slices, columns=["_slice_index"])
-    sfile.update("cryolo_include", include_df, True)
-
-    sfile.write_star_file(overwrite=True, tags=["global", "cryolo", "cryolo_include"])
 
 
 def write_coords(results: pd.DataFrame, filepath: str) -> None:
