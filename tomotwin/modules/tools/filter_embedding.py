@@ -1,9 +1,11 @@
-from tomotwin.modules.tools.tomotwintool import TomoTwinTool
-import pandas as pd
-import numpy as np
 import argparse
 import os
-from tomotwin.modules.tools.median_embedding import MedianTool
+
+import pandas as pd
+
+from tomotwin.modules.tools.tomotwintool import TomoTwinTool
+
+
 class FilterTool(TomoTwinTool):
 
 

@@ -375,10 +375,12 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
+from typing import Dict, Union
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Dict, Union
+
 from tomotwin.modules.networks.torchmodel import TorchModel
 
 

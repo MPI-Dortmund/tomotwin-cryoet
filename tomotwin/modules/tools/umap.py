@@ -1,15 +1,18 @@
 import argparse
+import os
+import pickle
 import typing
 from argparse import ArgumentParser
-from tomotwin.modules.tools.tomotwintool import TomoTwinTool
-import pandas as pd
-import numpy as np
-import cuml
-from tqdm import tqdm
-import pickle
-import os
 
+import cuml
+import numpy as np
+import pandas as pd
 from numpy.typing import ArrayLike
+from tqdm import tqdm
+
+from tomotwin.modules.tools.tomotwintool import TomoTwinTool
+
+
 class UmapTool(TomoTwinTool):
 
     def get_command_name(self) -> str:

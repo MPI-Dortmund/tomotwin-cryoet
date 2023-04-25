@@ -375,9 +375,11 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import numpy as np
 import os
 import re
+
+import numpy as np
+
 
 def label_filename(path: str) -> str:
     filename = os.path.basename(path)

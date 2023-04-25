@@ -377,8 +377,9 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 from abc import ABC, abstractmethod
 from typing import Any
-from tomotwin.modules.training.filepathtriplet import FilePathTriplet
 from typing import List
+
+from tomotwin.modules.training.filepathtriplet import FilePathTriplet
 
 
 class Trainer(ABC):

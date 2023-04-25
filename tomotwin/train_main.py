@@ -375,33 +375,34 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-from typing import List, Tuple, Dict, Callable
 import os
-import sys
 import random
-import tqdm
+import sys
+from typing import List, Tuple, Dict, Callable
+
 import numpy as np
+import tqdm
 from pytorch_metric_learning import miners, losses
 
-
+from tomotwin.modules.common import distances, exceptions
+from tomotwin.modules.common.distances import DistanceManager
+from tomotwin.modules.common.preprocess import label_filename
+from tomotwin.modules.common.utils import check_for_updates
+from tomotwin.modules.networks.networkmanager import NetworkManager
+from tomotwin.modules.training.LossPyML import LossPyML
 from tomotwin.modules.training.argparse_ui import (
     TrainingArgParseUI,
     TrainingConfiguration,
 )
-from tomotwin.modules.training.filenametripletprovider import (
-    FilenameMatchingTripletProvider,
-)
-from tomotwin.modules.common.utils import check_for_updates
 from tomotwin.modules.training.filenamematchingtripletprovidernopdb import (
     FilenameMatchingTripletProviderNoPDB,
 )
-from tomotwin.modules.training.torchtrainer import TorchTrainer, TripletDataset
-from tomotwin.modules.training.LossPyML import LossPyML
-from tomotwin.modules.common.distances import DistanceManager
+from tomotwin.modules.training.filenametripletprovider import (
+    FilenameMatchingTripletProvider,
+)
+from tomotwin.modules.training.filepathtriplet import FilePathTriplet
 from tomotwin.modules.training.mrctriplethandler import MRCTripletHandler
-from tomotwin.modules.common import distances, exceptions
-from tomotwin.modules.common.preprocess import label_filename
-
+from tomotwin.modules.training.torchtrainer import TorchTrainer, TripletDataset
 from tomotwin.modules.training.transforms import (
     AugmentationPipeline,
     AddNoise,
@@ -410,8 +411,6 @@ from tomotwin.modules.training.transforms import (
     RotateFull,
     VoxelDropout,
 )
-from tomotwin.modules.training.filepathtriplet import FilePathTriplet
-from tomotwin.modules.networks.networkmanager import NetworkManager
 
 try:
     from importlib_metadata import version

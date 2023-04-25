@@ -1,6 +1,6 @@
-from setuptools import setup
 # read the contents of your README file
 from os import path
+from setuptools import setup
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -44,7 +44,6 @@ setup(
     entry_points={
         'console_scripts': [
             'tomotwin_train.py = tomotwin.train_main:_main_',
-            'tomotwin_optuna.py = tomotwin.train_optuna:_main_',
             'tomotwin_embed.py = tomotwin.embed_main:_main_',
             'tomotwin_map.py = tomotwin.map_main:_main_',
             'tomotwin_locate.py = tomotwin.locate_main:_main_',
@@ -52,6 +51,7 @@ setup(
             'tomotwin_scripts_evaluate.py = scripts.evaluation:_main_',
             'tomotwin_dev_matrix.py = scripts.pdb_similarity_matrix:_main_',
             'tomotwin_dev_json2tloc.py = scripts.json2tloc:_main_',
+            'tomotwin_dev_optuna.py = tomotwin.train_optuna:_main_',
             'tomotwin_dev_molmapbbox.py = scripts.molmapsbbox:_main_',
             'tomotwin_tools.py = tomotwin.tools_main:_main_'
         ]},

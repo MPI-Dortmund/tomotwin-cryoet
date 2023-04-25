@@ -376,9 +376,11 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 """
 
 from abc import ABC, abstractmethod
+from typing import Union, Tuple
+
 import numpy.lib.stride_tricks as tricks
 from numpy.typing import NDArray
-from typing import Union, Tuple
+
 from tomotwin.modules.inference.volumedata import SlidingWindowVolumeData
 
 

@@ -375,27 +375,27 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
+import copy
 import os
 from typing import Any, Dict, Tuple, Iterable
-import copy
+
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
-
-from torch import nn
-from torch.utils.data import DataLoader
 import torch
+from torch import nn
 from torch import optim
 from torch.backends import cudnn
-from torch.utils.tensorboard import SummaryWriter
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.cuda.amp import GradScaler, autocast
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
 
 import tomotwin
+from tomotwin.modules.common import preprocess
+from tomotwin.modules.networks.torchmodel import TorchModel
 from tomotwin.modules.training.trainer import Trainer
 from tomotwin.modules.training.tripletdataset import TripletDataset
-from tomotwin.modules.networks.torchmodel import TorchModel
-from tomotwin.modules.common import preprocess
 
 
 class TorchTrainer(Trainer):

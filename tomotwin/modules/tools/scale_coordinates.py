@@ -374,12 +374,14 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
+import argparse
 import os
+from argparse import ArgumentParser
 
 import pandas as pd
-from argparse import ArgumentParser
-import argparse
+
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
+
 
 class ScaleCoordinates(TomoTwinTool):
     def get_command_name(self) -> str:

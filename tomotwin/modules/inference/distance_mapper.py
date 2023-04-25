@@ -375,11 +375,14 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-from typing import Callable, List
 import multiprocessing
+from typing import Callable, List
+
 import numpy as np
 import tqdm
+
 from tomotwin.modules.inference.mapper import Mapper
+
 
 class DistanceMapper(Mapper):
     """

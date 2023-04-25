@@ -375,9 +375,10 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
+from typing import Tuple
+
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Tuple
 
 """
 Adapted from https://discuss.pytorch.org/t/adding-own-pooling-algorithm-to-pytorch/54742

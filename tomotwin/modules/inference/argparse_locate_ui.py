@@ -380,6 +380,7 @@ import sys
 
 from tomotwin.modules.inference.locate_ui import LocateUI, LocateConfiguration, LocateMode
 
+
 class LocateArgParseUI(LocateUI):
 
     def __init__(self):

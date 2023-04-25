@@ -374,23 +374,22 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
-from typing import List
+import glob
 import hashlib
 import os
-import glob
-import pandas as pd
-import tomotwin
+from typing import List
 
-import torch
 import numpy as np
+import pandas as pd
+import torch
 
-from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration
-from tomotwin.modules.inference.embedor import TorchEmbedor, Embedor
-from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
-from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
+import tomotwin
 from tomotwin.modules.common.io.mrc_format import MrcFormat
 from tomotwin.modules.common.utils import check_for_updates
-
+from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration
+from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
+from tomotwin.modules.inference.embedor import TorchEmbedor, Embedor
+from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
 
 
 def sliding_window_embedding(
@@ -532,25 +531,28 @@ def embed_tomogram(
     print(f"Wrote embeddings to disk to {os.path.join(conf.output_path, filename)}")
     print("Done.")
 
-def _main_():
-    ########################
-    # Get configuration from user interface
-    ########################
-
-    ui = EmbedArgParseUI()
-
-    ui.run()
-
-    check_for_updates()
-
-    conf = ui.get_embed_configuration()
-    os.makedirs(conf.output_path, exist_ok=True)
-
+def make_embeddor(conf: EmbedConfiguration) -> Embedor:
+    '''
+    Create the embeddor
+    :param conf: Embed configuratio from an UI
+    :return: Instance of embeddor
+    '''
     embedor = TorchEmbedor(
         weightspth=conf.model_path,
         batchsize=conf.batchsize,
         workers=12,  # multiprocessing.cpu_count(),
     )
+    return embedor
+
+
+def run(conf: EmbedConfiguration) -> None:
+    '''
+    Runs the embed procedure
+    :param conf: Configuration from a UI
+    '''
+    os.makedirs(conf.output_path, exist_ok=True)
+
+    embedor = make_embeddor(conf)
 
     window_size = get_window_size(conf.model_path)
     if conf.mode == EmbedMode.TOMO:
@@ -565,6 +567,16 @@ def _main_():
                 foundfiles = glob.glob(os.path.join(p, "*.mrc"))
                 paths.extend(foundfiles)
         embed_subvolumes(paths, embedor, conf)
+def _main_():
+    ########################
+    # Get configuration from user interface
+    ########################
+    ui = EmbedArgParseUI()
+    ui.run()
+    check_for_updates()
+    config = ui.get_embed_configuration()
+    run(config)
+
 
 if __name__ == "__main__":
     _main_()

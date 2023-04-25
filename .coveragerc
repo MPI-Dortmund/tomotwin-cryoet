@@ -1,2 +1,7 @@
 [run]
-omit = *tests*
+concurrency = multiprocessing
+omit =
+    tests/*
+    scripts/*
+    setup.py
+

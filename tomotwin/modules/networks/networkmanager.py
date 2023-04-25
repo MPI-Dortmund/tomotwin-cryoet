@@ -375,15 +375,12 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
+import json
+from typing import Dict
+
 from tomotwin.modules.networks.SiameseNet3D import SiameseNet3D
 from tomotwin.modules.networks.resnet import Resnet
-from tomotwin.modules.networks.densenet import DenseNet3D
-from tomotwin.modules.networks.customtestmodels import FacebookNet
-from tomotwin.modules.networks.customtestmodels import Resnet3D
 from tomotwin.modules.networks.torchmodel import TorchModel
-from tomotwin.modules.networks.dnet16 import DNet16
-from typing import Dict
-import json
 
 
 class NetworkNotExistError(Exception):
@@ -393,23 +390,19 @@ class NetworkNotExistError(Exception):
 class MalformedConfigError(Exception):
     """Expection when there when using malformed configuration files"""
 
+
 class NetworkManager:
     """
     Factory for all networks.
     """
+    network_identifier_map = {
+        "SiameseNet".upper(): SiameseNet3D,
+        "ResNet".upper(): Resnet,
+    }
 
-    def __init__(self):
-        # Does not need to be class variable
-        self.network_identifier_map = {}
-        self.add_network("SiameseNet", SiameseNet3D)
-        self.add_network("ResNet", Resnet)
-        self.add_network("Facebook", FacebookNet)
-        self.add_network("ResNet3D", Resnet3D)
-        self.add_network("DenseNet3D", DenseNet3D)
-        self.add_network("DNet16", DNet16)
 
-    def add_network(self, key: str, netclass: TorchModel) -> None:
-        # NOT NECESSARY
+    @staticmethod
+    def add_network(key: str, netclass: TorchModel) -> None:
         """
         Add a network to the network identifier map.
 
@@ -417,11 +410,11 @@ class NetworkManager:
         :param netclass: Class for the network
         :return: None
         """
-        self.network_identifier_map[key.upper()] = netclass
+        NetworkManager.network_identifier_map[key.upper()] = netclass
 
 
-    def check_format(self, config: Dict) -> None:
-        # CAN BE STATIC!!!
+    @staticmethod
+    def check_format(config: Dict) -> None:
         """
         Check if all necessary fields are in the configuration file.
         :param config: Configuration dictionary
@@ -439,9 +432,8 @@ class NetworkManager:
             raise MalformedConfigError(
                 "The keyword 'train_config' must be in the config file"
             )
-
-    def load_configuration(self, config_path: str) -> Dict:
-        # CAN BE STATIC
+    @staticmethod
+    def load_configuration(config_path: str) -> Dict:
         """
         Load the configuration
         :param config_path: Path to config file.
@@ -449,11 +441,12 @@ class NetworkManager:
         """
         with open(config_path) as json_file:
             config = json.load(json_file)
-            self.check_format(config)
+            NetworkManager.check_format(config)
 
         return config
 
-    def create_network(self, configuration: Dict) -> TorchModel:
+    @staticmethod
+    def create_network(configuration: Dict) -> TorchModel:
         """
         Create the networking given in the configuration
         :param configuration:
@@ -462,10 +455,10 @@ class NetworkManager:
 
         identifier = configuration["identifier"].upper()
 
-        if identifier not in self.network_identifier_map:
+        if identifier not in NetworkManager.network_identifier_map:
             raise NetworkNotExistError(f"Network '{identifier}' does not exist")
         else:
-            modelclass = self.network_identifier_map[identifier]
+            modelclass = NetworkManager.network_identifier_map[identifier]
             config = configuration["network_config"]
             if "groups" in config:
                 '''

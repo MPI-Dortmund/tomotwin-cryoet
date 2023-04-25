@@ -375,28 +375,26 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import os
-import sys
 import json
-from typing import List
+import os
+from typing import List, Dict
 
+import mrcfile
 import numpy as np
 import pandas as pd
-import mrcfile
-from scipy.ndimage import zoom
 import tqdm
+from scipy.ndimage import zoom
 
 import tomotwin
-from tomotwin.modules.inference.locate_ui import (
-    LocateUI,
-    LocateMode,
-    LocateConfiguration,
-)
+from tomotwin.modules.common.preprocess import label_filename
+from tomotwin.modules.common.utils import check_for_updates
 from tomotwin.modules.inference.argparse_locate_ui import LocateArgParseUI
 from tomotwin.modules.inference.findmaxima_locator import FindMaximaLocator
+from tomotwin.modules.inference.locate_ui import (
+    LocateConfiguration,
+)
 from tomotwin.modules.inference.locator import Locator
-from tomotwin.modules.common.utils import check_for_updates
-from tomotwin.modules.common.preprocess import label_filename
+
 
 def read_map(path: str) -> pd.DataFrame:
     """
@@ -416,70 +414,14 @@ def read_map(path: str) -> pd.DataFrame:
     return df_map
 
 
-def extract_subclass_df(map: pd.DataFrame) -> List[pd.DataFrame]:
+def run_non_maximum_suppression(class_frames: List[pd.DataFrame], boxsize: int, size_dict: Dict[str,int]=None) -> List[pd.DataFrame]:
     '''
-    Extract a dataframe for each reference
-    :param map: Resullt from running map
+    Runs nun maximum supression for each target class
+    :param class_frames: Results for each target
+    :param boxsize: Boxsize to use
+    :param size_dict: Alternative to boxsize, a dictionary can be provided that maps the traget name to a boxsize.
+    :return: list of nms applied dataframes
     '''
-    sub_dfs = []
-    for i in range(len(map.attrs["references"])):
-        sub = map[["X", "Y", "Z", f"d_class_{i}"]]
-        sub.attrs["ref_name"] = map.attrs["references"][i]
-        sub.attrs["ref_index"] = i
-        sub_dfs.append(sub)
-    return sub_dfs
-
-
-def run(conf: LocateConfiguration):
-    out_path = conf.output_path
-    os.makedirs(out_path, exist_ok=True)
-    map_result = read_map(conf.map_path)
-
-    if conf.mode == LocateMode.FINDMAX:
-        if "stride" in map_result.attrs:
-            stride = map_result.attrs["stride"]
-        else:
-            raise ValueError(
-                "Stride unknown. It seems that you are using an invalid model"
-            )
-        if len(stride) == 1:
-            stride = stride * 3
-
-        if "window_size" in map_result.attrs:
-            window_size = map_result.attrs["window_size"]
-        else:
-            raise ValueError("Window size unknown. Stop.")
-
-        locator = FindMaximaLocator(
-            tolerance=conf.tolerance,
-            stride=stride,
-            window_size=window_size,
-            global_min=conf.global_min,
-        )
-        locator.output = out_path
-
-    sub_dfs = extract_subclass_df(map_result)
-    map_attrs = map_result.attrs
-    del map_result
-
-    from concurrent.futures import ProcessPoolExecutor as Pool
-
-    with Pool(conf.processes) as pool:
-        class_frames_and_vols = list(pool.map(locator.locate, sub_dfs))
-
-    size_dict = None
-    class_frames = [t[0] for t in class_frames_and_vols]
-    class_vols = [t[1] for t in class_frames_and_vols]
-
-    if conf.boxsize is None:
-        conf.boxsize = window_size
-    try:
-        conf.boxsize = int(conf.boxsize)
-    except ValueError:
-        print("Read boxsize from JSON")
-        with open(conf.boxsize, "r", encoding="utf8") as conf_sizes_file:
-            size_dict = json.load(conf_sizes_file)
-
     for class_id, class_frame in enumerate(class_frames):
         if len(class_frame) == 0:
             print("No particles for class", class_frame.attrs["name"])
@@ -493,28 +435,98 @@ def run(conf: LocateConfiguration):
                 print(
                     f"Can't find boxsize for {class_name}. Try to use extract PDB id and use this"
                 )
-
                 pdb = label_filename(class_name)
                 try:
-                    if pdb.lower() in size_dict:
-                        pdb_key = pdb.lower()
-                    elif pdb in size_dict:
-                        pdb_key = pdb.lower()
-                    size = size_dict[pdb_key]
+                    size = size_dict[pdb.lower()]
                 except KeyError as kr:
                     raise KeyError(
                         f"Can't find size for {class_name} in boxsize dictionary"
                     ) from kr
         else:
-            size = conf.boxsize
+            size = boxsize
 
         class_frame = Locator.nms(class_frame, size)
         class_frames[class_id] = class_frame
         print(
             f"Particles of class {class_name}: {len(class_frame)} (before NMS: {before_nms}) "
         )
+    return class_frames
 
-    located_particles = pd.concat(class_frames)
+def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.array]) -> None:
+    '''
+    Write heatmaps to disk
+    :param reference_names: Name of the references
+    :param out_path: Folder where the heatmaps will be written to.
+    :param heatmaps: List of heatmaps
+    :return: None
+    '''
+    assert len(reference_names) == len(heatmaps), "Unequal number of references and heatmaps"
+    for ref_i, ref_name in tqdm.tqdm(
+            enumerate(reference_names), desc="Write heatmaps"
+    ):
+        with mrcfile.new(
+                os.path.join(out_path, ref_name + ".mrc"), overwrite=True
+        ) as mrc:
+            print("Write heatmap", os.path.join(out_path, ref_name + ".mrc"))
+            vol = heatmaps[ref_i]
+            vol = vol.astype(np.float32)
+            vol = zoom(vol, 2)
+            vol = np.pad(vol, ((18, 18), (18, 18), (18, 18)), "constant")
+            vol = vol.swapaxes(0, 2)
+            mrc.set_data(vol)
+
+
+def run(conf: LocateConfiguration) -> None:
+    '''
+    Runs the locate procedure
+    :param conf: Configuration file from a UI
+    '''
+    out_path = conf.output_path
+    os.makedirs(out_path, exist_ok=True)
+    map_result = read_map(conf.map_path)
+
+    if "stride" in map_result.attrs:
+        stride = map_result.attrs["stride"]
+    else:
+        raise ValueError(
+            "Stride unknown. It seems that you are using an invalid model"
+        )
+    if len(stride) == 1:
+        stride = stride * 3
+
+    if "window_size" in map_result.attrs:
+        window_size = map_result.attrs["window_size"]
+    else:
+        raise ValueError("Window size unknown. Stop.")
+
+    size_dict = None
+    if conf.boxsize is None:
+        conf.boxsize = window_size
+    try:
+        conf.boxsize = int(conf.boxsize)
+    except ValueError:
+        print("Read boxsize from JSON")
+        with open(conf.boxsize, "r", encoding="utf8") as conf_sizes_file:
+            size_dict = json.load(conf_sizes_file)
+
+    locator = FindMaximaLocator(
+        tolerance=conf.tolerance,
+        stride=stride,
+        window_size=window_size,
+        global_min=conf.global_min,
+        processes=conf.processes
+    )
+    locator.output = out_path
+    map_attrs = map_result.attrs
+
+    class_frames_and_vols = locator.locate(map_result)
+    del map_result
+
+
+    class_vols = [t.attrs['heatmap'] for t in class_frames_and_vols if 'heatmap' in t.attrs]
+    class_frames_and_vols = run_non_maximum_suppression(class_frames_and_vols, conf.boxsize, size_dict=size_dict)
+
+    located_particles = pd.concat(class_frames_and_vols)
 
     located_particles.attrs["tt_version_locate"] = tomotwin.__version__
 
@@ -526,19 +538,7 @@ def run(conf: LocateConfiguration):
 
     # Write picking headmaps
     if conf.write_heatmaps:
-        for ref_i, ref_name in tqdm.tqdm(
-            enumerate(map_attrs["references"]), desc="Write heatmaps"
-        ):
-            with mrcfile.new(
-                os.path.join(out_path, ref_name + ".mrc"), overwrite=True
-            ) as mrc:
-                vol = class_vols[ref_i]
-                vol = vol.astype(np.float32)
-                vol = zoom(vol, 2)
-                vol = np.pad(vol, ((18, 18), (18, 18), (18, 18)), "constant")
-                vol = vol.swapaxes(0, 2)
-                mrc.set_data(vol)
-
+        write_heatmaps(map_attrs["references"], out_path, class_vols)
 
 def _main_():
     ui = LocateArgParseUI()

@@ -377,8 +377,8 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Tuple
 from enum import Enum, auto
+from typing import List, Tuple
 
 
 class EmbedMode(Enum):

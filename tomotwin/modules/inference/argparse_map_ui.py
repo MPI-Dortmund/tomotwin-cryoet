@@ -377,6 +377,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 import argparse
 import sys
+
 from tomotwin.modules.inference.map_ui import (
     MapUI,
     MapConfiguration,
