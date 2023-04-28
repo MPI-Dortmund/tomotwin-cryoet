@@ -61,7 +61,7 @@ Note: when generating targets to pick large proteins, it is best to outline poin
 
 Once you have outlined a target cluster for each protein of interest, it is time to save these targets to be used as picking references in this and additional tomograms.
 
-This can be done with :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Save cluster targets` and providing an output directory cluster_targets.temb will be written.
+This can be done with :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Save cluster targets` and providing an output directory where cluster_targets.temb will be written.
 
 
 7. Map your tomogram
