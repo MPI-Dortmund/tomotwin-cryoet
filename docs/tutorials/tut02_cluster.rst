@@ -36,11 +36,7 @@ Now that we have all the input files for the clustering workflow we can get star
 
     napari your_tomo_a10.mrc your_tomo_a10/clustering/your_tomo_a10_embedding_label_mask.mrci
 
-Next open the napari-tomotwin clustering tool via:
-
-:guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster UMAP embeddings`
-
-Choose the :guilabel:`Path to UMAP` by clicking on :guilabel:`Select file` and provide the path to your :file:`your_tomo_a10_embeddings.tumap`. Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings should appear in the plugin window.
+Next open the napari-tomotwin clustering tool via :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster UMAP embeddings`. Then choose the :guilabel:`Path to UMAP` by clicking on :guilabel:`Select file` and provide the path to your :file:`your_tomo_a10_embeddings.tumap`. Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings should appear in the plugin window.
 
 4. Find target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
