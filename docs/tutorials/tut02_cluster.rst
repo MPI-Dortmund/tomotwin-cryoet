@@ -45,7 +45,7 @@ Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings shou
 Outline a set of points in the 2D plot and these points will become highlighted in your tomogram. To select multiple targets at once hold :kbd:`Shift` when outlining points.
 
 .. image:: ../img/tutorial_2/img1.png
-    :width: 300
+    :width: 650
     :align: center
 
 .. admonition:: **Use log scale to see weak clusters*
@@ -57,15 +57,16 @@ Outline a set of points in the 2D plot and these points will become highlighted 
 Alternatively you can click in the tomogram and a small red circle appears around the embedding for this position in the tomogram.
 
 .. image:: ../img/tutorial_2/img3.png
-    :width: 300
+    :width: 650
     :align: center
 
 .. |mag| image:: ../img/tutorial_2/mag.png
+    :width: 20
 
 You can use the |mag| icon to change the displayed area/zoom and the :guilabel:`Home` icon to reset it.
 
 .. image:: ../img/tutorial_2/img2.png
-    :width: 300
+    :width: 650
     :align: center
 
 .. admonition:: **Improved centering**
@@ -73,7 +74,7 @@ You can use the |mag| icon to change the displayed area/zoom and the :guilabel:`
     When generating targets to pick large proteins, it is best to outline points that only lay in the center of your protein rather than covering the entire protein. Note that due to the way embeddings are generated from the tomogram, this likely won't be in the center of the cluster. This will help ensure that your resulting picks are centered.
 
 .. image:: ../img/tutorial_2/img4.png
-    :width: 300
+    :width: 650
     :align: center
 
 6. Save target clusters
