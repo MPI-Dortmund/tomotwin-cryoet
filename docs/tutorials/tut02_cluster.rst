@@ -16,11 +16,13 @@ We are working on a streamlined version of the clustering workflow. Will follow 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Now we will approximate the tomogram embeddings to 2D to allow for efficient visualization. To calculate a UMAP
+
 .. prompt:: bash $
 
     tomotwin_tools.py umap -i your_tomo_a10/embed/tomo/tomo_embeddings.temb -o your_tomo_a10/clustering/
 
 Additionally, we will generate a mask of the embeddings to allow us to track which UMAP values correspond to which points in the tomogram. To generate this mask:
+
 .. prompt:: bash $
 
     tomotwin_tools.py embedding_mask -i your_tomo_a10/embed/tomo/tomo_embeddings.temb -o your_tomo_a10/clustering/
@@ -29,6 +31,7 @@ Additionally, we will generate a mask of the embeddings to allow us to track whi
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 Now that we have all the input files for the clustering workflow we can get started in Napari. First open your tomogram and the embedding mask
+
 .. prompt:: bash $
 
     napari_boxmanager your_tomo_a10.mrc your_tomo_a10/clustering/your_tomo_a10_embedding_label_mask.mrci
