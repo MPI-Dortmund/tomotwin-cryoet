@@ -49,7 +49,7 @@ You can use the :guilabel:`Magnifying glass` icon to change the displayed area/z
 
 In some cases, using a log scale for the histogram may show clusters that are difficult to distinguish. To activate the log scale click on :guilabel:`Advanced settings` :guilabel:`Log scale`.
 
-You can select multiple targets at once by holding shift when outlining points.
+You can select multiple targets at once by holding :kbd:`Shift` when outlining points.
 
 .. admonition:: **Improved centering**
 
