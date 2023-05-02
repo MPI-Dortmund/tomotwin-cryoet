@@ -55,7 +55,7 @@ In some cases, using a log scale for the histogram may show clusters that are di
 
 You can select multiple targets at once by holding shift when outlining points.
 
-.. admonition:: **Improve centering**
+.. admonition:: **Improved centering**
 
     When generating targets to pick large proteins, it is best to outline points that only lay in the center of your protein rather than covering the entire protein. This will help ensure that your resulting picks are centered.
 
