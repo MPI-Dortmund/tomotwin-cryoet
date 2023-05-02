@@ -15,7 +15,7 @@ We are working on a streamlined version of the clustering workflow. Will follow 
 3. Estimate UMAP manifold and Generate Embedding Mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Now we will approximate the tomogram embeddings to 2D to allow for efficient visualization. To calculate a UMAP
+Now we will approximate the tomogram embeddings to 2D to allow for efficient visualization. To calculate a UMAP:
 
 .. prompt:: bash $
 
@@ -30,17 +30,17 @@ Additionally, we will generate a mask of the embeddings to allow us to track whi
 4. Load data for clustering in Napari
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Now that we have all the input files for the clustering workflow we can get started in Napari. First open your tomogram and the embedding mask
+Now that we have all the input files for the clustering workflow we can get started in Napari. First open your tomogram and the embedding mask by:
 
 .. prompt:: bash $
 
-    napari_boxmanager your_tomo_a10.mrc your_tomo_a10/clustering/your_tomo_a10_embedding_label_mask.mrci
+    napari your_tomo_a10.mrc your_tomo_a10/clustering/your_tomo_a10_embedding_label_mask.mrci
 
-Next open the napari-tomotwin clustering tool via
+Next open the napari-tomotwin clustering tool via:
 
 :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster UMAP embeddings`
 
-Choose the :guilabel:`Path to UMAP` by clicking on :guilabel:`Select file` and provide the path to your your_tomo_a10_embeddings.tumap.
+Choose the :guilabel:`Path to UMAP` by clicking on :guilabel:`Select file` and provide the path to your :file:`your_tomo_a10_embeddings.tumap`.
 
 Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings should appear in the plugin window.
 
@@ -64,7 +64,7 @@ Note: when generating targets to pick large proteins, it is best to outline poin
 
 Once you have outlined a target cluster for each protein of interest, it is time to save these targets to be used as picking references in this and additional tomograms.
 
-This can be done with :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Save cluster targets` and providing an output directory cluster_targets.temb will be written.
+This can be done with :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Save cluster targets` and providing an output directory :file:`cluster_targets.temb` will be written.
 
 
 7. Map your tomogram
