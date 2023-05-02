@@ -42,17 +42,39 @@ Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings shou
 4. Find target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Outline a set of points in the 2D plot and these points will become highlighted in your tomogram. Alternatively you can click in the tomogram and a small red circle appears around the embedding for this position in the tomogram.
+Outline a set of points in the 2D plot and these points will become highlighted in your tomogram. To select multiple targets at once hold :kbd:`Shift` when outlining points.
 
-.. admonition:: **Use log scale to see weak clusters**
+.. image:: ../img/tutorial_2/img1.png
+    :width: 300
+    :align: center
+
+.. admonition:: **Use log scale to see weak clusters*
     
     When the abundance of the protein is low, the clusters are often difficult to detect. Using a log scale for the plot may show clusters that are otherwise difficult to spot. To activate the log scale click on :guilabel:`Advanced settings` :guilabel:`Log scale`.
 
-You can use the :guilabel:`Magnifying glass` icon to change the displayed area/zoom and the :guilabel:`Home` icon to reset it. To select multiple targets at once hold :kbd:`Shift` when outlining points.
+.. admonition:: ** Locate particles in the UMAP by clicking in the tomogram*
+
+Alternatively you can click in the tomogram and a small red circle appears around the embedding for this position in the tomogram.
+
+.. image:: ../img/tutorial_2/img3.png
+    :width: 300
+    :align: center
+
+.. |mag| image:: ../img/tutorial_2/mag.png
+
+You can use the |mag| icon to change the displayed area/zoom and the :guilabel:`Home` icon to reset it.
+
+.. image:: ../img/tutorial_2/img2.png
+    :width: 300
+    :align: center
 
 .. admonition:: **Improved centering**
 
     When generating targets to pick large proteins, it is best to outline points that only lay in the center of your protein rather than covering the entire protein. This will help ensure that your resulting picks are centered.
+
+.. image:: ../img/tutorial_2/img4.png
+    :width: 300
+    :align: center
 
 6. Save target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -86,3 +108,4 @@ Content comes here :-)
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: text_modules/scale.rst
+
