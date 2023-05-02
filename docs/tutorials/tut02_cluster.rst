@@ -40,9 +40,7 @@ Next open the napari-tomotwin clustering tool via:
 
 :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster UMAP embeddings`
 
-Choose the :guilabel:`Path to UMAP` by clicking on :guilabel:`Select file` and provide the path to your :file:`your_tomo_a10_embeddings.tumap`.
-
-Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings should appear in the plugin window.
+Choose the :guilabel:`Path to UMAP` by clicking on :guilabel:`Select file` and provide the path to your :file:`your_tomo_a10_embeddings.tumap`. Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings should appear in the plugin window.
 
 4. Find target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -57,7 +55,9 @@ In some cases, using a log scale for the histogram may show clusters that are di
 
 You can select multiple targets at once by holding shift when outlining points.
 
-Note: when generating targets to pick large proteins, it is best to outline points that only lay in the center of your protein rather than covering the entire protein. This will help ensure that your resulting picks are centered.
+.. admonition:: **Improve centering**
+
+    When generating targets to pick large proteins, it is best to outline points that only lay in the center of your protein rather than covering the entire protein. This will help ensure that your resulting picks are centered.
 
 6. Save target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
