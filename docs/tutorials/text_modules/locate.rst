@@ -1,4 +1,4 @@
-Run `tomotwin_locate` to locate particles:
+To locate potential particles positions for each target run:
 
 .. prompt:: bash $
 
