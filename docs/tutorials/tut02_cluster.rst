@@ -41,15 +41,13 @@ Next open the napari-tomotwin clustering tool via :guilabel:`Plugins` -> :guilab
 4. Find target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Outline a set of points in the 2D plot and these points will become highlighted in your tomogram.
+Outline a set of points in the 2D plot and these points will become highlighted in your tomogram. Alternatively you can click in the tomogram and a small red circle appears around the embedding for this position in the tomogram.
 
-Alternatively you can click in the tomogram and a small red circle appears around the embedding for this position in the tomogram.
+.. admonition:: **Use log scale to see weak clusters**
+    
+    When the abundance of the protein is low, the clusters are often difficult to detect. Using a log scale for the plot may show clusters that are otherwise difficult to spot. To activate the log scale click on :guilabel:`Advanced settings` :guilabel:`Log scale`.
 
-You can use the :guilabel:`Magnifying glass` icon to change the displayed area/zoom and the :guilabel:`Home` icon to reset it.
-
-In some cases, using a log scale for the histogram may show clusters that are difficult to distinguish. To activate the log scale click on :guilabel:`Advanced settings` :guilabel:`Log scale`.
-
-You can select multiple targets at once by holding :kbd:`Shift` when outlining points.
+You can use the :guilabel:`Magnifying glass` icon to change the displayed area/zoom and the :guilabel:`Home` icon to reset it. To select multiple targets at once hold :kbd:`Shift` when outlining points.
 
 .. admonition:: **Improved centering**
 
