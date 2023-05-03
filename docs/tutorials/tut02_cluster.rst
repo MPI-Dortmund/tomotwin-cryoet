@@ -94,18 +94,38 @@ The map command will calculate the pairwise distances/similarity between the tar
 
     tomotwin_map.py distance -r your_tomo_a10/clustering/cluster_targets.temb -v your_tomo_a10/embed/tomo/your_tomo_a10_embeddings.temb -o your_tomo_a10/map/
 
-6. Localize potential particles
+8. Localize potential particles
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: text_modules/locate.rst
 
 
-7. Inspect your particles with the boxmanager
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Open your particles with the following command or drag the files into an open napari window:
 
-Content comes here :-)
+.. prompt:: bash $
 
-8. Scale your coordinates
+    napari_boxmanager tomo/your_tomo_a10.mrc out/locate/located.tloc
+
+.. image:: ../img/tutorial_1/start.png
+   :width: 650
+
+The example shown here is from the SHREC competition. In the table on the right you see 12 references. I selected the :guilabel:`model_8_5MRC_86.mrc`, which is a ribosome.
+Below the table, you need to adjust the :guilabel:`metric min` and :guilabel:`size min` thresholds until you like the results. After the optimization is done the result might look similar to this:
+
+.. image:: ../img/tutorial_1/after_optim.png
+   :width: 650
+
+In the left panel, select the references you would like to pick (ctrl click on windows, cmd click on mac to select multiple). You can now press :guilabel:`File` -> :guilabel:`Save selected Layer(s)`. In the dialog, change the :guilabel:`Files of type` to  :guilabel:`Box Manager`. Choose filename like :guilabel:`selected_coords.tloc`. Make sure that the file ending is :file:`.tloc`.
+
+To convert the :file:`.tloc` file into :file:`.coords` you need to run
+
+.. prompt:: bash $
+
+    tomotwin_pick.py -l coords.tloc -o coords/
+
+You will find coordinate file for each reference in :file:`.coords` format in the :file:`coords/` folder.
+
+9. Scale your coordinates
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: text_modules/scale.rst
