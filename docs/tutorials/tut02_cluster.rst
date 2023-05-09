@@ -54,7 +54,7 @@ Outline a set of points in the 2D plot and these points will become highlighted 
 
 Alternatively you can click in the tomogram and a small red circle appears around the embedding for this position in the tomogram.
 
-.. image:: ../img/tutorial_2/img3.png
+.. figure:: ../img/tutorial_2/img3.png
     :width: 650
     :align: center
 
