@@ -44,7 +44,7 @@ Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings shou
 
 Outline a set of points in the 2D plot and these points will become highlighted in your tomogram. To select multiple targets at once hold :kbd:`Shift` when outlining points.
 
-.. image:: ../img/tutorial_2/img1.png
+.. figure:: ../img/tutorial_2/img1.png
     :width: 650
     :align: center
 
