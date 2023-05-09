@@ -73,9 +73,9 @@ You can use the |mag| icon to change the displayed area/zoom and the :guilabel:`
 
     When generating targets to pick large proteins, it is best to outline points that only lay in the center of your protein rather than covering the entire protein. Note that due to the way embeddings are generated from the tomogram, this likely won't be in the center of the cluster. This will help ensure that your resulting picks are centered.
 
-.. image:: ../img/tutorial_2/img4.png
-    :width: 650
-    :align: center
+    .. image:: ../img/tutorial_2/img4.png
+        :width: 650
+        :align: center
 
 6. Save target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
