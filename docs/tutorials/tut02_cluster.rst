@@ -48,11 +48,9 @@ Outline a set of points in the 2D plot and these points will become highlighted 
     :width: 650
     :align: center
 
-.. admonition:: **Use log scale to see weak clusters*
+.. admonition:: **Use log scale to see weak clusters**
     
     When the abundance of the protein is low, the clusters are often difficult to detect. Using a log scale for the plot may show clusters that are otherwise difficult to spot. To activate the log scale click on :guilabel:`Advanced settings` :guilabel:`Log scale`.
-
-.. admonition:: ** Locate particles in the UMAP by clicking in the tomogram*
 
 Alternatively you can click in the tomogram and a small red circle appears around the embedding for this position in the tomogram.
 
@@ -63,11 +61,13 @@ Alternatively you can click in the tomogram and a small red circle appears aroun
 .. |mag| image:: ../img/tutorial_2/mag.png
     :width: 20
 
+
 You can use the |mag| icon to change the displayed area/zoom and the :guilabel:`Home` icon to reset it.
 
 .. image:: ../img/tutorial_2/img2.png
     :width: 650
     :align: center
+
 
 .. admonition:: **Improved centering**
 
