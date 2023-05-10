@@ -10,6 +10,9 @@ from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
 class MakeTargetEmbeddings(TomoTwinTool):
     def get_command_name(self) -> str:
+        '''
+        :return: The name of the command
+        '''
         return "make_target"
 
     def create_parser(self, parentparser: ArgumentParser) -> ArgumentParser:
@@ -49,6 +52,12 @@ class MakeTargetEmbeddings(TomoTwinTool):
     def make_targets(
             self, embeddings: pd.DataFrame, clusters: pd.DataFrame
     ) -> pd.DataFrame:
+        '''
+        Calculates the average embedding for each target (Cluster)
+        :param embeddings: Embeddings
+        :param clusters: Label for each embedding to row a cluster
+        :return: List of average embeddings
+        '''
         embeddings = embeddings.drop(
             columns=["X", "Y", "Z", "filepath"], errors="ignore"
         )
@@ -69,6 +78,10 @@ class MakeTargetEmbeddings(TomoTwinTool):
         return targets
 
     def run(self, args):
+        '''
+        runs the tool :-)
+        '''
+
         print("Read embeddings")
         embeddings = pd.read_pickle(args.input)
 
