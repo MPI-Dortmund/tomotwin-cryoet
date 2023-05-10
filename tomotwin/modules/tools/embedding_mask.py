@@ -393,6 +393,9 @@ class EmbeddingMaskTool(TomoTwinTool):
     """
 
     def get_command_name(self) -> str:
+        '''
+        :return: Name of the command
+        '''
         return "embedding_mask"
 
     def create_parser(self, parentparser: ArgumentParser) -> ArgumentParser:

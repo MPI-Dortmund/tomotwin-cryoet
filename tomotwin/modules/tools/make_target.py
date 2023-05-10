@@ -1,19 +1,22 @@
-from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 import argparse
-from argparse import ArgumentParser
-import pandas as pd
-import numpy as np
 import os
+from argparse import ArgumentParser
+
+import numpy as np
+import pandas as pd
+
+from tomotwin.modules.tools.tomotwintool import TomoTwinTool
+
 
 class MakeTargetEmbeddings(TomoTwinTool):
     def get_command_name(self) -> str:
-        return 'make_target'
+        return "make_target"
 
-    def create_parser(self, parentparser : ArgumentParser) -> ArgumentParser:
-        '''
+    def create_parser(self, parentparser: ArgumentParser) -> ArgumentParser:
+        """
         :param parentparser: ArgumentPaser where the subparser for this tool needs to be added.
         :return: Argument parser that was added to the parentparser
-        '''
+        """
 
         parser = parentparser.add_parser(
             self.get_command_name(),
@@ -21,26 +24,42 @@ class MakeTargetEmbeddings(TomoTwinTool):
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
 
-        parser.add_argument('-i', '--input', type=str, required=True,
-                            help='Embeddings that were used for clustering')
+        parser.add_argument(
+            "-i",
+            "--input",
+            type=str,
+            required=True,
+            help="Embeddings that were used for clustering",
+        )
 
-        parser.add_argument('-c', '--clusters', type=str, required=True,
-                            help='Output csv file from clustering')
+        parser.add_argument(
+            "-c",
+            "--clusters",
+            type=str,
+            required=True,
+            help="Output csv file from clustering",
+        )
 
-        parser.add_argument('-o', '--output', type=str, required=True,
-                            help='Output folder')
+        parser.add_argument(
+            "-o", "--output", type=str, required=True, help="Output folder"
+        )
 
         return parser
 
-    def make_targets(self, embeddings: pd.DataFrame, clusters: pd.DataFrame) -> pd.DataFrame:
-
-        embeddings = embeddings.drop(columns=["X", "Y", "Z", "filepath"], errors="ignore")
+    def make_targets(
+            self, embeddings: pd.DataFrame, clusters: pd.DataFrame
+    ) -> pd.DataFrame:
+        embeddings = embeddings.drop(
+            columns=["X", "Y", "Z", "filepath"], errors="ignore"
+        )
         targets = []
         target_names = []
         for cluster in set(clusters):
-            if cluster==0:
+            if cluster == 0:
                 continue
-            target = embeddings.loc[clusters==cluster,:].astype(np.float32).mean(axis=0)
+            target = (
+                embeddings.loc[clusters == cluster, :].astype(np.float32).mean(axis=0)
+            )
             target = target.to_frame().T
             targets.append(target)
             target_names.append(f"cluster_{cluster}")
@@ -49,21 +68,22 @@ class MakeTargetEmbeddings(TomoTwinTool):
         targets["filepath"] = target_names
         return targets
 
-
     def run(self, args):
         print("Read embeddings")
         embeddings = pd.read_pickle(args.input)
 
         print("Read clusters")
-        clusters = pd.read_csv(args.clusters)['MANUAL_CLUSTER_ID']
+        clusters = pd.read_csv(args.clusters)["MANUAL_CLUSTER_ID"]
 
-        assert len(embeddings)==len(clusters),"Cluster and embedding file are not compatible."
+        assert len(embeddings) == len(
+            clusters
+        ), "Cluster and embedding file are not compatible."
 
         print("Make targets")
         targets = self.make_targets(embeddings, clusters)
 
         print("Write targets")
         os.makedirs(args.output, exist_ok="True")
-        pth_ref = os.path.join(args.output,"cluster.temb")
+        pth_ref = os.path.join(args.output, "cluster.temb")
 
         targets.to_pickle(pth_ref)
