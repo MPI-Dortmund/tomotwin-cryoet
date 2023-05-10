@@ -37,6 +37,8 @@ class UmapTool(TomoTwinTool):
                             help='Output folder')
         parser.add_argument('-m', '--model', type=str, required=False, default=None,
                             help='Previously fitted model')
+        parser.add_argument('-n', '--ncomponents', type=int, required=False, default=2,
+                            help='Number of components')
         parser.add_argument('--neighbors', type=int, required=False, default=200,
                             help='Previously fitted model')
         parser.add_argument('--fit_sample_size', type=int, default=400000,
@@ -52,6 +54,7 @@ class UmapTool(TomoTwinTool):
             fit_sample_size: int,
             transform_chunk_size: int,
             reducer: cuml.UMAP = None,
+            ncomponents=2,
             neighbors: int = 200) -> typing.Tuple[ArrayLike, cuml.UMAP]:
         print("Prepare data")
 
@@ -61,7 +64,7 @@ class UmapTool(TomoTwinTool):
         if reducer is None:
             reducer = cuml.UMAP(
                 n_neighbors=neighbors,
-                n_components=2,
+                n_components=ncomponents,
                 n_epochs=None,  # means automatic selection
                 min_dist=0.0,
                 random_state=19
@@ -95,9 +98,17 @@ class UmapTool(TomoTwinTool):
                                                           fit_sample_size=args.fit_sample_size,
                                                           transform_chunk_size=args.chunk_size,
                                                           reducer=model,
-                                                          neighbors=args.neighbors)
+                                                          neighbors=args.neighbors,
+                                                          ncomponents=args.ncomponents)
 
         os.makedirs(out_pth,exist_ok=True)
         fname = os.path.splitext(os.path.basename(args.input))[0]
-        pd.DataFrame(umap_embeddings).to_pickle(os.path.join(out_pth,fname+".tumap"))
+        df_embeddings = pd.DataFrame(umap_embeddings)
+        print("Write embeedings to disk")
+        df_embeddings.columns = [f"umap_{i}" for i in range(umap_embeddings.shape[1])]
+        df_embeddings.to_pickle(os.path.join(out_pth,fname+".tumap"))
+        print("Write model to disk")
         pickle.dump(fitted_umap, open(os.path.join(out_pth,fname+"_umap_model.pkl"), "wb"))
+
+
+        print("Done")

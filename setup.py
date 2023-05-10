@@ -1,8 +1,6 @@
 # read the contents of your README file
 from os import path
-
 from setuptools import setup
-
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -51,10 +49,9 @@ setup(
             'tomotwin_locate.py = tomotwin.locate_main:_main_',
             'tomotwin_pick.py = tomotwin.pick_main:_main_',
             'tomotwin_scripts_evaluate.py = scripts.evaluation:_main_',
-            'tomotwin_scripts_lasso.py = scripts.lasso:_main_',
-            'tomotwin_scripts_train_optuna.py = scripts.train_optuna:_main_',
             'tomotwin_dev_matrix.py = scripts.pdb_similarity_matrix:_main_',
             'tomotwin_dev_json2tloc.py = scripts.json2tloc:_main_',
+            'tomotwin_dev_optuna.py = tomotwin.train_optuna:_main_',
             'tomotwin_dev_molmapbbox.py = scripts.molmapsbbox:_main_',
             'tomotwin_tools.py = tomotwin.tools_main:_main_'
         ]},
