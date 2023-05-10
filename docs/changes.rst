@@ -1,6 +1,13 @@
 Changes
 =======
 
+Version 0.4.0
+*************
+
+* Official clustering workflow release. Please checkout the updated installation instructions and in depth tutorial.
+* Added important tools like ``tomotwin_tools umap`` and ``tomotwin_tools embeddings_mask``
+* Added more unit tests
+
 Version 0.3.0
 *************
 
