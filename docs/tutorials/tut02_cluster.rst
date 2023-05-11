@@ -47,7 +47,6 @@ Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings shou
     A video demo of selecting clusters with the Napari tool can be found here:
 
     ..  youtube:: PaJlaPAfqtI
-       :width: 70%
        :align: center
 
 Outline a set of points in the 2D plot and these points will become highlighted in your tomogram. To select multiple targets at once hold :kbd:`Shift` when outlining points.
