@@ -27,7 +27,7 @@ Here we assume that you don't have napari installed. Please do:
     mamba create -y -n napari-tomotwin -c conda-forge python=3.10 napari=0.4.17 pyqt pip
     conda activate napari-tomotwin
 
-Install the required plguins `napari-boxmanager` and `napari-tomotwin` via [pip]:
+Install the required plugins `napari-boxmanager` and `napari-tomotwin` via pip:
 
 .. prompt:: bash $
 
