@@ -42,6 +42,8 @@ Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings shou
 5. Find target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
+The next step is to generate potential targets from the 2D umap using the interactive lasso (freehand) tool from the napari-clusters-plotter.
+
 .. admonition:: **Check out the video demo of selecting clusters**
 
     ..  youtube:: PaJlaPAfqtI
