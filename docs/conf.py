@@ -18,9 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'TomoTwin'
-copyright = '2022, MPI-Dortmund'
-author = 'Gavin Rice, Thorsten Wagner'
-
+copyright = '2023, MPI-Dortmund'
+author = 'Gavin Rice, Thorsten Wagner, Markus Stabrin'
 
 # -- General configuration ---------------------------------------------------
 
@@ -28,6 +27,8 @@ author = 'Gavin Rice, Thorsten Wagner'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.intersphinx',
+    'sphinxcontrib.youtube'
 ]
 '''
 extensions = [

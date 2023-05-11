@@ -39,8 +39,15 @@ Now that we have all the input files for the clustering workflow we can get star
 Next open the napari-tomotwin clustering tool via :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster UMAP embeddings`. Then choose the :guilabel:`Path to UMAP` by clicking on :guilabel:`Select file` and provide the path to your :file:`your_tomo_a10_embeddings.tumap`. 
 Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings should appear in the plugin window.
 
-4. Find target clusters
+5. Find target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
+
+The next step is to generate potential targets from the 2D umap using the interactive lasso (freehand) tool from the napari-clusters-plotter.
+
+.. admonition:: **Check out the video demo of selecting clusters**
+
+    ..  youtube:: PaJlaPAfqtI
+       :align: center
 
 Outline a set of points in the 2D plot and these points will become highlighted in your tomogram. To select multiple targets at once hold :kbd:`Shift` when outlining points.
 
