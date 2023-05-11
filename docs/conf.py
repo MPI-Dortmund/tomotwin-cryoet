@@ -28,6 +28,8 @@ author = 'Gavin Rice, Thorsten Wagner'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.intersphinx',
+    'sphinxcontrib.youtube'
 ]
 '''
 extensions = [
