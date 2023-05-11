@@ -27,18 +27,11 @@ Here we assume that you don't have napari installed. Please do:
     mamba create -y -n napari-tomotwin -c conda-forge python=3.10 napari=0.4.17 pyqt pip
     conda activate napari-tomotwin
 
-You can install `napari-boxmanager` via [pip]:
+Install the required plguins `napari-boxmanager` and `napari-tomotwin` via [pip]:
 
 .. prompt:: bash $
 
-    pip install napari-boxmanager
-
-Additionally you need the `napari-tomotwin` and the `cluster plotter plugin` plugin via [pip]:
-
-.. prompt:: bash $
-
-    pip install git+https://github.com/thorstenwagner/napari-clusters-plotter.git@heatmap_and_force_img
-    pip install napari-tomotwin
+    pip install napari-boxmanager napari-tomotwin
 
 
 3. Link Napari
