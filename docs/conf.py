@@ -18,9 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'TomoTwin'
-copyright = '2022, MPI-Dortmund'
-author = 'Gavin Rice, Thorsten Wagner'
-
+copyright = '2023, MPI-Dortmund'
+author = 'Gavin Rice, Thorsten Wagner, Markus Stabrin'
 
 # -- General configuration ---------------------------------------------------
 
