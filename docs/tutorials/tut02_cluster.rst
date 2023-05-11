@@ -42,9 +42,7 @@ Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings shou
 5. Find target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. admonition:: **Video Tutorial**
-
-    A video demo of selecting clusters with the Napari tool can be found here:
+.. admonition:: **Check out the video demo of selecting clusters**
 
     ..  youtube:: PaJlaPAfqtI
        :align: center
