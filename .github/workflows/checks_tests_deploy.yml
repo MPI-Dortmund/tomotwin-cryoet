@@ -12,7 +12,7 @@ jobs:
       run:
         shell: bash -el {0}
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
     - name: Set up conda ${{ matrix.python-version }}
       uses: conda-incubator/setup-miniconda@v2
       with:
@@ -26,30 +26,30 @@ jobs:
     - run: conda init bash
     - run: |
         which python
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install setuptools setuptools_scm pylint tox tox-gh-actions pytest pytest-coverage twine build
-          pip install .
-      - name: Debug Info
-        run: |
-          which python
-          pip freeze
-      - name: Analysing the code with pylint
-        run: |
-          pylint -E $(git ls-files '*.py')
-      - name: Tests
-        run: |
-          pytest -v --cov=./ --cov-report=xml --cov-config=.coveragerc
-        env:
-          PLATFORM: ${{ matrix.platform }}
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-      - name: Build and publish
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.TWINE_API_KEY }}
-        run: |
-          git tag
-          python -m build .
-          twine upload dist/*
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools setuptools_scm pylint tox tox-gh-actions pytest pytest-coverage twine build
+        pip install .
+    - name: Debug Info
+      run: |
+        which python
+        pip freeze
+    - name: Analysing the code with pylint
+      run: |
+        pylint -E $(git ls-files '*.py')
+    - name: Tests
+      run: |
+        pytest -v --cov=./ --cov-report=xml --cov-config=.coveragerc
+      env:
+        PLATFORM: ${{ matrix.platform }}
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.TWINE_API_KEY }}
+      run: |
+        git tag
+        python -m build .
+        twine upload dist/*
