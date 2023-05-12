@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+title: TomoTwin
+message: "If you want to cite this repository, please use the metadata from this file."
+type: software
+authors:
+  - given-names: Gavin
+    family-names: Rice
+  - given-names: Markus
+    family-names: Stabrin
+  - given-names: Thorsten
+    family-names: Wagner
+    email: thorsten.wagner@mpi-dortmund.mpg.de
+    orcid: 'https://orcid.org/0000-0002-1550-8275'
+identifiers:
+  - type: doi
+    value: 10.1101/2022.06.24.497279
+    description: TomoTwin Preprint
+repository-code: 'https://github.com/MPI-Dortmund/tomotwin-cryoet'
+url: 'https://cryolo.readthedocs.io/en/stable/'
+abstract: "cryo-ET particle picking using triplet networks and metric learning."
+keywords:
+  - cryo-em
+  - cryo-et
+  - metric-learning
+  - deep learning
+  - picking
+license: MPL-2.0
