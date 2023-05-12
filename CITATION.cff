@@ -7,14 +7,17 @@ authors:
     family-names: Rice
     email: gavin.rice@mpi-dortmund.mpg.de
     orcid: 'https://orcid.org/0000-0002-7151-5904'
-  - given-names: Markus
-    family-names: Stabrin
-    email: markus.stabrin@mpi-dortmund.mpg.de
-    orcid: 'https://orcid.org/0000-0003-0191-6419'
   - given-names: Thorsten
     family-names: Wagner
     email: thorsten.wagner@mpi-dortmund.mpg.de
     orcid: 'https://orcid.org/0000-0002-1550-8275'
+  - given-names: Markus
+    family-names: Stabrin
+    email: markus.stabrin@mpi-dortmund.mpg.de
+    orcid: 'https://orcid.org/0000-0003-0191-6419'
+  - given-names: Daniel
+    family-names: Prumbaum
+    email: daniel.prumbaum@mpi-dortmund.mpg.de
   - given-names: Stefan
     family-names: Raunser
     email: stefan.raunser@mpi-dortmund.mpg.de
