@@ -26,15 +26,15 @@ jobs:
     - run: conda init bash
     - run: |
         which python
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools setuptools_scm pylint tox tox-gh-actions pytest pytest-coverage twine build
-        pip install .
-    - name: Debug Info
-      run: |
-        which python
-        pip freeze
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools setuptools_scm pylint tox tox-gh-actions pytest pytest-coverage twine build
+          pip install .
+      - name: Debug Info
+        run: |
+          which python
+          pip freeze
       - name: Analysing the code with pylint
         run: |
           pylint -E $(git ls-files '*.py')
