@@ -29,7 +29,7 @@ setup(
         "numpy >= 1.20.0",
         "scikit-learn",
         "scikit-image",
-        "pystardb==0.3.1",
+        "pystardb>=0.4.2",
         "pandas >= 1.3",
         "pytorch-metric-learning==1.6.3",
         "numba",
