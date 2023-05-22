@@ -13,7 +13,7 @@ There are three main steps to install TomoTwin:
 
 .. prompt:: bash $
 
-    mamba create -n tomotwin -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.9 pytorch==1.12 torchvision pandas scipy numpy matplotlib pytables cuML=22.06 cudatoolkit=11.6 'protobuf>3.20' tensorboard  optuna mysql-connector-python
+    mamba create -n tomotwin -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.10 pytorch==1.13.1 torchvision pandas scipy numpy matplotlib pytables cuML=23.04 cudatoolkit=11.8 'protobuf>3.20' tensorboard  optuna mysql-connector-python
     conda activate tomotwin
     pip install tomotwin-cryoet
 

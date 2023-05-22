@@ -29,8 +29,8 @@ setup(
         "numpy >= 1.20.0",
         "scikit-learn",
         "scikit-image",
-        "pystardb==0.3.1",
-        "pandas >= 1.3",
+        "pystardb>=0.4.2",
+        "pandas <= 2", # Because rapids does not support pandas > 1.5.3
         "pytorch-metric-learning==1.6.3",
         "numba",
         "tabulate",

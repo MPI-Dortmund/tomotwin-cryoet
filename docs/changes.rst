@@ -1,6 +1,15 @@
 Changes
 =======
 
+Version 0.4.3
+*************
+
+* Fix numba related issue by updating various dependencies (https://github.com/MPI-Dortmund/tomotwin-cryoet/issues/20):
+    - Python 3.9 -> Python 3.10
+    - Rapids 22.04 -> 23.04
+    - CUDA 11.6 -> CUDA 11.8
+* Updating pyStarDB from 0.3.2 -> 0.4.2
+
 Version 0.4.0
 *************
 
