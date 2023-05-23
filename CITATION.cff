@@ -24,8 +24,14 @@ authors:
     orcid: 'https://orcid.org/0000-0001-9373-3016'
 identifiers:
   - type: doi
+    value: 10.1038/s41592-023-01878-z
+    description: TomoTwin publication
+  - type: doi
     value: 10.1101/2022.06.24.497279
     description: TomoTwin Preprint
+  - type: doi
+    description: This is the collection of archived snapshots of all versions of TomoTwin
+    value: 10.5281/zenodo.7956443
 repository-code: 'https://github.com/MPI-Dortmund/tomotwin-cryoet'
 url: 'https://cryolo.readthedocs.io/en/stable/'
 abstract: "cryo-ET particle picking using triplet networks and metric learning."
