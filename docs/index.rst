@@ -32,6 +32,11 @@ User Guide: full table of contents
    tutorials/tutorials_overview
    changes
 
+Citation
+========
+
+Rice, G., Wagner, T., Stabrin, M. et al. TomoTwin: generalized 3D localization of macromolecules in cryo-electron tomograms with structural data mining. Nat Methods (2023). https://doi.org/10.1038/s41592-023-01878-z
+
 Help
 ====
 
