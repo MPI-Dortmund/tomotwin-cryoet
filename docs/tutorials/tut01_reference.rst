@@ -17,7 +17,7 @@ In this tutorial we describe how to use TomoTwin for picking in tomograms using 
 1. Downscale your Tomogram to 10 Å
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. include:: text_modules/downscale.rst
+.. include:: text_modules/downscale_reference.rst
 
 2. Pick and extract your reference
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
