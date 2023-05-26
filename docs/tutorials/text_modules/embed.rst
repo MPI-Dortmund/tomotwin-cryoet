@@ -1,6 +1,6 @@
 I assume that you already have downloaded the general model.
 
-To embed your tomogram using two GPUs do:
+To embed your tomogram using two GPUs use:
 
 .. prompt:: bash $
 

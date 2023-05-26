@@ -3,7 +3,7 @@ Tutorial 2: Clustering based particle picking
 
 1. Downscale your Tomogram to 10 Å
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. include:: text_modules/downscale.rst
+.. include:: text_modules/downscale_clustering.rst
 
 2. Embed your Tomogram
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -17,6 +17,11 @@ Now we will approximate the tomogram embeddings to 2D to allow for efficient vis
 .. prompt:: bash $
 
     tomotwin_tools.py umap -i your_tomo_a10/embed/tomo/tomo_embeddings.temb -o your_tomo_a10/clustering/
+
+.. note::
+
+    If you encounter an out of memory error here, you may need to reduce the :guilabel:`fit_sample_size` and/or :guilabel:`chunk_size` values (default 400,000).
+
 
 Additionally, we will generate a mask of the embeddings to allow us to track which UMAP values correspond to which points in the tomogram. To generate this mask:
 
