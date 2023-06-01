@@ -1,8 +1,7 @@
 Developer information
 =====================
 
-This section contains some developer information in the future.
-
+This section contains some information snippets for developers. Will be extended in the future.
 
 Reading output formats
 **********************
