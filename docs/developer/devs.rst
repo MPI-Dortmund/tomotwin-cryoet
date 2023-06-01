@@ -23,7 +23,7 @@ Implementing new architectures
 Adding new CNN architectures is straightforward in TomoTwin.
 
 1. Add a class for your network in ``modules/networks/`` and implement the interface defined by ``modules/networks/torchmodel.py``
-2. Add your newly defined made network to the ``network_identifier_map`` dictonary in the ```modules/networks/networkmanager.py`` module.
+2. Add your newly defined made network to the ``network_identifier_map`` dictonary in the ``modules/networks/networkmanager.py`` module.
 3. Create a network configuration file like in ``resources/configs/config_siamese.json``. The ``network_config`` entry should match your ``__init__`` method your new network.
 
 Now you are in principle set to train your network (see ``How to train TomoTwin``).
