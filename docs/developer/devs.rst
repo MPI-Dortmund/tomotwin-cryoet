@@ -12,6 +12,7 @@ They can all be read by:
 
 .. code:: python
 
+    import pandas as pd
     df = pd.read_pickle("path/to/a/tomotwin/output/file")
 
 
