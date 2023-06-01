@@ -6,7 +6,7 @@ This section contains some information snippets for developers. Will be extended
 Reading output formats
 **********************
 
-While TomoTwin writes files with various extensions (".temb", ".tmap", ".tloc", ".tumap"), they are basically all pickled pandas dataframes.
+While TomoTwin writes files with various extensions (``.temb``, ``.tmap``, ``.tloc``, ``.tumap``), they are basically all pickled pandas dataframes.
 They can all be read by:
 
 .. code:: python
