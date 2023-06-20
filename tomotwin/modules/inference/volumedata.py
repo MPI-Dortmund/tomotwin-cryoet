@@ -401,9 +401,9 @@ class VolumeDataset(ABC):
     def __getitem__(self, itemindex) -> np.array:
         """Return the an item with a certain index"""
 
+    @abstractmethod
     def get_localization(self, itemindex) -> Tuple[int, int, int]:
         """Returns the center positions of an item"""
-        return self.center_coords[itemindex]
 
 
 class FileNameVolumeDataset(VolumeDataset):
