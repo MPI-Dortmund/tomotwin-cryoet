@@ -40,6 +40,21 @@ class MyTestCase(unittest.TestCase):
         boxes = boxer.box(tomogram=tomo)
         self.assertEqual(len(boxes), 1)
 
+    def test_SlidingWindowBoxer_stride2_mask_wrongshape(self):
+        import numpy as np
+        tomo = np.random.randn(9, 9, 9)
+        mask = np.zeros(shape=(8, 8, 8)) # Wrong mask shape!
+        mask[3:6, 3:6, 3:6] = 1
+        mask = mask != 0
+
+        boxer = SlidingWindowBoxer(
+            stride=3,
+            box_size=3,
+            mask=mask
+        )
+        self.assertRaises(AssertionError,boxer.box,tomo)
+
+
 
 if __name__ == '__main__':
     unittest.main()
