@@ -470,6 +470,8 @@ class SlidingWindowBoxer(Boxer):
                 raise InvalidZRangeConfiguration()
 
             tomogram = tomogram[self.zrange[0]:self.zrange[1]]
+        if self.mask is not None:
+            assert tomogram.shape == self.mask.shape, f"Tomogram shape ({tomogram.shape}) and mask shape ({self.mask.shape}) need to be equal."
 
         sliding_window_volumes, self.center_coords = SlidingWindowBoxer._calc_sliding_volumes(
             tomogram=tomogram,
@@ -481,7 +483,6 @@ class SlidingWindowBoxer(Boxer):
         # Mask if necessary
         if self.mask is not None:
             def _check_in_mask(row):
-                print(row)
                 c = tuple(row.astype(int).astype(int).tolist())
                 return self.mask[c]
             mask = np.apply_along_axis(_check_in_mask, axis=1, arr=self.center_coords)
