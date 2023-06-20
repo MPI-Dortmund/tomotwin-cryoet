@@ -380,6 +380,12 @@ from abc import ABC, abstractmethod
 from typing import Tuple, List, Callable
 import itertools
 import numpy as np
+from dataclasses import dataclass
+
+@dataclass
+class VolumeROI:
+    indicis: np.array
+    center_coords: np.array
 
 
 class VolumeDataset(ABC):
@@ -395,7 +401,9 @@ class VolumeDataset(ABC):
     def __getitem__(self, itemindex) -> np.array:
         """Return the an item with a certain index"""
 
-
+    def get_localization(self, itemindex) -> Tuple[int, int, int]:
+        """Returns the center positions of an item"""
+        return self.center_coords[itemindex]
 
 
 class FileNameVolumeDataset(VolumeDataset):
@@ -413,22 +421,35 @@ class FileNameVolumeDataset(VolumeDataset):
     def __len__(self) -> int:
         return len(self.volumes)
 
+    def get_localization(self, itemindex) -> Tuple[int, int, int]:
+        return None
+
 
 class SimpleVolumeData(VolumeDataset):
     """
     Represents a volume dataset that came from a sliding window.
     """
 
-    def __init__(self, volumes: np.array):
+    def __init__(self,
+                 volumes: np.array,
+                 roi: VolumeROI):
         """
-        :param volumes: array with shape (N,BS,BS,BS), where was BS is the box size and X,Y,Z relate
+        :param volumes: array with shape (X,Y,Z,BS,BS,BS), where was BS is the box size and X,Y,Z relate
         to the position of the subvolume.
         """
         self.volumes = volumes
+        self.roi = roi
 
     def __len__(self) -> int:
-        return self.volumes.shape[0]
+        return self.roi.indicis.shape[0]
+
 
     def __getitem__(self, itemindex) -> np.array:
-        vol = self.volumes[itemindex]
-        return vol
+        index = tuple(self.roi.indicis[itemindex])
+        v = self.volumes[index]
+        return v
+
+    def get_localization(self, itemindex) -> Tuple[int, int, int]:
+        return self.roi.center_coords[itemindex]
+
+

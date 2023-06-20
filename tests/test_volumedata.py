@@ -16,17 +16,16 @@ class MyTestCase(unittest.TestCase):
         box_size = 3
         stride = 2
 
-        sliding_window_strides, center_coords = SlidingWindowBoxer._calc_sliding_volumes(
+        sliding_window_strides = SlidingWindowBoxer._calc_sliding_volumes(
             tomogram=vol,
             stride=(stride,stride,stride),
-            box_size=box_size
-
-
+            window_shape=(box_size,box_size,box_size)
         )
-        dat = SimpleVolumeData(volumes=sliding_window_strides)
+        roi = SlidingWindowBoxer._calc_volume_roi(sliding_window_strides,stride=(stride,stride,stride),box_size=box_size)
+        dat = SimpleVolumeData(volumes=sliding_window_strides, roi=roi)
 
         for i in range(len(dat)):
-            loc = center_coords[i]
+            loc = roi.center_coords[i]
 
             sub = dat[i]
             if loc[0] == pos0 and loc[1] == pos1 and loc[2] == pos2:

@@ -393,6 +393,7 @@ class EmbedArgParseUI(EmbedUI):
         self.stride = None
         self.mode = None
         self.zrange = None
+        self.maskpth = None
 
     def run(self, args=None) -> None:
         parser = self.create_parser()
@@ -413,6 +414,7 @@ class EmbedArgParseUI(EmbedUI):
             self.zrange = args.zrange
             if len(self.stride) == 1:
                 self.stride = self.stride*3
+            self.maskpth = args.mask
 
     def get_embed_configuration(self) -> EmbedConfiguration:
         conf = EmbedConfiguration(
@@ -422,7 +424,8 @@ class EmbedArgParseUI(EmbedUI):
             mode=self.mode,
             batchsize=self.batchsize,
             stride=self.stride,
-            zrange=self.zrange
+            zrange=self.zrange,
+            maskpth=self.maskpth
         )
         return conf
 
@@ -465,6 +468,8 @@ class EmbedArgParseUI(EmbedUI):
             required=True,
             help="All output files are written in that path.",
         )
+
+
 
     @staticmethod
     def create_tomo_parser(parser):
@@ -521,6 +526,14 @@ class EmbedArgParseUI(EmbedUI):
             default=None,
             nargs=2,
             help="Minimum z and maximum z for to run the sliding window on. Handy to skip the void volume in order to speed up the embedding.",
+        )
+
+        parser.add_argument(
+            "--mask",
+            type=str,
+            required=False,
+            default=None,
+            help="Path to binary mask to define embedding region (mrc format). All values != 0 are interpreted as 'True'.",
         )
 
     def create_parser(self) -> argparse.ArgumentParser:

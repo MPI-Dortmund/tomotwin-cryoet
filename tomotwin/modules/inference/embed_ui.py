@@ -408,6 +408,7 @@ class EmbedConfiguration:
     batchsize: int
     stride: int = None
     zrange: Tuple[int,int] = None
+    maskpth: str = None
 
 
 class EmbedUI(ABC):

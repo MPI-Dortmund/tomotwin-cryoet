@@ -407,7 +407,7 @@ def sliding_window_embedding(
     embeddings = embedor.embed(volume_data=boxes)
     positions = []
     for i in range(embeddings.shape[0]):
-        positions.append(boxer.get_localization(i))
+        positions.append(boxes.get_localization(i))
     positions = np.array(positions)
     embeddings = np.hstack([positions, embeddings])
 
@@ -480,7 +480,8 @@ def embed_tomogram(
         tomo: np.array,
         embedor: Embedor,
         conf: EmbedConfiguration,
-        window_size: int) -> pd.DataFrame:
+        window_size: int,
+        mask: np.array = None) -> pd.DataFrame:
     """
     Embeds a tomogram
     :return: DataFrame of embeddings
@@ -495,7 +496,7 @@ def embed_tomogram(
         )  # here we need to take make sure that the box size is subtracted etc.
 
     boxer = SlidingWindowBoxer(
-        box_size=window_size, stride=conf.stride, zrange=conf.zrange
+        box_size=window_size, stride=conf.stride, zrange=conf.zrange, mask=mask
     )
     embeddings = sliding_window_embedding(tomo=tomo, boxer=boxer, embedor=embedor)
 
@@ -557,7 +558,10 @@ def run(conf: EmbedConfiguration) -> None:
     window_size = get_window_size(conf.model_path)
     if conf.mode == EmbedMode.TOMO:
         tomo = -1 * MrcFormat.read(conf.volumes_path)  # -1 to invert the contrast
-        embed_tomogram(tomo, embedor, conf, window_size)
+        mask = None
+        if conf.maskpth is not None:
+            mask = MrcFormat.read(conf.maskpth)!=0
+        embed_tomogram(tomo, embedor, conf, window_size, mask)
     elif conf.mode == EmbedMode.VOLUMES:
         paths = []
         for p in conf.volumes_path:
