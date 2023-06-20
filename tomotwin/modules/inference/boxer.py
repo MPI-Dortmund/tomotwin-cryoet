@@ -494,8 +494,6 @@ class SlidingWindowBoxer(Boxer):
 
             tomogram = tomogram[self.zrange[0]:self.zrange[1]]
 
-        if self.mask is not None:
-            assert tomogram.shape == self.mask.shape, f"Tomogram shape ({tomogram.shape}) and mask shape ({self.mask.shape}) need to be equal."
 
         sliding_window_volumes = SlidingWindowBoxer._calc_sliding_volumes(
             tomogram=tomogram,

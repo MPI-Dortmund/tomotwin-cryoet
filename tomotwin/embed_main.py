@@ -486,6 +486,10 @@ def embed_tomogram(
     Embeds a tomogram
     :return: DataFrame of embeddings
     """
+
+    if mask is not None:
+        assert tomo.shape == mask.shape, f"Tomogram shape ({tomo.shape}) and mask shape ({mask.shape}) need to be equal."
+
     if conf.zrange:
         hb = int((window_size - 1) // 2)
         minz = max(0, conf.zrange[0] - hb)
