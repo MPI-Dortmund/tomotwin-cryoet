@@ -1,5 +1,6 @@
 import unittest
-from tomotwin.modules.inference.volumedata import SlidingWindowVolumeData
+from tomotwin.modules.inference.volumedata import SimpleVolumeData
+from tomotwin.modules.inference.boxer import SlidingWindowBoxer
 import numpy as np
 import numpy.lib.stride_tricks as tricks
 
@@ -15,18 +16,18 @@ class MyTestCase(unittest.TestCase):
         box_size = 3
         stride = 2
 
-        window_shape = (box_size, box_size, box_size)
-        sliding_window_views = tricks.sliding_window_view(
-            vol, window_shape=window_shape
-        )
+        sliding_window_strides, center_coords = SlidingWindowBoxer._calc_sliding_volumes(
+            tomogram=vol,
+            stride=(stride,stride,stride),
+            box_size=box_size
 
-        sliding_window_strides = sliding_window_views[
-                                 :: stride, :: stride, :: stride
-                                 ]
-        dat = SlidingWindowVolumeData(volumes=sliding_window_strides, stride=stride, boxsize=box_size)
+
+        )
+        dat = SimpleVolumeData(volumes=sliding_window_strides)
 
         for i in range(len(dat)):
-            loc = dat.get_localization(i)
+            loc = center_coords[i]
+
             sub = dat[i]
             if loc[0] == pos0 and loc[1] == pos1 and loc[2] == pos2:
                 self.assertEqual(sub[1, 1, 1], val)

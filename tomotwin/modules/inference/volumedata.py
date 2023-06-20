@@ -375,10 +375,10 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import itertools
+
 from abc import ABC, abstractmethod
 from typing import Tuple, List, Callable
-
+import itertools
 import numpy as np
 
 
@@ -395,13 +395,11 @@ class VolumeDataset(ABC):
     def __getitem__(self, itemindex) -> np.array:
         """Return the an item with a certain index"""
 
-    @abstractmethod
-    def get_localization(self, itemindex) -> Tuple[int, int, int]:
-        """Returns the center positions of an item"""
+
 
 
 class FileNameVolumeDataset(VolumeDataset):
-    """Here the subvolumes are representent by individual files"""
+    """Here the subvolumes are represented by individual files"""
 
     def __init__(self, volumes: List[str], filereader: Callable[[str], np.array]):
         self.volumes = volumes
@@ -412,47 +410,25 @@ class FileNameVolumeDataset(VolumeDataset):
         volume = self.filereader(pth)
         return volume
 
-    def get_localization(self, itemindex) -> Tuple[float, float, float]:
-        return None
-
     def __len__(self) -> int:
         return len(self.volumes)
 
 
-class SlidingWindowVolumeData(VolumeDataset):
+class SimpleVolumeData(VolumeDataset):
     """
-    Represents a volume datset that came from a sliding window.
+    Represents a volume dataset that came from a sliding window.
     """
 
-    def __init__(self, volumes: np.array, stride: Tuple, boxsize: int, zrange: Tuple[int, int] = None):
+    def __init__(self, volumes: np.array):
         """
-        :param volumes: array with shape (X,Y,Z,BS,BS,BS), where was BS is the box size and X,Y,Z relate
+        :param volumes: array with shape (N,BS,BS,BS), where was BS is the box size and X,Y,Z relate
         to the position of the subvolume.
         """
         self.volumes = volumes
-        self.stride = stride
-        self.boxsize = boxsize
-        self.minz = None
-        self.maxz = None
-
-        self.center_coords = {}
-        self.indicies = {}
-
-
-        self.indicies = np.array(list(itertools.product(range(volumes.shape[0]), range(volumes.shape[1]),range(volumes.shape[2]))))
-        self.center_coords = self.indicies * self.stride + (self.boxsize-1)/2
-        if zrange:
-            self.center_coords[:,0] = zrange[0] + self.center_coords[:,0]
-
 
     def __len__(self) -> int:
-        return len(self.center_coords)
+        return self.volumes.shape[0]
 
     def __getitem__(self, itemindex) -> np.array:
-        location = self.indicies[itemindex]
-        vol = self.volumes[tuple(location)]
+        vol = self.volumes[itemindex]
         return vol
-
-    def get_localization(self, itemindex) -> Tuple[float, float, float]:
-        """Return the center position"""
-        return (self.center_coords[itemindex][0],self.center_coords[itemindex][1],self.center_coords[itemindex][2])

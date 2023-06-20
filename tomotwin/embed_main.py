@@ -407,7 +407,7 @@ def sliding_window_embedding(
     embeddings = embedor.embed(volume_data=boxes)
     positions = []
     for i in range(embeddings.shape[0]):
-        positions.append(boxes.get_localization(i))
+        positions.append(boxer.get_localization(i))
     positions = np.array(positions)
     embeddings = np.hstack([positions, embeddings])
 

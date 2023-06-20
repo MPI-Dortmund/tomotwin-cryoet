@@ -379,9 +379,12 @@ from abc import ABC, abstractmethod
 from typing import Union, Tuple
 
 import numpy.lib.stride_tricks as tricks
+import numpy as np
 from numpy.typing import NDArray
 
-from tomotwin.modules.inference.volumedata import SlidingWindowVolumeData
+import itertools
+
+from tomotwin.modules.inference.volumedata import SimpleVolumeData
 
 
 class Boxer(ABC):
@@ -389,8 +392,12 @@ class Boxer(ABC):
     Abstract representation of a boxer
     """
     @abstractmethod
-    def box(self, tomogram: NDArray) -> SlidingWindowVolumeData:
+    def box(self, tomogram: NDArray) -> SimpleVolumeData:
         """Transforms tomogram into a set of boxes. Returns an array of arrays (boxes)"""
+
+    @abstractmethod
+    def get_localization(self, itemindex) -> Tuple[int, int, int]:
+        """Returns the center positions of an item"""
 
 class InvalidZRangeConfiguration(Exception):
     ...
@@ -400,7 +407,10 @@ class SlidingWindowBoxer(Boxer):
     Sliding window boxer
     """
 
-    def __init__(self, box_size: int, stride: Union[int, Tuple], zrange: Tuple[int,int] = None):
+    def __init__(self, box_size: int,
+                 stride: Union[int, Tuple],
+                 zrange: Tuple[int,int] = None,
+                 mask: np.array = None):
         self.box_size = box_size
         self.stride = stride
         if isinstance(self.stride,int):
@@ -410,12 +420,48 @@ class SlidingWindowBoxer(Boxer):
         else:
             self._stride_x, self._stride_y, self._stride_z = stride
 
-        self.center_coords = None
         self.zrange = zrange
+        self.center_coords = None
+        self.indicies = None
+        self.mask = mask
 
 
+    @staticmethod
+    def _calc_sliding_volumes(tomogram: np.array,
+                              stride: Tuple[int, int, int],
+                              box_size: int,
+                              zrange=None) -> Tuple[np.array, np.array]:
+        """
+        Calculate the sliding subvolumes (views) and returns their center coordinates
+        :return:
+        """
 
-    def box(self, tomogram: NDArray) -> SlidingWindowVolumeData:
+        window_shape = (box_size, box_size, box_size)
+
+        sliding_window_views = tricks.sliding_window_view(
+            tomogram, window_shape=window_shape
+        )
+
+        sliding_window_strides = sliding_window_views[
+                                 ::stride[2], :: stride[1], :: stride[0]
+                                 ]
+
+        ## Calculate center coordinates
+        indicies = np.array(
+            list(itertools.product(
+                range(sliding_window_strides.shape[0]),
+                range(sliding_window_strides.shape[1]),
+                range(sliding_window_strides.shape[2]))
+            )
+        )
+        center_coords = indicies * stride + (box_size - 1) / 2
+        if zrange is not None:
+            center_coords[:, 0] = zrange[0] + center_coords[:, 0]
+        sliding_window_strides = sliding_window_strides.reshape(np.prod(sliding_window_strides.shape[:3]), *sliding_window_strides.shape[3:])
+        return sliding_window_strides, center_coords
+
+
+    def box(self, tomogram: NDArray) -> SimpleVolumeData:
         """
         Transforms tomogram into a set of boxes
         """
@@ -425,22 +471,30 @@ class SlidingWindowBoxer(Boxer):
 
             tomogram = tomogram[self.zrange[0]:self.zrange[1]]
 
-        window_shape = (self.box_size, self.box_size, self.box_size)
-        sliding_window_views = tricks.sliding_window_view(
-            tomogram, window_shape=window_shape
-        )
-
-
-
-        sliding_window_strides = sliding_window_views[
-            ::self._stride_z, :: self._stride_y, :: self._stride_x
-        ]
-
-        data = SlidingWindowVolumeData(
-            volumes=sliding_window_strides,
-            boxsize=self.box_size,
-            stride=(self._stride_x,self._stride_y,self._stride_z),
+        sliding_window_volumes, self.center_coords = SlidingWindowBoxer._calc_sliding_volumes(
+            tomogram=tomogram,
+            stride=(self._stride_x, self._stride_y, self._stride_z),
+            box_size=self.box_size,
             zrange=self.zrange
         )
 
+        # Mask if necessary
+        if self.mask is not None:
+            def _check_in_mask(row):
+                print(row)
+                c = tuple(row.astype(int).astype(int).tolist())
+                return self.mask[c]
+            mask = np.apply_along_axis(_check_in_mask, axis=1, arr=self.center_coords)
+            sliding_window_volumes = sliding_window_volumes[mask]
+
+
+
+        data = SimpleVolumeData(
+            volumes=sliding_window_volumes,
+        )
+
         return data
+
+    def get_localization(self, itemindex) -> Tuple[int, int, int]:
+        """Returns the center positions of an item"""
+        return self.center_coords[itemindex]
