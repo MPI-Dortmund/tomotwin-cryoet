@@ -375,18 +375,15 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
+import itertools
 from abc import ABC, abstractmethod
-from typing import Union, Tuple, List
+from typing import Union, Tuple
 
-import numpy.lib.stride_tricks as tricks
 import numpy as np
+import numpy.lib.stride_tricks as tricks
 from numpy.typing import NDArray
 
-import itertools
-
 from tomotwin.modules.inference.volumedata import SimpleVolumeData, VolumeROI
-
-
 
 
 class Boxer(ABC):
@@ -516,5 +513,3 @@ class SlidingWindowBoxer(Boxer):
         )
 
         return data
-
-

@@ -377,10 +377,11 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 
 from abc import ABC, abstractmethod
-from typing import Tuple, List, Callable
-import itertools
-import numpy as np
 from dataclasses import dataclass
+from typing import Tuple, List, Callable
+
+import numpy as np
+
 
 @dataclass
 class VolumeROI:
@@ -451,5 +452,3 @@ class SimpleVolumeData(VolumeDataset):
 
     def get_localization(self, itemindex) -> Tuple[int, int, int]:
         return self.roi.center_coords[itemindex]
-
-
