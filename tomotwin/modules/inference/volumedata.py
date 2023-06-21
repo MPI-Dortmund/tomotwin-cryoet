@@ -385,6 +385,9 @@ import numpy as np
 
 @dataclass
 class VolumeROI:
+    '''
+    Represents a region of interesion within a volume
+    '''
     indicis: np.array
     center_coords: np.array
 
