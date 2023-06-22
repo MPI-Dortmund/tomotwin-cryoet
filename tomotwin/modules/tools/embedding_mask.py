@@ -389,7 +389,7 @@ from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
 class EmbeddingMaskTool(TomoTwinTool):
     """
-    Tools to create mask with label IDs for tomogram embeddings
+    Tools to create ROI of embedding
     """
 
     def get_command_name(self) -> str:
