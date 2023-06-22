@@ -23,11 +23,7 @@ Now we will approximate the tomogram embeddings to 2D to allow for efficient vis
     If you encounter an out of memory error here, you may need to reduce the :guilabel:`fit_sample_size` and/or :guilabel:`chunk_size` values (default 400,000).
 
 
-Additionally, we will generate a mask of the embeddings to allow us to track which UMAP values correspond to which points in the tomogram. To generate this mask:
-
-.. prompt:: bash $
-
-    tomotwin_tools.py embedding_mask -i out/embed/tomo/tomo_embeddings.temb -o out/clustering/
+Additionally, it generated a mask (`tomo_embeddings_label_mask.mrci`) of the embeddings to allow us to track which UMAP values correspond to which points in the tomogram.
 
 4. Load data for clustering in Napari
 ^^^^^^^^^^^^^^^^^^^^^^^^

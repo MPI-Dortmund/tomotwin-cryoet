@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from numpy.typing import ArrayLike
 from tqdm import tqdm
+import mrcfile
 
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
@@ -86,6 +87,33 @@ class UmapTool(TomoTwinTool):
 
         return embedding, reducer
 
+    def create_embedding_mask(self, embeddings: pd.DataFrame):
+        """
+        Creates mask where each individual subvolume of the running windows gets an individual ID
+        """
+        print("Create embedding mask")
+        Z = embeddings.attrs["tomogram_input_shape"][0]
+        Y = embeddings.attrs["tomogram_input_shape"][1]
+        X = embeddings.attrs["tomogram_input_shape"][2]
+        stride = embeddings.attrs["stride"][0]
+        embeddings = embeddings.reset_index(drop=True)
+        segmentation_mask = embeddings[["Z", "Y", "X"]].copy()
+        segmentation_mask = segmentation_mask.reset_index()
+        empty_array = np.zeros(shape=(Z, Y, X))
+        for row in tqdm(
+                segmentation_mask.itertuples(index=True, name="Pandas"),
+                total=len(segmentation_mask),
+        ):
+            X = int(row.X)
+            Y = int(row.Y)
+            Z = int(row.Z)
+            label = int(row.index)
+            empty_array[(Z): (Z + stride), (Y): (Y + stride), (X): (X + stride)] = (
+                    label + 1
+            )
+        segmentation_array = empty_array.astype(np.float32)
+
+        return segmentation_array
 
     def run(self, args):
         print("Read data")
@@ -101,14 +129,28 @@ class UmapTool(TomoTwinTool):
                                                           neighbors=args.neighbors,
                                                           ncomponents=args.ncomponents)
 
+
+
         os.makedirs(out_pth,exist_ok=True)
         fname = os.path.splitext(os.path.basename(args.input))[0]
         df_embeddings = pd.DataFrame(umap_embeddings)
+
         print("Write embeedings to disk")
         df_embeddings.columns = [f"umap_{i}" for i in range(umap_embeddings.shape[1])]
         df_embeddings.to_pickle(os.path.join(out_pth,fname+".tumap"))
-        print("Write model to disk")
-        pickle.dump(fitted_umap, open(os.path.join(out_pth,fname+"_umap_model.pkl"), "wb"))
 
+        print("Write umap model to disk")
+        pickle.dump(fitted_umap, open(os.path.join(out_pth, fname + "_umap_model.pkl"), "wb"))
+
+        print("Calculate label mask and write it to disk")
+        embedding_mask = self.create_embedding_mask(embeddings)
+        with mrcfile.new(
+                os.path.join(
+                    args.output,
+                    fname + "_label_mask.mrci",
+                ),
+                overwrite=True,
+        ) as mrc:
+            mrc.set_data(embedding_mask)
 
         print("Done")
