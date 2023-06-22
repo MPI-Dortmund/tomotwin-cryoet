@@ -378,12 +378,11 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 import argparse
 import os
 from argparse import ArgumentParser
+from typing import Callable
 
 import mrcfile
 import numpy as np
 from scipy import ndimage as ndimg
-from skimage.transform import rescale
-
 
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
@@ -424,31 +423,28 @@ class EmbeddingMaskTool(TomoTwinTool):
 
         return parser
 
-    def create_embedding_mask(self, img: np.array) -> np.array:
-        """
-        Creates mask where each individual subvolume of the running windows gets an individual ID
-        """
+    def threshold_mode(self, img: np.array) -> np.array:
         print("Background subtraction")
         filtered = ndimg.gaussian_filter(img, (10, 10, 10))
-
         background_removed = img - filtered
 
         print("Threshold estimation")
         blurred = ndimg.gaussian_filter(background_removed, (2, 2, 2))
-
         min_img = ndimg.minimum_filter(blurred, 5 * 2)
-        with mrcfile.new('min.mrc', overwrite=True) as mrc:
-            mrc.set_data(min_img.astype(np.float32))
 
-        min_img_rescaled = rescale(min_img, 0.25)
-
-        from skimage.filters import threshold_multiotsu as thr
-        t = thr(min_img_rescaled, classes=3)[1] * 0.75
-
-        print(f"Found  threshold: {t}")
+        hist = np.histogram(min_img, bins=256)
+        b = np.argmax(hist[0])
+        t = hist[1][b]
+        print(f"Found  threshold: {t:2f}")
         mask = min_img < t
+        return mask
 
-        print(f"Masked out: {100 - np.sum(mask) * 100 / np.prod(mask.shape)}%")
+    def create_embedding_mask(self, img: np.array, mask_calc: Callable[[np.array], np.array]) -> np.array:
+        """
+        Calculating the mask
+        """
+        mask = mask_calc(img)
+        print(f"Masked out: {100 - np.sum(mask) * 100 / np.prod(mask.shape):.2f}%")
 
         return mask
 
@@ -461,7 +457,7 @@ class EmbeddingMaskTool(TomoTwinTool):
             img = mrc.data
 
         print("Calculate mask")
-        mask = self.create_embedding_mask(img=img)
+        mask = self.create_embedding_mask(img=img, mask_calc=self.threshold_mode)
         print("Write results to disk")
         os.makedirs(args.output, exist_ok=True)
         with mrcfile.new(
