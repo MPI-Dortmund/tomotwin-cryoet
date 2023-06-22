@@ -381,8 +381,9 @@ from argparse import ArgumentParser
 
 import mrcfile
 import numpy as np
-import pandas as pd
-from tqdm import tqdm
+from scipy import ndimage as ndimg
+from skimage.transform import rescale
+
 
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
@@ -406,7 +407,7 @@ class EmbeddingMaskTool(TomoTwinTool):
 
         parser = parentparser.add_parser(
             self.get_command_name(),
-            help="Generates an label mask for use in the clustering workflow with Napari",
+            help="(EXPERIMENTAL) Generates an ROI mask to speed up embeddings",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         parser.add_argument(
@@ -414,7 +415,7 @@ class EmbeddingMaskTool(TomoTwinTool):
             "--input",
             type=str,
             required=True,
-            help="Embeddings file to use for clustering",
+            help="Tomogram file that needs to be embedded",
         )
 
         parser.add_argument(
@@ -423,50 +424,52 @@ class EmbeddingMaskTool(TomoTwinTool):
 
         return parser
 
-    def create_embedding_mask(self, embeddings: pd.DataFrame):
+    def create_embedding_mask(self, img: np.array) -> np.array:
         """
         Creates mask where each individual subvolume of the running windows gets an individual ID
         """
-        print("Create embedding mask")
-        Z = embeddings.attrs["tomogram_input_shape"][0]
-        Y = embeddings.attrs["tomogram_input_shape"][1]
-        X = embeddings.attrs["tomogram_input_shape"][2]
-        stride = embeddings.attrs["stride"][0]
-        embeddings = embeddings.reset_index(drop=True)
-        segmentation_mask = embeddings[["Z", "Y", "X"]].copy()
-        segmentation_mask = segmentation_mask.reset_index()
-        empty_array = np.zeros(shape=(Z, Y, X))
-        for row in tqdm(
-                segmentation_mask.itertuples(index=True, name="Pandas"),
-                total=len(segmentation_mask),
-        ):
-            X = int(row.X)
-            Y = int(row.Y)
-            Z = int(row.Z)
-            label = int(row.index)
-            empty_array[(Z): (Z + stride), (Y): (Y + stride), (X): (X + stride)] = (
-                    label + 1
-            )
-        segmentation_array = empty_array.astype(np.float32)
+        print("Background subtraction")
+        filtered = ndimg.gaussian_filter(img, (10, 10, 10))
 
-        return segmentation_array
+        background_removed = img - filtered
+
+        print("Threshold estimation")
+        blurred = ndimg.gaussian_filter(background_removed, (2, 2, 2))
+
+        min_img = ndimg.minimum_filter(blurred, 5 * 2)
+        with mrcfile.new('min.mrc', overwrite=True) as mrc:
+            mrc.set_data(min_img.astype(np.float32))
+
+        min_img_rescaled = rescale(min_img, 0.25)
+
+        from skimage.filters import threshold_multiotsu as thr
+        t = thr(min_img_rescaled, classes=3)[1] * 0.75
+
+        print(f"Found  threshold: {t}")
+        mask = min_img < t
+
+        print(f"Masked out: {100 - np.sum(mask) * 100 / np.prod(mask.shape)}%")
+
+        return mask
 
     def run(self, args):
         """
         Runs the tools
         """
         print("Read data")
-        embeddings = pd.read_pickle(args.input)
-        print("Generate label mask")
-        segmentation_layer = self.create_embedding_mask(embeddings=embeddings)
+        with mrcfile.open(args.input) as mrc:
+            img = mrc.data
+
+        print("Calculate mask")
+        mask = self.create_embedding_mask(img=img)
         print("Write results to disk")
         os.makedirs(args.output, exist_ok=True)
         with mrcfile.new(
                 os.path.join(
                     args.output,
-                    os.path.splitext(os.path.basename(args.input))[0] + "_label_mask.mrci",
+                    os.path.splitext(os.path.basename(args.input))[0] + "_mask.mrc",
                 ),
                 overwrite=True,
         ) as mrc:
-            mrc.set_data(segmentation_layer)
+            mrc.set_data(mask.astype(np.float32))
         print("Done")
