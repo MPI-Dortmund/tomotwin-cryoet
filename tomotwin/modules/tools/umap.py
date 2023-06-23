@@ -5,11 +5,11 @@ import typing
 from argparse import ArgumentParser
 
 import cuml
+import mrcfile
 import numpy as np
 import pandas as pd
 from numpy.typing import ArrayLike
 from tqdm import tqdm
-import mrcfile
 
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
@@ -96,22 +96,17 @@ class UmapTool(TomoTwinTool):
         Y = embeddings.attrs["tomogram_input_shape"][1]
         X = embeddings.attrs["tomogram_input_shape"][2]
         stride = embeddings.attrs["stride"][0]
-        embeddings = embeddings.reset_index(drop=True)
-        segmentation_mask = embeddings[["Z", "Y", "X"]].copy()
-        segmentation_mask = segmentation_mask.reset_index()
-        empty_array = np.zeros(shape=(Z, Y, X))
-        for row in tqdm(
-                segmentation_mask.itertuples(index=True, name="Pandas"),
-                total=len(segmentation_mask),
-        ):
-            X = int(row.X)
-            Y = int(row.Y)
-            Z = int(row.Z)
-            label = int(row.index)
-            empty_array[(Z): (Z + stride), (Y): (Y + stride), (X): (X + stride)] = (
-                    label + 1
-            )
-        segmentation_array = empty_array.astype(np.float32)
+        segmentation_array = np.zeros(shape=(Z, Y, X), dtype=np.float32)
+        z = np.array(embeddings["Z"], dtype=int)
+        y = np.array(embeddings["Y"], dtype=int)
+        x = np.array(embeddings["X"], dtype=int)
+
+        values = np.array(range(1, len(x) + 1))
+        for stride_x in tqdm(list(range(stride))):
+            for stride_y in range(stride):
+                for stride_z in range(stride):
+                    index = (z + stride_z, y + stride_y, x + stride_x)
+                    segmentation_array[index] = values
 
         return segmentation_array
 
