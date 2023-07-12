@@ -8,7 +8,7 @@ To embed your tomogram using two GPUs use:
 
 .. admonition:: Speed up embedding using ROI mask
 
-    With TomoTwin 0.4.4, the emedding command supports the use of masks. With masks you can define which regions of your tomogram get actually embedded and therefore speedup the embbeding.
+    With TomoTwin 0.5, the emedding command supports the use of masks. With masks you can define which regions of your tomogram get actually embedded and therefore speedup the embbeding.
     We also provide new tools that calculates mask that excludes areas that probably does not contain any protein. You can run it with:
 
     .. prompt:: bash $
