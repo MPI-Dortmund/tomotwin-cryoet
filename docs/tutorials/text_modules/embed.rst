@@ -25,5 +25,3 @@ To embed your tomogram using two GPUs and batchsize of 256 use:
     .. prompt:: bash $
 
         napari your_tomo_a10.mrc out_mask/your_tomo_a10_mask.mrc
-
-    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -m LATEST_TOMOTWIN_MODEL.pth -v your_tomo_a10.mrc -o out/embed/tomo/
