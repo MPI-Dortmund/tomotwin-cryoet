@@ -4,11 +4,9 @@ Changes
 Version 0.5.0 (upcoming)
 *************
 
-.. admonition:: **CHANGES**
-
-    * The ``tomotwin_embed.py tomogram`` command has now a optional ``--mask`` option to select region of interestes for embeddings.
-    * The ``tomotwin_tools.py embedding_mask`` now calculates a mask that masks out some portions of the tomogram volume that probably do not contain proteins. Using the generated mask when running ``tomotwin_embed.py tomogram``, the embeddings step is 2 times faster. CAUTION: In TomoTwin 0.4 the ``embeddings_mask`` command calculated a label mask for the clustering workflow. This functionality now happens automatically during the calculation of the umap (``tomotwin_tools.py umap``).
-    * For the clustering workflow, you can noew calculate the medoid instead of arithmetic mean. This should be a much better representation of the cluster center.
+* The ``tomotwin_embed.py tomogram`` command has now a optional ``--mask`` option to select region of interestes for embeddings.
+* The ``tomotwin_tools.py embedding_mask`` now calculates a mask that masks out some portions of the tomogram volume that probably do not contain proteins. Using the generated mask when running ``tomotwin_embed.py tomogram``, the embeddings step is 2 times faster. CAUTION: In TomoTwin 0.4 the ``embeddings_mask`` command calculated a label mask for the clustering workflow. This functionality now happens automatically during the calculation of the umap (``tomotwin_tools.py umap``).
+* For the clustering workflow, you can noew calculate the medoid instead of arithmetic mean. This should be a much better representation of the cluster center.
 
 
 Version 0.4.3
