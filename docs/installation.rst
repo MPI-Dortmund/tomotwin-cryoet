@@ -58,7 +58,7 @@ Download latest model
 
 :Number of proteins: 120
 
-:Link: `Zendodo <https://doi.org/10.5281/zenodo.8137931>`_
+:Link: `Zenodo <https://doi.org/10.5281/zenodo.8137931>`_
 
 System requirements
 ^^^^^^^^^^^^^^^^^^^
