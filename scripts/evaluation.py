@@ -1,15 +1,18 @@
 import argparse
-import numpy as np
-from typing import Dict, List, Callable
-import pandas as pd
-from tabulate import tabulate
+import glob
+import json
 import os
 import re
-import glob
+from typing import Dict, List, Callable
+
+import numpy as np
+import pandas as pd
 import tqdm
-from tomotwin.modules.inference.locator import Locator
+from tabulate import tabulate
+
 from tomotwin.modules.common.preprocess import label_filename
-import json
+from tomotwin.modules.inference.locator import Locator
+
 
 def create_subvolume_parser(parser_parent):
 
@@ -145,10 +148,14 @@ def _add_size(df, size, size_dict = None) -> pd.DataFrame:
         df["height"] = 0
         df["depth"] = 0
         for row_index, row in df.iterrows():
-            size = size_dict[str(row["class"]).upper()]
-            df.at[row_index,"width"] = size
-            df.at[row_index, "height"] = size
-            df.at[row_index, "depth"] = size
+            try:
+                s = size_dict[str(row["class"]).upper()]
+            except KeyError:
+                print(f"Can't find {str(row['class']).upper()} in size dict. Use default size {size}")
+                s = size
+            df.at[row_index, "width"] = s
+            df.at[row_index, "height"] = s
+            df.at[row_index, "depth"] = s
 
     return df
 
@@ -260,8 +267,11 @@ class SubvolumeEvaluator():
 
     @staticmethod
     def extract_pdb_from_filename(filename):
-        regex = "\d[a-zA-Z0-9]{3}" # https://regex101.com/r/rZi0TZ/1
-        return re.search(regex, filename).group(0)
+        from tomotwin.modules.common.preprocess import label_filename
+        return label_filename(filename)
+        # regex = "id(\d[a-zA-Z0-9]{3})" # https://regex101.com/r/rZi0TZ/1
+        regex = "id(?P<PDB>\d[a-zA-Z0-9]{3})"
+        return re.search(regex, filename).group("PDB")
 
     @staticmethod
     def print_stats(stats, pdb_id_converter, output_path: str=''):
