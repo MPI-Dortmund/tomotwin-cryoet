@@ -383,8 +383,12 @@ import numpy as np
 
 def label_filename(path: str) -> str:
     filename = os.path.basename(path)
-    regex = "\d[a-zA-Z0-9]{3}"  # https://regex101.com/r/rZi0TZ/1
-    return re.search(regex, filename).group(0).upper()
+    try:
+        lbl = re.search("id(?P<PDB>\d[a-zA-Z0-9]{3})", filename).group("PDB").upper()
+    except AssertionError:
+        lbl = re.search("\d[a-zA-Z0-9]{3}", filename).group(0).upper()  # https://regex101.com/r/rZi0TZ/1
+
+    return lbl
 
 def norm(vol: np.array) -> np.array:
     """Applies standard normalization"""
