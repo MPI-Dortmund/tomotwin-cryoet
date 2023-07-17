@@ -385,7 +385,7 @@ def label_filename(path: str) -> str:
     filename = os.path.basename(path)
     try:
         lbl = re.search("id(?P<PDB>\d[a-zA-Z0-9]{3})", filename).group("PDB").upper()
-    except AssertionError:
+    except AttributeError:
         lbl = re.search("\d[a-zA-Z0-9]{3}", filename).group(0).upper()  # https://regex101.com/r/rZi0TZ/1
 
     return lbl
