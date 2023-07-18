@@ -11,7 +11,9 @@ Version 0.5.0
 * More accurate cluster centers
     * When selecting clusters in Napari during the clustering workflow, the `Medoid <https://en.wikipedia.org/wiki/Medoid`_ is now calculated instead of the average of all cluster embeddings. This has the advantage that it is guaranteed to be on the embedding hypersphere and should be a better representation of the cluster center than the average.
     * The coordinates of the found medoid for each cluster is written as a .coords file to disk.
-* Updated installation instructions for napari: Napari 0.4.17 -> Napari 0.4.18
+* Other
+    * Updated installation instructions for napari: Napari 0.4.17 -> Napari 0.4.18
+    * :ref:`Developer Information<Added some information snippets for developers>`
 
 
 Version 0.4.3
