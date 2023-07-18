@@ -1,4 +1,4 @@
-.. _Developer Information:
+.. _dev-info:
 Developer information
 =====================
 
