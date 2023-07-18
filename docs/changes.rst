@@ -6,7 +6,8 @@ Version 0.5.0
 
 * Speed up embedding using Masks
     * The command ``tomotwin_embed.py tomogram`` now has an optional ``--mask`` argument to select the region of interest for embedding.
-    * The command ``tomotwin_tools.py embedding_mask`` now computes a mask that hides some parts of the tomogram volume that are unlikely to contain proteins. If you use the generated mask when running ``tomotwin_embed.py tomogram``, the embedding step is up to 2 times faster. CAUTION: In TomoTwin 0.4, the ``embeddings_mask`` command calculated a label mask for the clustering workflow. This functionality now happens automatically during the calculation of the umap (``tomotwin_tools.py umap``).* For the clustering workflow, you can now calculate the medoid instead of arithmetic mean. This should be a much better representation of the cluster center.
+    * The command ``tomotwin_tools.py embedding_mask`` now computes a by isonet inspired mask that hides some parts of the tomogram volume that are unlikely to contain proteins. If you use the generated mask when running ``tomotwin_embed.py tomogram``, the embedding step is up to 2 times faster. CAUTION: In TomoTwin 0.4, the ``embeddings_mask`` command calculated a label mask for the clustering workflow. This functionality now happens automatically during the calculation of the umap (``tomotwin_tools.py umap``).
+    * Thanks Caitie McCafferty and Ricardo Righetto for the feature request
 * More accurate cluster centers
     * When selecting clusters in Napari during the clustering workflow, the "Medoid <https://en.wikipedia.org/wiki/Medoid" is now calculated instead of the average of all cluster embeddings. This has the advantage that it is guaranteed to be on the embedding hypersphere and should be a better representation of the cluster center than the average.
     * The coordinates of the found medoid for each cluster is written as a .coords file to disk.
