@@ -13,9 +13,6 @@ Version 0.5.0
 * Updated installation instructions for napari: Napari 0.4.17 -> Napari 0.4.18
 
 
-^^^^
-
-
 Version 0.4.3
 *************
 
