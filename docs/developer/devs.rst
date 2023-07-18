@@ -1,5 +1,4 @@
 .. _Developer Information:
-
 Developer information
 =====================
 
