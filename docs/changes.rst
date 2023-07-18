@@ -13,7 +13,7 @@ Version 0.5.0
     * The coordinates of the found medoid for each cluster is written as a .coords file to disk.
 * Other
     * Updated installation instructions for napari: Napari 0.4.17 -> Napari 0.4.18
-    * `Developer Information <Added some information snippets for developers>`_
+    * `Added some information snippets for developers <Developer Information>`_
 
 Version 0.4.3
 *************
