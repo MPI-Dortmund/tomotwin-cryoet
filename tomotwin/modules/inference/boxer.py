@@ -508,7 +508,7 @@ class SlidingWindowBoxer(Boxer):
         )
 
         data = SimpleVolumeData(
-            volumes=sliding_window_volumes,
+            volumes=tomogram,
             roi=roi
         )
 

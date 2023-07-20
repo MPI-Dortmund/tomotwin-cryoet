@@ -536,7 +536,7 @@ def embed_tomogram(
     print(f"Wrote embeddings to disk to {os.path.join(conf.output_path, filename)}")
     print("Done.")
 
-def make_embeddor(conf: EmbedConfiguration) -> Embedor:
+def make_embeddor(conf: EmbedConfiguration, rank: int, world_size: int) -> Embedor:
     '''
     Create the embeddor
     :param conf: Embed configuratio from an UI
@@ -545,19 +545,22 @@ def make_embeddor(conf: EmbedConfiguration) -> Embedor:
     embedor = TorchEmbedor(
         weightspth=conf.model_path,
         batchsize=conf.batchsize,
+        rank=rank,
+        world_size=world_size,
         workers=12,  # multiprocessing.cpu_count(),
     )
     return embedor
 
 
-def run(conf: EmbedConfiguration) -> None:
+def run(rank, conf: EmbedConfiguration, world_size) -> None:
     '''
     Runs the embed procedure
     :param conf: Configuration from a UI
     '''
+    print("RUN RUN???", world_size, rank)
     os.makedirs(conf.output_path, exist_ok=True)
 
-    embedor = make_embeddor(conf)
+    embedor = make_embeddor(conf, rank=rank, world_size=world_size)
 
     window_size = get_window_size(conf.model_path)
     if conf.mode == EmbedMode.TOMO:
@@ -583,8 +586,17 @@ def _main_():
     ui.run()
     check_for_updates()
     config = ui.get_embed_configuration()
-    run(config)
+
+    # suppose we have 2 gpus
+    world_size = 2
+    import torch.multiprocessing as mp
+    mp.spawn(
+        run,
+        args=([config, world_size]),
+        nprocs=world_size
+    )
 
 
 if __name__ == "__main__":
+    import torch.multiprocessing as mp
     _main_()
