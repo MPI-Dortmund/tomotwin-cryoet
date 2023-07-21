@@ -13,9 +13,7 @@ There are three main steps to install TomoTwin:
 
 .. prompt:: bash $
 
-    mamba create -n tomotwin -c pytorch -c rapidsai -c nvidia -c conda-forge python=3.10 pytorch==1.13.1 torchvision pandas scipy numpy matplotlib pytables cuML=23.04 cudatoolkit=11.8 'protobuf>3.20' tensorboard  optuna mysql-connector-python
-    conda activate tomotwin
-    pip install tomotwin-cryoet
+    mamba env create -n tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_tomotwin.yml
 
 2. Install Napari
 """""""""""""""""""
@@ -24,14 +22,8 @@ Here we assume that you don't have napari installed. Please do:
 
 .. prompt:: bash $
 
-    mamba create -y -n napari-tomotwin -c conda-forge python=3.10 napari=0.4.18 pyqt pip
+    mamba env create -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_napari.yml
     conda activate napari-tomotwin
-
-Install the required plugins `napari-boxmanager` and `napari-tomotwin` via pip:
-
-.. prompt:: bash $
-
-    pip install napari-boxmanager napari-tomotwin
 
 
 3. Link Napari
@@ -50,6 +42,14 @@ This is an optional step, but for convenience reasons we link an adapted napari 
     chmod +x ${napari_link_file}
     conda activate tomotwin
 
+Update TomoTwin
+^^^^^^^^^^^^^^^
+To update an existing TomoTwin installation just do:
+
+.. prompt:: bash $
+
+    mamba env update -n tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_tomotwin.yml --prune
+    mamba env update -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_napari.yml --prune
 
 Download latest model
 ^^^^^^^^^^^^^^^^^^^^^
