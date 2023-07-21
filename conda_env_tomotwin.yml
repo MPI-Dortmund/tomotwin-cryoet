@@ -19,3 +19,6 @@ dependencies:
   - tensorboard
   - optuna
   - mysql-connector-python
+  - pip
+  - pip:
+      - tomotwin-cryoet
