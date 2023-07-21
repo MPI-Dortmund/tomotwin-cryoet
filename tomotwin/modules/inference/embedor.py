@@ -519,12 +519,37 @@ class TorchEmbedor(Embedor):
         for emb in embeddings:
             embeddings_np.append(emb.numpy())
         embeddings = np.concatenate(embeddings_np)
-        print(f"Rank {self.rank} convert")
+
         items_np = []
         for it in items:
             items_np.append(it.numpy())
         items = np.concatenate(items_np)
-        embeddings[items.argsort()]
+        items = torch.from_numpy(items[:10]).to(self.rank)  # necessary because of nccl, : 10 to make it readable
+        tdist.barrier()
+
+        items_gather_list = None
+        if self.rank == 0:
+            print(f"Rank {self.rank} items:")
+            print(items)
+            items_gather_list = [torch.zeros_like(items)] * 2
+        tdist.barrier()
+        if self.rank == 1:
+            print(f"Rank {self.rank} items:")
+            print(items)
+        tdist.barrier()
+        print("GATHER")
+        tdist.gather(items,
+                     gather_list=items_gather_list,
+                     dst=0)
+        tdist.barrier()
+
+        if self.rank == 0:
+            print(f"LEN GATER LIST", len(items_gather_list))
+            print(items_gather_list[0])
+            print(" ")
+            print(items_gather_list[1])
+
+        # embeddings[items.argsort()]
         print(f"Rank {self.rank} convert done")
         print(f"Rank {self.rank}: {np.min(items)} {np.max(items)}")
 
