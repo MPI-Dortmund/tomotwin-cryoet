@@ -40,8 +40,8 @@ This is an optional step, but for convenience reasons we link an adapted napari 
     chmod +x ${napari_link_file}
     conda activate tomotwin
 
-Update TomoTwin
-^^^^^^^^^^^^^^^
+Update TomoTwin & Napari
+^^^^^^^^^^^^^^^^^^^^^^^^
 To update an existing TomoTwin installation just do:
 
 .. prompt:: bash $
