@@ -23,8 +23,6 @@ Here we assume that you don't have napari installed. Please do:
 .. prompt:: bash $
 
     mamba env create -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_napari.yml
-    conda activate napari-tomotwin
-
 
 3. Link Napari
 """""""""""""""""""
