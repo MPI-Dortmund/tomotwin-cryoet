@@ -547,7 +547,7 @@ def make_embeddor(conf: EmbedConfiguration, rank: int, world_size: int) -> Embed
         batchsize=conf.batchsize,
         rank=rank,
         world_size=world_size,
-        workers=12,  # multiprocessing.cpu_count(),
+        workers=8,  # multiprocessing.cpu_count(),
     )
     return embedor
 

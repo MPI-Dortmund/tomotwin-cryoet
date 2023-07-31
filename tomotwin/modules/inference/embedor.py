@@ -485,6 +485,8 @@ class TorchEmbedor(Embedor):
         """Calculates the embeddings. The volumes showed have the dimension NxBSxBSxBS where N is the number of nu"""
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        torch.backends.cudnn.benchmark = True
+
         dataset = TorchVolumeDataset(volumes=volume_data)
         sampler_data = torch.utils.data.DistributedSampler(dataset, rank=self.rank)
         volume_loader = DataLoader(
@@ -492,8 +494,9 @@ class TorchEmbedor(Embedor):
             batch_size=self.batchsize,
             shuffle=False,
             num_workers=self.workers,
+            # prefetch_factor=3,
             pin_memory=True,
-            sampler=sampler_data
+            sampler=sampler_data,
         )
 
         if device.type == "cuda":
@@ -503,54 +506,55 @@ class TorchEmbedor(Embedor):
         model.eval()
         volume_loader_tqdm = tqdm(volume_loader, desc="Calculate embeddings", leave=False)
         embeddings = []
-        items = []
-        from torch.cuda.amp import autocast
+        items_indicis = []
+
         with torch.no_grad():
             for batch, item_index in volume_loader_tqdm:
                 subvolume = batch["volume"]
                 subvolume = subvolume.to(self.rank)
-                with autocast():
-                    # print("Batch to GPU", self.rank)
-                    subvolume_out = model.forward(subvolume).data.cpu()
-                items.append(item_index)
-                embeddings.append(subvolume_out)
-        tdist.barrier()
-        embeddings_np = []
-        for emb in embeddings:
-            embeddings_np.append(emb.numpy())
-        embeddings = np.concatenate(embeddings_np)
-
-        items_np = []
-        for it in items:
-            items_np.append(it.numpy())
-        items = np.concatenate(items_np)
-        items = torch.from_numpy(items[:10]).to(self.rank)  # necessary because of nccl, : 10 to make it readable
+                with torch.autocast(device_type='cuda', dtype=torch.float16):
+                    subvolume = model.forward(subvolume)
+                subvolume = subvolume.data.cpu()
+                items_indicis.append(item_index)
+                embeddings.append(subvolume)
         tdist.barrier()
 
+        ## Sync items
+        items_indicis = torch.cat(items_indicis).to(self.rank)  # necessary because of nccl, : 10 to make it readable
         items_gather_list = None
         if self.rank == 0:
-            print(f"Rank {self.rank} items:")
-            print(items)
-            items_gather_list = [torch.zeros_like(items)] * 2
-        tdist.barrier()
-        if self.rank == 1:
-            print(f"Rank {self.rank} items:")
-            print(items)
+            items_gather_list = [torch.zeros_like(items_indicis) for _ in range(2)]
         tdist.barrier()
         print("GATHER")
-        tdist.gather(items,
+        tdist.gather(items_indicis,
                      gather_list=items_gather_list,
                      dst=0)
         tdist.barrier()
 
         if self.rank == 0:
-            print(f"LEN GATER LIST", len(items_gather_list))
-            print(items_gather_list[0])
-            print(" ")
-            print(items_gather_list[1])
+            items_indicis = torch.cat(items_gather_list)
+            print(f"Rank items {self.rank}: {items_indicis.shape}")
 
-        # embeddings[items.argsort()]
-        print(f"Rank {self.rank} convert done")
-        print(f"Rank {self.rank}: {np.min(items)} {np.max(items)}")
+        ## Sync embeddings
+        print("Sync to gpu ", self.rank)
+        embeddings = torch.cat(embeddings).to(self.rank)  # necessary because of nccl, : 10 to make it readable
+        tdist.barrier()
+
+        embeddings_gather_list = None
+        if self.rank == 0:
+            embeddings_gather_list = [torch.zeros_like(embeddings) for _ in range(2)]
+        print("GATHER EMBEDDINGS")
+        tdist.gather(embeddings,
+                     gather_list=embeddings_gather_list,
+                     dst=0)
+
+        if self.rank == 0:
+            embeddings = torch.cat(embeddings_gather_list)
+            embeddings = embeddings[torch.argsort(items_indicis)]  # sort embeddings after gathering
+            embeddings = embeddings.data.cpu().numpy()
+            print(f"Rank embeddings {self.rank}: {embeddings.shape} {type(embeddings)}")
+        else:
+            embeddings = None
+
 
         return embeddings

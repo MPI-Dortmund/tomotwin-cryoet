@@ -444,7 +444,7 @@ class SimpleVolumeData(VolumeDataset):
         self.roi = roi
 
     def __len__(self) -> int:
-        return 2000  # self.roi.indicis.shape[0]
+        return self.roi.indicis.shape[0]  # 2000
 
     def __getitem__(self, itemindex) -> np.array:
         # index = tuple(self.roi.indicis[itemindex])
