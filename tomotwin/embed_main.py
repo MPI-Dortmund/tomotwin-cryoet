@@ -510,6 +510,7 @@ def embed_tomogram(
     embeddings = sliding_window_embedding(tomo=tomo, boxer=boxer, embedor=embedor)
     if embeddings is None:
         return
+
     # Write results to disk
 
     filename = (

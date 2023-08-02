@@ -386,6 +386,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
+import tomotwin.modules.common.preprocess as pp
 from tomotwin.modules.inference.volumedata import VolumeDataset
 from tomotwin.modules.networks.networkmanager import NetworkManager
 
@@ -407,19 +408,19 @@ class TorchVolumeDataset(Dataset):
         self.volumes = volumes
 
     def __getitem__(self, item_index):
-        # vol = self.volumes[item_index]
-        # vol = vol.astype(np.float32)
-        # vol = pp.norm(vol)
-        # vol = vol[np.newaxis]
-        #
-        vol = np.random.randn(1, 37, 37, 37).astype(np.float32)
+        vol = self.volumes[item_index]
+        vol = vol.astype(np.float32)
+        vol = pp.norm(vol)
+        vol = vol[np.newaxis]
+        vol = vol.astype(np.float16)
+        # vol = np.random.randn(1, 37, 37, 37).astype(np.float16)
         torch_vol = torch.from_numpy(vol)
         input_triplet = {"volume": torch_vol}
 
         return input_triplet, item_index
 
     def __len__(self):
-        return 2000  # len(self.volumes)
+        return len(self.volumes)
 
 
 class WrongVolumeDimensionException(Exception):
@@ -503,27 +504,24 @@ class TorchEmbedor(Embedor):
             persistent_workers=False
         )
 
-        # if device.type == "cuda":
-        #    torch.cuda.get_device_name()
-
-        model = self.model.to(self.rank)
-        model.eval()
+        self.model.eval()
         volume_loader_tqdm = tqdm(volume_loader, desc=f"Calculate embeddings ({self.rank})", leave=False)
         embeddings = []
         items_indicis = []
 
         with torch.no_grad():
             for batch, item_index in volume_loader_tqdm:
-                subvolume = batch["volume"]
-                subvolume = subvolume.to(self.rank)
+                subvolume = batch["volume"].to(self.rank)
                 with torch.autocast(device_type='cuda', dtype=torch.float16):
-                    subvolume = model.forward(subvolume)
+                    subvolume = self.model.forward(subvolume)
                     print("-")
                 subvolume = subvolume.data.cpu()
                 items_indicis.append(item_index)
                 embeddings.append(subvolume)
-        torch.cuda.empty_cache()
+        print("FREE")
+        #torch.cuda.empty_cache()
         tdist.barrier()
+        print("DONE")
 
         ## Sync items
         items_indicis = torch.cat(items_indicis).to(self.rank)  # necessary because of nccl, : 10 to make it readable
@@ -560,7 +558,7 @@ class TorchEmbedor(Embedor):
             embeddings = embeddings.data.cpu().numpy()
             print(f"Rank embeddings {self.rank}: {embeddings.shape} {type(embeddings)}")
         else:
-            embeddings = None
+            return
 
 
         return embeddings
