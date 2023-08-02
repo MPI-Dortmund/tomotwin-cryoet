@@ -405,6 +405,8 @@ def sliding_window_embedding(
     '''
     boxes = boxer.box(tomogram=tomo)
     embeddings = embedor.embed(volume_data=boxes)
+    if embeddings is None:
+        return None
     positions = []
     for i in range(embeddings.shape[0]):
         positions.append(boxes.get_localization(i))
@@ -506,7 +508,8 @@ def embed_tomogram(
         box_size=window_size, stride=conf.stride, zrange=conf.zrange, mask=mask
     )
     embeddings = sliding_window_embedding(tomo=tomo, boxer=boxer, embedor=embedor)
-
+    if embeddings is None:
+        return
     # Write results to disk
 
     filename = (

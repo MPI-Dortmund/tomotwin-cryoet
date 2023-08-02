@@ -419,7 +419,7 @@ class TorchVolumeDataset(Dataset):
         return input_triplet, item_index
 
     def __len__(self):
-        return len(self.volumes)
+        return 2000  # len(self.volumes)
 
 
 class WrongVolumeDimensionException(Exception):
@@ -459,8 +459,9 @@ class TorchEmbedor(Embedor):
         if self.weightspth is not None:
             checkpoint = torch.load(self.weightspth)
             self.tomotwin_config = checkpoint["tomotwin_config"]
-            print("Model config:")
-            print(self.tomotwin_config)
+            if self.rank == 0:
+                print("Model config:")
+                print(self.tomotwin_config)
         self.model = NetworkManager.create_network(self.tomotwin_config).get_model()
 
         before_parallel_failed = False
@@ -521,6 +522,7 @@ class TorchEmbedor(Embedor):
                 subvolume = subvolume.data.cpu()
                 items_indicis.append(item_index)
                 embeddings.append(subvolume)
+        torch.cuda.empty_cache()
         tdist.barrier()
 
         ## Sync items
