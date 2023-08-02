@@ -462,6 +462,9 @@ def embed_subvolumes(paths: List[str], embedor: Embedor, conf: EmbedConfiguratio
     Embeds a set of subvolumes
     '''
     embeddings = volume_embedding(paths, embedor=embedor)
+
+    if embeddings == None:
+        return
     column_names = []
     for i in range(embeddings.shape[1]):
         column_names.append(str(i))
@@ -547,7 +550,7 @@ def make_embeddor(conf: EmbedConfiguration, rank: int, world_size: int) -> Embed
         batchsize=conf.batchsize,
         rank=rank,
         world_size=world_size,
-        workers=8,  # multiprocessing.cpu_count(),
+        workers=4,  # multiprocessing.cpu_count(),
     )
     return embedor
 
@@ -588,8 +591,10 @@ def _main_():
     config = ui.get_embed_configuration()
 
     # suppose we have 2 gpus
-    world_size = 2
+    print("COUNT", torch.cuda.device_count())
+    world_size = torch.cuda.device_count()
     import torch.multiprocessing as mp
+    mp.set_sharing_strategy('file_system')
     mp.spawn(
         run,
         args=([config, world_size]),
@@ -599,4 +604,6 @@ def _main_():
 
 if __name__ == "__main__":
     import torch.multiprocessing as mp
+
+    mp.set_sharing_strategy('file_system')
     _main_()
