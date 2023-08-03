@@ -19,3 +19,6 @@ dependencies:
   - tensorboard
   - optuna
   - mysql-connector-python
+  - pip
+  - pip:
+      - git+https://github.com/MPI-Dortmund/tomotwin-cryoet.git@pt2_distrdataparallel
