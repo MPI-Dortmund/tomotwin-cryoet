@@ -389,6 +389,11 @@ class EmbedMode(Enum):
     VOLUMES = auto()
 
 
+class DistrMode(Enum):
+    DP = 0
+    DDP = 1
+
+
 @dataclass
 class EmbedConfiguration:
     """
@@ -409,6 +414,7 @@ class EmbedConfiguration:
     stride: int = None
     zrange: Tuple[int,int] = None
     maskpth: str = None
+    distr_mode: DistrMode = None
 
 
 class EmbedUI(ABC):

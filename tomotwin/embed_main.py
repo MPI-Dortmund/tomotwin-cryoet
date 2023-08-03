@@ -385,9 +385,9 @@ from typing import List
 import tomotwin
 from tomotwin.modules.common.io.mrc_format import MrcFormat
 from tomotwin.modules.common.utils import check_for_updates
-from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration
+from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration, DistrMode
 from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
-from tomotwin.modules.inference.embedor import TorchEmbedorDistributed, Embedor
+from tomotwin.modules.inference.embedor import TorchEmbedorDistributed, Embedor, TorchEmbedor
 from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
 
 
@@ -548,13 +548,20 @@ def make_embeddor(conf: EmbedConfiguration, rank: int, world_size: int) -> Embed
     :param conf: Embed configuratio from an UI
     :return: Instance of embeddor
     '''
-    embedor = TorchEmbedorDistributed(
-        weightspth=conf.model_path,
-        batchsize=conf.batchsize,
-        rank=rank,
-        world_size=world_size,
-        workers=4,  # multiprocessing.cpu_count(),
-    )
+    if rank is None:
+        embedor = TorchEmbedor(
+            weightspth=conf.model_path,
+            batchsize=conf.batchsize,
+            workers=4,
+        )
+    else:
+        embedor = TorchEmbedorDistributed(
+            weightspth=conf.model_path,
+            batchsize=conf.batchsize,
+            rank=rank,
+            world_size=world_size,
+            workers=4,
+        )
     return embedor
 
 
@@ -563,9 +570,7 @@ def run(rank, conf: EmbedConfiguration, world_size) -> None:
     Runs the embed procedure
     :param conf: Configuration from a UI
     '''
-    print("RUN RUN???", world_size, rank)
     os.makedirs(conf.output_path, exist_ok=True)
-
     embedor = make_embeddor(conf, rank=rank, world_size=world_size)
 
     window_size = get_window_size(conf.model_path)
@@ -594,19 +599,19 @@ def _main_():
     config = ui.get_embed_configuration()
 
     # suppose we have 2 gpus
-    print("COUNT", torch.cuda.device_count())
-    world_size = torch.cuda.device_count()
-    import torch.multiprocessing as mp
-    mp.set_sharing_strategy('file_system')
-    mp.spawn(
-        run,
-        args=([config, world_size]),
-        nprocs=world_size
-    )
+    if config.distr_mode == DistrMode.DDP:
+        import torch.multiprocessing as mp
+        mp.set_sharing_strategy('file_system')
+        world_size = torch.cuda.device_count()
+        print(f"Found {world_size} GPU(s). Start DDP + Compiling.")
+        mp.spawn(
+            run,
+            args=([config, world_size]),
+            nprocs=world_size
+        )
+    else:
+        run(None, config, None)
 
 
 if __name__ == "__main__":
-    import torch.multiprocessing as mp
-
-    mp.set_sharing_strategy('file_system')
     _main_()

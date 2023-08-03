@@ -399,7 +399,6 @@ class Embedor(ABC):
     def embed(self, volume_data: VolumeDataset) -> np.array:
         """Given a set of volumes, this function calculates a set of embeddings"""
 
-
 class TorchVolumeDataset(Dataset):
     """Implementation for the volume dataset"""
 
@@ -412,7 +411,6 @@ class TorchVolumeDataset(Dataset):
         vol = pp.norm(vol)
         vol = vol[np.newaxis]
         vol = vol.astype(np.float16)
-        # vol = np.random.randn(1, 37, 37, 37).astype(np.float16)
         torch_vol = torch.from_numpy(vol)
         input_triplet = {"volume": torch_vol}
 
@@ -422,11 +420,88 @@ class TorchVolumeDataset(Dataset):
         return len(self.volumes)
 
 
+
 class WrongVolumeDimensionException(Exception):
     """Raised when input dimensions are wrong"""
 
 
 class TorchEmbedor(Embedor):
+    """
+    Embedor for PyTorch
+    """
+
+    def __init__(
+            self,
+            weightspth: str,
+            batchsize: int,
+            workers: int = 0,
+    ) -> None:
+        """Inits the embedor"""
+        self.batchsize = batchsize
+        self.workers = workers
+        self.weightspth = weightspth
+        self.tomotwin_config = None
+        print("reading", self.weightspth)
+        self.model = None
+        self.load_weights_()
+
+    def load_weights_(self):
+        checkpoint = None
+        if self.weightspth is not None:
+            checkpoint = torch.load(self.weightspth)
+            self.tomotwin_config = checkpoint["tomotwin_config"]
+            print("Model config:")
+            print(self.tomotwin_config)
+        self.model = NetworkManager.create_network(self.tomotwin_config).get_model()
+        before_parallel_failed = False
+
+        if checkpoint is not None:
+            try:
+                self.model.load_state_dict(checkpoint["model_state_dict"])
+            except RuntimeError:
+                print("Load before failed")
+                before_parallel_failed = True
+
+        self.model = torch.nn.DataParallel(self.model)
+        if before_parallel_failed:
+            self.model.load_state_dict(checkpoint["model_state_dict"])
+
+    def embed(self, volume_data: VolumeDataset) -> np.array:
+        """Calculates the embeddings. The volumes showed have the dimension NxBSxBSxBS where N is the number of nu"""
+
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        dataset = TorchVolumeDataset(volumes=volume_data)
+
+        volume_loader = DataLoader(
+            dataset=dataset,
+            batch_size=self.batchsize,
+            shuffle=False,
+            num_workers=self.workers,
+            pin_memory=True
+        )
+
+        if device.type == "cuda":
+            torch.cuda.get_device_name()
+
+        model = self.model.to(device)
+        model.eval()
+        volume_loader_tqdm = tqdm(volume_loader, desc="Calculate embeddings", leave=False)
+        embeddings = []
+        from torch.cuda.amp import autocast
+        with torch.no_grad():
+            for batch, _ in volume_loader_tqdm:
+                vol = batch["volume"]
+                subvolume = vol.to(device)
+                with autocast():
+                    subvolume_out = model.forward(subvolume).data.cpu()
+                embeddings.append(subvolume_out)
+
+        embeddings_np = []
+        for emb in embeddings:
+            embeddings_np.append(emb.numpy())
+        embeddings = np.concatenate(embeddings_np)
+
+        return embeddings
 
 
 class TorchEmbedorDistributed(Embedor):
@@ -479,12 +554,7 @@ class TorchEmbedorDistributed(Embedor):
 
         self.model.to(self.rank)
 
-        #
-        # import torch._dynamo as dyn
-        # dyn.reset()
-        print("Compiling! Reduced overhead")
         self.model = torch.compile(self.model, mode="reduce-overhead").to(self.rank)
-
         self.model = torch.nn.parallel.DistributedDataParallel(self.model, device_ids=[self.rank])
 
     def embed(self, volume_data: VolumeDataset) -> np.array:
@@ -494,14 +564,12 @@ class TorchEmbedorDistributed(Embedor):
         torch.backends.cudnn.benchmark = True
 
         dataset = TorchVolumeDataset(volumes=volume_data)
-        print("WORLD:", tdist.get_world_size())
         sampler_data = torch.utils.data.DistributedSampler(dataset, rank=self.rank, shuffle=True)
         volume_loader = DataLoader(
             dataset=dataset,
             batch_size=self.batchsize,
             shuffle=False,
-            num_workers=2,  # self.workers,
-            # prefetch_factor=3,
+            num_workers=self.workers,
             pin_memory=False,
             sampler=sampler_data,
             persistent_workers=False
@@ -517,14 +585,9 @@ class TorchEmbedorDistributed(Embedor):
                 subvolume = batch["volume"].to(self.rank)
                 with torch.autocast(device_type='cuda', dtype=torch.float16):
                     subvolume = self.model.forward(subvolume).type(torch.HalfTensor)
-                    print("-")
                 subvolume = subvolume.data.cpu()
                 items_indicis.append(item_index.data.cpu())
                 embeddings.append(subvolume.data.cpu())
-        print("FREE")
-        # torch.cuda.empty_cache()
-        #tdist.barrier()
-        print("DONE")
 
         ## Sync items
         items_indicis = torch.cat(items_indicis)  # .to(self.rank)  # necessary because of nccl
@@ -532,7 +595,7 @@ class TorchEmbedorDistributed(Embedor):
         if self.rank == 0:
             items_gather_list = [torch.zeros_like(items_indicis) for _ in range(tdist.get_world_size())]
         tdist.barrier()
-        print("GATHER")
+
         tdist.gather(items_indicis,
                      gather_list=items_gather_list,
                      dst=0)
@@ -540,19 +603,17 @@ class TorchEmbedorDistributed(Embedor):
 
         if self.rank == 0:
             items_indicis = torch.cat(items_gather_list)
-            print(f"Rank items {self.rank}: {items_indicis.shape}")
         else:
             items_indicis = None
 
         ## Sync embeddings
-        print("Sync to gpu ", self.rank)
-        embeddings = torch.cat(embeddings)  #.to(self.rank)  # necessary because of nccl, : 10 to make it readable
+        embeddings = torch.cat(embeddings)
         tdist.barrier()
 
         embeddings_gather_list = None
         if self.rank == 0:
             embeddings_gather_list = [torch.zeros_like(embeddings) for _ in range(tdist.get_world_size())]
-        print("GATHER EMBEDDINGS")
+
         torch.cuda.empty_cache()
         tdist.gather(embeddings,
                      gather_list=embeddings_gather_list,
@@ -562,9 +623,7 @@ class TorchEmbedorDistributed(Embedor):
             embeddings = torch.cat(embeddings_gather_list)
             embeddings = embeddings[torch.argsort(items_indicis)]  # sort embeddings after gathering
             embeddings = embeddings.data.cpu().numpy()
-            print(f"Rank embeddings {self.rank}: {embeddings.shape} {type(embeddings)}")
         else:
-            embeddings = None
             return
 
 
