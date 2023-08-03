@@ -376,19 +376,18 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 """
 import glob
 import hashlib
-import os
-from typing import List
-
 import numpy as np
+import os
 import pandas as pd
 import torch
+from typing import List
 
 import tomotwin
 from tomotwin.modules.common.io.mrc_format import MrcFormat
 from tomotwin.modules.common.utils import check_for_updates
 from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration
 from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
-from tomotwin.modules.inference.embedor import TorchEmbedor, Embedor
+from tomotwin.modules.inference.embedor import TorchEmbedorDistributed, Embedor
 from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
 
 
@@ -549,7 +548,7 @@ def make_embeddor(conf: EmbedConfiguration, rank: int, world_size: int) -> Embed
     :param conf: Embed configuratio from an UI
     :return: Instance of embeddor
     '''
-    embedor = TorchEmbedor(
+    embedor = TorchEmbedorDistributed(
         weightspth=conf.model_path,
         batchsize=conf.batchsize,
         rank=rank,

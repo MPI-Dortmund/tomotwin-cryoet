@@ -425,7 +425,11 @@ class TorchVolumeDataset(Dataset):
 class WrongVolumeDimensionException(Exception):
     """Raised when input dimensions are wrong"""
 
+
 class TorchEmbedor(Embedor):
+
+
+class TorchEmbedorDistributed(Embedor):
     """
     Embedor for PyTorch
     """
