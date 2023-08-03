@@ -375,13 +375,12 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import os
-from abc import ABC, abstractmethod
-
 import numpy as np
+import os
 import torch
 import torch.distributed as tdist
 import torch.nn
+from abc import ABC, abstractmethod
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from tqdm import tqdm
@@ -443,7 +442,7 @@ class TorchEmbedor(Embedor):
 
         os.environ['MASTER_ADDR'] = '127.0.0.1'
         os.environ['MASTER_PORT'] = '29500'
-        tdist.init_process_group(backend='nccl', rank=rank, world_size=world_size)
+        tdist.init_process_group(backend='gloo', rank=rank, world_size=world_size)
         tdist.barrier()
         self.rank = rank
         self.batchsize = batchsize
@@ -497,7 +496,7 @@ class TorchEmbedor(Embedor):
             dataset=dataset,
             batch_size=self.batchsize,
             shuffle=False,
-            num_workers=2,  #self.workers,
+            num_workers=2,  # self.workers,
             # prefetch_factor=3,
             pin_memory=False,
             sampler=sampler_data,
@@ -513,18 +512,18 @@ class TorchEmbedor(Embedor):
             for batch, item_index in volume_loader_tqdm:
                 subvolume = batch["volume"].to(self.rank)
                 with torch.autocast(device_type='cuda', dtype=torch.float16):
-                    subvolume = self.model.forward(subvolume)
+                    subvolume = self.model.forward(subvolume).type(torch.HalfTensor)
                     print("-")
                 subvolume = subvolume.data.cpu()
-                items_indicis.append(item_index)
-                embeddings.append(subvolume)
+                items_indicis.append(item_index.data.cpu())
+                embeddings.append(subvolume.data.cpu())
         print("FREE")
-        #torch.cuda.empty_cache()
-        tdist.barrier()
+        # torch.cuda.empty_cache()
+        #tdist.barrier()
         print("DONE")
 
         ## Sync items
-        items_indicis = torch.cat(items_indicis).to(self.rank)  # necessary because of nccl, : 10 to make it readable
+        items_indicis = torch.cat(items_indicis)  # .to(self.rank)  # necessary because of nccl
         items_gather_list = None
         if self.rank == 0:
             items_gather_list = [torch.zeros_like(items_indicis) for _ in range(tdist.get_world_size())]
@@ -538,16 +537,19 @@ class TorchEmbedor(Embedor):
         if self.rank == 0:
             items_indicis = torch.cat(items_gather_list)
             print(f"Rank items {self.rank}: {items_indicis.shape}")
+        else:
+            items_indicis = None
 
         ## Sync embeddings
         print("Sync to gpu ", self.rank)
-        embeddings = torch.cat(embeddings).to(self.rank)  # necessary because of nccl, : 10 to make it readable
+        embeddings = torch.cat(embeddings)  #.to(self.rank)  # necessary because of nccl, : 10 to make it readable
         tdist.barrier()
 
         embeddings_gather_list = None
         if self.rank == 0:
             embeddings_gather_list = [torch.zeros_like(embeddings) for _ in range(tdist.get_world_size())]
         print("GATHER EMBEDDINGS")
+        torch.cuda.empty_cache()
         tdist.gather(embeddings,
                      gather_list=embeddings_gather_list,
                      dst=0)
@@ -558,6 +560,7 @@ class TorchEmbedor(Embedor):
             embeddings = embeddings.data.cpu().numpy()
             print(f"Rank embeddings {self.rank}: {embeddings.shape} {type(embeddings)}")
         else:
+            embeddings = None
             return
 
 
