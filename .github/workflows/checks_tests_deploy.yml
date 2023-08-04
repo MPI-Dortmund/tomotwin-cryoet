@@ -16,11 +16,13 @@ jobs:
     - name: Set up conda ${{ matrix.python-version }}
       uses: conda-incubator/setup-miniconda@v2
       with:
+        #channels: conda-forge, pytorch-nightly, nvidia, rapidsai, defaults
+        channel-priority: strict
         mamba-version: "*"
         activate-environment: tomotwin
-        channel-priority: true
+
         python-version: ${{ matrix.python-version }}
-        #channels: conda-forge, pytorch-nightly, nvidia, rapidsai, defaults
+
         environment-file: conda_env_tomotwin.yml
     - run: conda --version
     - run: conda init bash
