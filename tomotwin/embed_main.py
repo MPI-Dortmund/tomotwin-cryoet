@@ -377,12 +377,14 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 import glob
 import hashlib
 import os
+import resource
 import sys
 from typing import List
 
 import numpy as np
 import pandas as pd
 import torch
+import torch.multiprocessing as mp
 
 import tomotwin
 from tomotwin.modules.common.io.mrc_format import MrcFormat
@@ -593,10 +595,10 @@ def run(rank, conf: EmbedConfiguration, world_size) -> None:
 
 
 def run_distr(config, world_size: int):
-    import torch.multiprocessing as mp
+    """
+    Starts a distributed run using DistributedDataParallel
+    """
     mp.set_sharing_strategy('file_system')
-
-    import resource
     limit = resource.getrlimit(resource.RLIMIT_NOFILE)
     if limit[0] < 65000:
         print(

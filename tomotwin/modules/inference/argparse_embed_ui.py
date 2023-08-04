@@ -547,6 +547,7 @@ class EmbedArgParseUI(EmbedUI):
             "--distribution_mode",
             type=int,
             required=False,
+            choices=[0, 1],
             default=1,
             help="0: DataParallel,  1: Faster parallelism mode using DistributedDataParallel"
         )

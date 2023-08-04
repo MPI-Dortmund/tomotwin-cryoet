@@ -390,6 +390,9 @@ class EmbedMode(Enum):
 
 
 class DistrMode(Enum):
+    """
+    Enumeration of Distribution mode
+    """
     DP = 0
     DDP = 1
 

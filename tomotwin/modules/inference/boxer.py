@@ -450,7 +450,7 @@ class SlidingWindowBoxer(Boxer):
 
         # Apply mask if necessary
         if mask is not None:
-            for c_i, c in enumerate(center_coords):
+            for c in center_coords:
                 if mask[tuple(c.astype(int).tolist())]:
                     relevant_center_coords.append(c)
             relevant_center_coords = np.vstack(relevant_center_coords)
