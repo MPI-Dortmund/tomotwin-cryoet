@@ -16,7 +16,7 @@ jobs:
     - name: Set up conda ${{ matrix.python-version }}
       uses: conda-incubator/setup-miniconda@v2
       with:
-        channels: conda-forge, pytorch-nightly, nvidia, rapidsai, defaults
+        channels: pytorch-nightly, conda-forge,  nvidia, rapidsai, defaults
         #channel-priority: strict
         auto-update-conda: true
         miniforge-variant: Mambaforge
