@@ -1,0 +1,13 @@
+name: napari-tomotwin
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - napari=0.4.17
+  - pyqt
+  - pip
+  - pip:
+      - napari-boxmanager
+      - napari-tomotwin
+
