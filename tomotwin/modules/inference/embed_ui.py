@@ -378,7 +378,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 
 class EmbedMode(Enum):
@@ -401,7 +401,7 @@ class EmbedConfiguration:
     """
 
     model_path: str
-    volumes_path: str | List[str]
+    volumes_path: Union[str, List[str]]
     output_path: str
     mode: EmbedMode
     batchsize: int
