@@ -377,6 +377,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 import glob
 import hashlib
 import os
+import sys
 from typing import List
 
 import numpy as np
@@ -595,6 +596,12 @@ def run_distr(config, world_size: int):
     import torch.multiprocessing as mp
     mp.set_sharing_strategy('file_system')
 
+    import resource
+    limit = resource.getrlimit(resource.RLIMIT_NOFILE)
+    if limit[0] < 65000:
+        print(
+            f"Your user limit ('ulimit -n') is too low ({limit[0]}). Please run 'ulimit -n 65000' before running tomotwin_embed.")
+        sys.exit(1)
     print(f"Found {world_size} GPU(s). Start DDP + Compiling.")
     mp.spawn(
         run,
