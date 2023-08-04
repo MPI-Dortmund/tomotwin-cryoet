@@ -6,7 +6,7 @@ channels:
   - nvidia
   - defaults
 dependencies:
-  - pytorch=2.1.0.dev20230802
+  - pytorch #=2.1.0.dev20230802 - not available anymore...
   - torchvision
   - pandas[version='<2']
   - scipy
