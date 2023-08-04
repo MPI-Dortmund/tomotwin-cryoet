@@ -411,7 +411,8 @@ class TorchVolumeDataset(Dataset):
         vol = vol.astype(np.float32)
         vol = pp.norm(vol)
         vol = vol[np.newaxis]
-        # vol = vol.astype(np.float16)
+        if torch.cuda.is_available():
+            vol = vol.astype(np.float16)
         torch_vol = torch.from_numpy(vol)
         input_triplet = {"volume": torch_vol}
 
