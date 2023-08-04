@@ -422,11 +422,18 @@ class SlidingWindowBoxer(Boxer):
         self.mask = mask
 
     @staticmethod
-    def _calc_volume_roi(sliding_window_strides: np.array,
+    def _calc_volume_roi(tomogram: np.array,
                                                        stride: Tuple[int, int, int],
                                                        box_size: int,
                                                        zrange = None,
                                                        mask: np.array = None) -> VolumeROI:
+
+        sliding_window_strides = SlidingWindowBoxer._calc_sliding_volumes(
+            tomogram=tomogram,
+            stride=stride,
+            window_shape=(box_size, box_size, box_size)
+        )  # this is actuallz a bit to complicated.
+
         ## Calculate center coordinates
         indicies = np.array(
             list(itertools.product(
@@ -438,19 +445,17 @@ class SlidingWindowBoxer(Boxer):
         center_coords = indicies * stride + (box_size - 1) / 2
         if zrange is not None:
             center_coords[:, 0] = zrange[0] + center_coords[:, 0]
-        relevant_indicis = []
         relevant_center_coords = []
+
+        ## Apply mask if necessary
         if mask is not None:
             for c_i, c in enumerate(center_coords):
                 if mask[tuple(c.astype(int).tolist())]:
-                    relevant_indicis.append(indicies[c_i])
                     relevant_center_coords.append(c)
             relevant_center_coords = np.vstack(relevant_center_coords)
-            relevant_indicis = np.vstack(relevant_indicis)
         else:
             relevant_center_coords = center_coords
-            relevant_indicis = indicies
-        r = VolumeROI(indicis=relevant_indicis, center_coords=relevant_center_coords)
+        r = VolumeROI(center_coords=relevant_center_coords, box_size=box_size)
         return r
 
 
@@ -461,7 +466,7 @@ class SlidingWindowBoxer(Boxer):
     def _calc_sliding_volumes(tomogram: np.array,
                               stride: Tuple[int, int, int],
                               window_shape: Tuple[int,int,int],
-                              ) -> Tuple[np.array, np.array]:
+                              ) -> np.array:
         """
         Calculate the sliding subvolumes (views) and returns their center coordinates
         :return:
@@ -492,14 +497,10 @@ class SlidingWindowBoxer(Boxer):
             tomogram = tomogram[self.zrange[0]:self.zrange[1]]
 
 
-        sliding_window_volumes = SlidingWindowBoxer._calc_sliding_volumes(
-            tomogram=tomogram,
-            stride=(self._stride_x, self._stride_y, self._stride_z),
-            window_shape=(self.box_size, self.box_size, self.box_size)
-        )
+
 
         roi = SlidingWindowBoxer._calc_volume_roi(
-            sliding_window_volumes,
+            tomogram,
             stride=(self._stride_x, self._stride_y, self._stride_z),
             box_size=self.box_size,
             zrange=self.zrange,

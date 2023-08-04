@@ -388,8 +388,8 @@ class VolumeROI:
     '''
     Represents a region of interesion within a volume
     '''
-    indicis: np.array
     center_coords: np.array
+    box_size: int
 
 
 class VolumeDataset(ABC):
@@ -444,13 +444,12 @@ class SimpleVolumeData(VolumeDataset):
         self.roi = roi
 
     def __len__(self) -> int:
-        return self.roi.indicis.shape[0]  # 2000
+        return len(self.roi.center_coords)
 
     def __getitem__(self, itemindex) -> np.array:
-        # index = tuple(self.roi.indicis[itemindex])
         p = self.roi.center_coords[itemindex].astype(int)
-        p_min = p - int(36 / 2)
-        p_max = p + int(36 / 2 + 1)
+        p_min = p - int((self.roi.box_size - 1) / 2)
+        p_max = p + int((self.roi.box_size - 1) / 2 + 1)
         v = self.volumes[p_min[0]:p_max[0], p_min[1]:p_max[1], p_min[2]:p_max[2]]
         return v
 

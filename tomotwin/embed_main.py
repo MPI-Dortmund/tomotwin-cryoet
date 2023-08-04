@@ -376,11 +376,12 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 """
 import glob
 import hashlib
-import numpy as np
 import os
+from typing import List
+
+import numpy as np
 import pandas as pd
 import torch
-from typing import List
 
 import tomotwin
 from tomotwin.modules.common.io.mrc_format import MrcFormat
@@ -464,7 +465,7 @@ def embed_subvolumes(paths: List[str], embedor: Embedor, conf: EmbedConfiguratio
     '''
     embeddings = volume_embedding(paths, embedor=embedor)
 
-    if embeddings == None:
+    if embeddings is None:
         return
     column_names = []
     for i in range(embeddings.shape[1]):
@@ -564,6 +565,9 @@ def make_embeddor(conf: EmbedConfiguration, rank: int, world_size: int) -> Embed
         )
     return embedor
 
+
+def run(conf: EmbedConfiguration) -> None:
+    run(None, conf, None)
 
 def run(rank, conf: EmbedConfiguration, world_size) -> None:
     '''

@@ -1,14 +1,15 @@
-import mrcfile
-import numpy as np
 import os.path
 import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
 
+import mrcfile
+import numpy as np
+
 import tomotwin.embed_main
-from tomotwin.modules.inference.argparse_embed_ui import EmbedConfiguration, EmbedMode
+from tomotwin.modules.inference.argparse_embed_ui import EmbedConfiguration, EmbedMode, DistrMode
 from tomotwin.modules.inference.embedor import Embedor
-from tomotwin.modules.inference.embedor import TorchEmbedorDistributed
+from tomotwin.modules.inference.embedor import TorchEmbedor
 from tomotwin.modules.inference.volumedata import VolumeDataset
 from tomotwin.modules.networks import networkmanager, SiameseNet3D
 
@@ -61,9 +62,10 @@ class TestsEmbedMain(unittest.TestCase):
             )
             with patch(
                     "tomotwin.embed_main.make_embeddor",
-                    MagicMock(return_value=TorchEmbedorDistributed(batchsize=1, weightspth=None)),
+                    MagicMock(return_value=TorchEmbedor(batchsize=1, weightspth=None)),
             ), patch("tomotwin.embed_main.get_window_size", MagicMock(return_value=37)):
-                embed_main_func(embed_conf)
+                embed_conf.distr_mode == DistrMode.DP
+                embed_main_func(None, embed_conf, None)
                 networkmanager.NetworkManager.create_network.reset_mock()
             self.assertEqual(
                 True, os.path.exists(os.path.join(tmpdirname, "embeddings.temb"))
@@ -94,7 +96,8 @@ class TestsEmbedMain(unittest.TestCase):
                 stride=1,
                 zrange=None,
             )
-            embed_main_func(embed_conf)
+            embed_conf.distr_mode == DistrMode.DP
+            embed_main_func(None, embed_conf, None)
             self.assertEqual(
                 True, os.path.exists(os.path.join(tmpdirname, "embeddings.temb"))
             )
@@ -120,7 +123,8 @@ class TestsEmbedMain(unittest.TestCase):
                 stride=1,
                 zrange=None,
             )
-            embed_main_func(embed_conf)
+            embed_conf.distr_mode == DistrMode.DP
+            embed_main_func(None, embed_conf, None)
             self.assertEqual(
                 True, os.path.exists(os.path.join(tmpdirname, "vola_embeddings.temb"))
             )
