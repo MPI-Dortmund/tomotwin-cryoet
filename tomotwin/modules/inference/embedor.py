@@ -412,7 +412,7 @@ class TorchVolumeDataset(Dataset):
         vol = pp.norm(vol)
         vol = vol[np.newaxis]
         if torch.cuda.is_available():
-            vol = vol.astype(np.float16)
+            vol = vol.astype(np.float16)  # Gives a speedup, when its done already here. However, does not work on CPUs.
         torch_vol = torch.from_numpy(vol)
         input_triplet = {"volume": torch_vol}
 
