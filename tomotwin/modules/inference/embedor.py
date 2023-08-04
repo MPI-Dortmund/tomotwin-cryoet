@@ -555,7 +555,7 @@ class TorchEmbedorDistributed(Embedor):
 
         self.model.to(self.rank)
 
-        self.model = torch.compile(self.model, mode="reduce-overhead").to(self.rank)
+        self.model = torch.compile(self.model, mode="reduce-overhead")
         self.model = torch.nn.parallel.DistributedDataParallel(self.model, device_ids=[self.rank])
 
     def embed(self, volume_data: VolumeDataset) -> np.array:

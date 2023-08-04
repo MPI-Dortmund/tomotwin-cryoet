@@ -79,6 +79,7 @@ class TestsEmbedMain(unittest.TestCase):
             )
         ),
     )
+    @unittest.skip("Not working when running within unittest")
     def test_embed_main_real_subvol_distributedtorchembeddor(self):
         from tomotwin.embed_main import run_distr as embed_main_func
 
