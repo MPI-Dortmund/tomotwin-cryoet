@@ -58,13 +58,12 @@ class TestsEmbedMain(unittest.TestCase):
                 mode=EmbedMode.VOLUMES,
                 batchsize=1,
                 stride=1,
-                zrange=None,
             )
             with patch(
                     "tomotwin.embed_main.make_embeddor",
                     MagicMock(return_value=TorchEmbedor(batchsize=1, weightspth=None)),
             ), patch("tomotwin.embed_main.get_window_size", MagicMock(return_value=37)):
-                embed_conf.distr_mode == DistrMode.DP
+                embed_conf.distr_mode = DistrMode.DP
                 embed_main_func(None, embed_conf, None)
                 networkmanager.NetworkManager.create_network.reset_mock()
             self.assertEqual(
@@ -96,7 +95,7 @@ class TestsEmbedMain(unittest.TestCase):
                 stride=1,
                 zrange=None,
             )
-            embed_conf.distr_mode == DistrMode.DP
+            embed_conf.distr_mode = DistrMode.DP
             embed_main_func(None, embed_conf, None)
             self.assertEqual(
                 True, os.path.exists(os.path.join(tmpdirname, "embeddings.temb"))
@@ -123,7 +122,7 @@ class TestsEmbedMain(unittest.TestCase):
                 stride=1,
                 zrange=None,
             )
-            embed_conf.distr_mode == DistrMode.DP
+            embed_conf.distr_mode = DistrMode.DP
             embed_main_func(None, embed_conf, None)
             self.assertEqual(
                 True, os.path.exists(os.path.join(tmpdirname, "vola_embeddings.temb"))
