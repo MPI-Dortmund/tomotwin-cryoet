@@ -589,6 +589,18 @@ def run(rank, conf: EmbedConfiguration, world_size) -> None:
                 foundfiles = glob.glob(os.path.join(p, "*.mrc"))
                 paths.extend(foundfiles)
         embed_subvolumes(paths, embedor, conf)
+
+
+def run_distr(config, world_size: int):
+    import torch.multiprocessing as mp
+    mp.set_sharing_strategy('file_system')
+
+    print(f"Found {world_size} GPU(s). Start DDP + Compiling.")
+    mp.spawn(
+        run,
+        args=([config, world_size]),
+        nprocs=world_size
+    )
 def _main_():
     ########################
     # Get configuration from user interface
@@ -600,15 +612,8 @@ def _main_():
 
     # suppose we have 2 gpus
     if config.distr_mode == DistrMode.DDP:
-        import torch.multiprocessing as mp
-        mp.set_sharing_strategy('file_system')
         world_size = torch.cuda.device_count()
-        print(f"Found {world_size} GPU(s). Start DDP + Compiling.")
-        mp.spawn(
-            run,
-            args=([config, world_size]),
-            nprocs=world_size
-        )
+        run_distr(config, world_size)
     else:
         run(None, config, None)
 

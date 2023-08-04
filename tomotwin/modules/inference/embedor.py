@@ -375,12 +375,13 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import numpy as np
 import os
+from abc import ABC, abstractmethod
+
+import numpy as np
 import torch
 import torch.distributed as tdist
 import torch.nn
-from abc import ABC, abstractmethod
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from tqdm import tqdm
@@ -410,7 +411,7 @@ class TorchVolumeDataset(Dataset):
         vol = vol.astype(np.float32)
         vol = pp.norm(vol)
         vol = vol[np.newaxis]
-        vol = vol.astype(np.float16)
+        # vol = vol.astype(np.float16)
         torch_vol = torch.from_numpy(vol)
         input_triplet = {"volume": torch_vol}
 
@@ -452,7 +453,9 @@ class TorchEmbedor(Embedor):
             self.tomotwin_config = checkpoint["tomotwin_config"]
             print("Model config:")
             print(self.tomotwin_config)
+        print(self.tomotwin_config)
         self.model = NetworkManager.create_network(self.tomotwin_config).get_model()
+        print(type(self.model))
         before_parallel_failed = False
 
         if checkpoint is not None:
@@ -541,16 +544,13 @@ class TorchEmbedorDistributed(Embedor):
             if self.rank == 0:
                 print("Model config:")
                 print(self.tomotwin_config)
+
         self.model = NetworkManager.create_network(self.tomotwin_config).get_model()
-
-        before_parallel_failed = False
-
         if checkpoint is not None:
             try:
                 self.model.load_state_dict(checkpoint["model_state_dict"])
             except RuntimeError:
                 print("Load before failed")
-                before_parallel_failed = True
 
         self.model.to(self.rank)
 
