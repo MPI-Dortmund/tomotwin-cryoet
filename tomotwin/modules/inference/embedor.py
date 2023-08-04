@@ -538,6 +538,9 @@ class TorchEmbedorDistributed(Embedor):
 
 
     def load_weights_(self):
+        """
+        Loads the model weights
+        """
         checkpoint = None
         if self.weightspth is not None:
             checkpoint = torch.load(self.weightspth)
