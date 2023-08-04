@@ -9,7 +9,7 @@ import numpy as np
 import tomotwin.embed_main
 from tomotwin.modules.inference.argparse_embed_ui import EmbedConfiguration, EmbedMode, DistrMode
 from tomotwin.modules.inference.embedor import Embedor
-from tomotwin.modules.inference.embedor import TorchEmbedor
+from tomotwin.modules.inference.embedor import TorchEmbedor, TorchEmbedorDistributed
 from tomotwin.modules.inference.volumedata import VolumeDataset
 from tomotwin.modules.networks import networkmanager, SiameseNet3D
 
@@ -65,6 +65,43 @@ class TestsEmbedMain(unittest.TestCase):
             ), patch("tomotwin.embed_main.get_window_size", MagicMock(return_value=37)):
                 embed_conf.distr_mode = DistrMode.DP
                 embed_main_func(None, embed_conf, None)
+                networkmanager.NetworkManager.create_network.reset_mock()
+            self.assertEqual(
+                True, os.path.exists(os.path.join(tmpdirname, "embeddings.temb"))
+            )
+
+    @patch(
+        "tomotwin.modules.networks.networkmanager.NetworkManager.create_network",
+        MagicMock(
+            return_value=SiameseNet3D.SiameseNet3D(
+                norm_name="GroupNorm",
+                norm_kwargs={"num_channels": 1024, "num_groups": 64},
+            )
+        ),
+    )
+    def test_embed_main_real_subvol_distributedtorchembeddor(self):
+        from tomotwin.embed_main import run_distr as embed_main_func
+
+        tomo = np.random.randn(37, 37, 37).astype(np.float32)
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            volumes = [os.path.join(tmpdirname, "vola.mrc")]
+            for v in volumes:
+                with mrcfile.new(v) as mrc:
+                    mrc.set_data(tomo)
+            embed_conf = EmbedConfiguration(
+                model_path=None,
+                volumes_path=volumes,
+                output_path=tmpdirname,
+                mode=EmbedMode.VOLUMES,
+                batchsize=1,
+                stride=1,
+            )
+            with patch(
+                    "tomotwin.embed_main.make_embeddor",
+                    MagicMock(return_value=TorchEmbedorDistributed(batchsize=1, weightspth=None, world_size=1, rank=0)),
+            ), patch("tomotwin.embed_main.get_window_size", MagicMock(return_value=37)):
+                embed_conf.distr_mode = DistrMode.DP
+                embed_main_func(embed_conf, world_size=2)
                 networkmanager.NetworkManager.create_network.reset_mock()
             self.assertEqual(
                 True, os.path.exists(os.path.join(tmpdirname, "embeddings.temb"))
