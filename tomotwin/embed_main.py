@@ -565,10 +565,6 @@ def make_embeddor(conf: EmbedConfiguration, rank: int, world_size: int) -> Embed
         )
     return embedor
 
-
-def run(conf: EmbedConfiguration) -> None:
-    run(None, conf, None)
-
 def run(rank, conf: EmbedConfiguration, world_size) -> None:
     '''
     Runs the embed procedure
