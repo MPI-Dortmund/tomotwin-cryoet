@@ -79,9 +79,8 @@ class TestsEmbedMain(unittest.TestCase):
             )
         ),
     )
-    @unittest.skip("Not working when running within unittest")
     def test_embed_main_real_subvol_distributedtorchembeddor(self):
-        from tomotwin.embed_main import run_distr as embed_main_func
+        from tomotwin.embed_main import run as embed_main_func
 
         tomo = np.random.randn(37, 37, 37).astype(np.float32)
         with tempfile.TemporaryDirectory() as tmpdirname:
@@ -102,7 +101,7 @@ class TestsEmbedMain(unittest.TestCase):
                     MagicMock(return_value=TorchEmbedorDistributed(batchsize=1, weightspth=None, world_size=1, rank=0)),
             ), patch("tomotwin.embed_main.get_window_size", MagicMock(return_value=37)):
                 embed_conf.distr_mode = DistrMode.DP
-                embed_main_func(embed_conf, world_size=2)
+                embed_main_func(rank=0, conf=embed_conf, world_size=1)
                 networkmanager.NetworkManager.create_network.reset_mock()
             self.assertEqual(
                 True, os.path.exists(os.path.join(tmpdirname, "embeddings.temb"))
