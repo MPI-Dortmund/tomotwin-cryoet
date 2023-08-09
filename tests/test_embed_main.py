@@ -5,6 +5,8 @@ from unittest.mock import MagicMock, patch
 
 import mrcfile
 import numpy as np
+import pytest
+import torch
 
 import tomotwin.embed_main
 from tomotwin.modules.inference.argparse_embed_ui import EmbedConfiguration, EmbedMode, DistrMode
@@ -79,6 +81,7 @@ class TestsEmbedMain(unittest.TestCase):
             )
         ),
     )
+    @pytest.mark.skipif(torch.cuda.is_available() == False, "Skipped because CUDA is not available")
     def test_embed_main_real_subvol_distributedtorchembeddor(self):
         from tomotwin.embed_main import run as embed_main_func
 

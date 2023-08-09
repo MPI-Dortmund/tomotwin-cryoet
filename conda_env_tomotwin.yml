@@ -1,9 +1,9 @@
 name: tomotwin
 channels:
-  - conda-forge
+  - nvidia
   - pytorch-nightly
   - rapidsai
-  - nvidia
+  - conda-forge
   - defaults
 dependencies:
   - pytorch #=2.1.0.dev20230802 - not available anymore...
