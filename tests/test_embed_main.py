@@ -81,7 +81,7 @@ class TestsEmbedMain(unittest.TestCase):
             )
         ),
     )
-    @pytest.mark.skipif(torch.cuda.is_available() == False, "Skipped because CUDA is not available")
+    @pytest.mark.skipif(torch.cuda.is_available() == False, reason="Skipped because CUDA is not available")
     def test_embed_main_real_subvol_distributedtorchembeddor(self):
         from tomotwin.embed_main import run as embed_main_func
 
