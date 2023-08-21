@@ -6,7 +6,7 @@ channels:
   - nvidia
   - defaults
 dependencies:
-  - pytorch==1.13.1
+  - pytorch[version='<2']
   - torchvision
   - pandas[version='<2']
   - scipy
