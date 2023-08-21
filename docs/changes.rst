@@ -1,6 +1,12 @@
 Changes
 =======
 
+
+Version 0.5.1
+*************
+
+* Unpin pytorch-metric-library in the requirements.
+
 Version 0.5.0
 *************
 
