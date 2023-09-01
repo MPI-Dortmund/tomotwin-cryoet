@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 0.6.0
+*************
+
+* ``tomotwim_embed.py` is now 1.6x faster and better scales across multiple GPUs
+   * Exploiting new the ``compile`` option of the latest pytorch 2.1 nightly build.
+   * Internally ``DistributedDataParallel`` is used instead of ``DataParallel``
 
 Version 0.5.1
 *************
