@@ -1,6 +1,8 @@
 # read the contents of your README file
 from os import path
+
 from setuptools import setup
+
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -31,7 +33,7 @@ setup(
         "scikit-image",
         "pystardb>=0.4.2",
         "pandas <= 2", # Because rapids does not support pandas > 1.5.3
-        "pytorch-metric-learning==1.6.3",
+        "pytorch-metric-learning<1.7",
         "numba",
         "tabulate",
         "setuptools_scm",
