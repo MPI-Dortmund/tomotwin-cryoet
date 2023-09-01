@@ -23,6 +23,7 @@ jobs:
         docker-images: true
         swap-storage: true
   build:
+    needs: [ free-disk-space ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
