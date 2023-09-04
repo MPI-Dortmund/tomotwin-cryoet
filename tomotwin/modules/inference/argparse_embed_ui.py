@@ -378,7 +378,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 import argparse
 import sys
 
-from tomotwin.modules.inference.embed_ui import EmbedUI, EmbedConfiguration, EmbedMode
+from tomotwin.modules.inference.embed_ui import EmbedUI, EmbedConfiguration, EmbedMode, DistrMode
 
 
 class EmbedArgParseUI(EmbedUI):
@@ -394,6 +394,7 @@ class EmbedArgParseUI(EmbedUI):
         self.mode = None
         self.zrange = None
         self.maskpth = None
+        self.distr_mode = None
 
     def run(self, args=None) -> None:
         parser = self.create_parser()
@@ -407,14 +408,18 @@ class EmbedArgParseUI(EmbedUI):
 
         if "subvolumes" in sys.argv[1]:
             self.mode = EmbedMode.VOLUMES
+            self.distr_mode = DistrMode.DP
 
         if "tomogram" in sys.argv[1]:
             self.mode = EmbedMode.TOMO
             self.stride = args.stride
             self.zrange = args.zrange
             if len(self.stride) == 1:
-                self.stride = self.stride*3
+                self.stride = self.stride * 3
             self.maskpth = args.mask
+            self.distr_mode = DistrMode.DDP
+            if args.distribution_mode == 0:
+                self.distr_mode = DistrMode.DP
 
     def get_embed_configuration(self) -> EmbedConfiguration:
         conf = EmbedConfiguration(
@@ -425,7 +430,8 @@ class EmbedArgParseUI(EmbedUI):
             batchsize=self.batchsize,
             stride=self.stride,
             zrange=self.zrange,
-            maskpth=self.maskpth
+            maskpth=self.maskpth,
+            distr_mode=self.distr_mode
         )
         return conf
 
@@ -534,6 +540,16 @@ class EmbedArgParseUI(EmbedUI):
             required=False,
             default=None,
             help="Path to binary mask to define embedding region (mrc format). All values != 0 are interpreted as 'True'.",
+        )
+
+        parser.add_argument(
+            "-d",
+            "--distribution_mode",
+            type=int,
+            required=False,
+            choices=[0, 1],
+            default=1,
+            help="0: DataParallel,  1: Faster parallelism mode using DistributedDataParallel"
         )
 
     def create_parser(self) -> argparse.ArgumentParser:

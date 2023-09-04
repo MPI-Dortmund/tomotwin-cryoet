@@ -377,18 +377,21 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 import glob
 import hashlib
 import os
+import resource
+import sys
 from typing import List
 
 import numpy as np
 import pandas as pd
 import torch
+import torch.multiprocessing as mp
 
 import tomotwin
 from tomotwin.modules.common.io.mrc_format import MrcFormat
 from tomotwin.modules.common.utils import check_for_updates
-from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration
+from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration, DistrMode
 from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
-from tomotwin.modules.inference.embedor import TorchEmbedor, Embedor
+from tomotwin.modules.inference.embedor import TorchEmbedorDistributed, Embedor, TorchEmbedor
 from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
 
 
@@ -405,6 +408,8 @@ def sliding_window_embedding(
     '''
     boxes = boxer.box(tomogram=tomo)
     embeddings = embedor.embed(volume_data=boxes)
+    if embeddings is None:
+        return None
     positions = []
     for i in range(embeddings.shape[0]):
         positions.append(boxes.get_localization(i))
@@ -462,6 +467,9 @@ def embed_subvolumes(paths: List[str], embedor: Embedor, conf: EmbedConfiguratio
     Embeds a set of subvolumes
     '''
     embeddings = volume_embedding(paths, embedor=embedor)
+
+    if embeddings is None:
+        return
     column_names = []
     for i in range(embeddings.shape[1]):
         column_names.append(str(i))
@@ -503,6 +511,8 @@ def embed_tomogram(
         box_size=window_size, stride=conf.stride, zrange=conf.zrange, mask=mask
     )
     embeddings = sliding_window_embedding(tomo=tomo, boxer=boxer, embedor=embedor)
+    if embeddings is None:
+        return
 
     # Write results to disk
 
@@ -536,28 +546,35 @@ def embed_tomogram(
     print(f"Wrote embeddings to disk to {os.path.join(conf.output_path, filename)}")
     print("Done.")
 
-def make_embeddor(conf: EmbedConfiguration) -> Embedor:
+def make_embeddor(conf: EmbedConfiguration, rank: int, world_size: int) -> Embedor:
     '''
     Create the embeddor
     :param conf: Embed configuratio from an UI
     :return: Instance of embeddor
     '''
-    embedor = TorchEmbedor(
-        weightspth=conf.model_path,
-        batchsize=conf.batchsize,
-        workers=12,  # multiprocessing.cpu_count(),
-    )
+    if rank is None:
+        embedor = TorchEmbedor(
+            weightspth=conf.model_path,
+            batchsize=conf.batchsize,
+            workers=4,
+        )
+    else:
+        embedor = TorchEmbedorDistributed(
+            weightspth=conf.model_path,
+            batchsize=conf.batchsize,
+            rank=rank,
+            world_size=world_size,
+            workers=4,
+        )
     return embedor
 
-
-def run(conf: EmbedConfiguration) -> None:
+def run(rank, conf: EmbedConfiguration, world_size) -> None:
     '''
     Runs the embed procedure
     :param conf: Configuration from a UI
     '''
     os.makedirs(conf.output_path, exist_ok=True)
-
-    embedor = make_embeddor(conf)
+    embedor = make_embeddor(conf, rank=rank, world_size=world_size)
 
     window_size = get_window_size(conf.model_path)
     if conf.mode == EmbedMode.TOMO:
@@ -575,6 +592,24 @@ def run(conf: EmbedConfiguration) -> None:
                 foundfiles = glob.glob(os.path.join(p, "*.mrc"))
                 paths.extend(foundfiles)
         embed_subvolumes(paths, embedor, conf)
+
+
+def run_distr(config, world_size: int):
+    """
+    Starts a distributed run using DistributedDataParallel
+    """
+    mp.set_sharing_strategy('file_system')
+    limit = resource.getrlimit(resource.RLIMIT_NOFILE)
+    if limit[0] < 65000:
+        print(
+            f"Your user limit ('ulimit -n') is too low ({limit[0]}). Please run 'ulimit -n 65000' before running tomotwin_embed.")
+        sys.exit(1)
+    print(f"Found {world_size} GPU(s). Start DDP + Compiling.")
+    mp.spawn(
+        run,
+        args=([config, world_size]),
+        nprocs=world_size
+    )
 def _main_():
     ########################
     # Get configuration from user interface
@@ -583,7 +618,13 @@ def _main_():
     ui.run()
     check_for_updates()
     config = ui.get_embed_configuration()
-    run(config)
+
+    # suppose we have 2 gpus
+    if config.distr_mode == DistrMode.DDP:
+        world_size = torch.cuda.device_count()
+        run_distr(config, world_size)
+    else:
+        run(None, config, None)
 
 
 if __name__ == "__main__":

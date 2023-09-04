@@ -359,7 +359,7 @@ Exhibit A - Source Code Form License Notice
 
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
-  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 If it is not possible or desirable to put the notice in a particular
 file, then You may include the notice in a location (such as a LICENSE
@@ -385,11 +385,12 @@ import numpy as np
 
 @dataclass
 class VolumeROI:
-    '''
+    """
     Represents a region of interesion within a volume
-    '''
-    indicis: np.array
+    """
+
     center_coords: np.array
+    box_size: int
 
 
 class VolumeDataset(ABC):
@@ -403,7 +404,7 @@ class VolumeDataset(ABC):
 
     @abstractmethod
     def __getitem__(self, itemindex) -> np.array:
-        """Return the an item with a certain index"""
+        """Return an item with a certain index"""
 
     @abstractmethod
     def get_localization(self, itemindex) -> Tuple[int, int, int]:
@@ -425,7 +426,7 @@ class FileNameVolumeDataset(VolumeDataset):
     def __len__(self) -> int:
         return len(self.volumes)
 
-    def get_localization(self, itemindex) -> Tuple[int, int, int]:
+    def get_localization(self, itemindex) -> None:
         return None
 
 
@@ -445,12 +446,13 @@ class SimpleVolumeData(VolumeDataset):
         self.roi = roi
 
     def __len__(self) -> int:
-        return self.roi.indicis.shape[0]
-
+        return len(self.roi.center_coords)
 
     def __getitem__(self, itemindex) -> np.array:
-        index = tuple(self.roi.indicis[itemindex])
-        v = self.volumes[index]
+        p = self.roi.center_coords[itemindex].astype(int)
+        p_min = p - int((self.roi.box_size - 1) / 2)
+        p_max = p + int((self.roi.box_size - 1) / 2 + 1)
+        v = self.volumes[p_min[0]:p_max[0], p_min[1]:p_max[1], p_min[2]:p_max[2]]
         return v
 
     def get_localization(self, itemindex) -> Tuple[int, int, int]:

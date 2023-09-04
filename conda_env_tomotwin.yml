@@ -1,13 +1,11 @@
 name: tomotwin
 channels:
-  - conda-forge
-  - pytorch
-  - rapidsai
   - nvidia
+  - pytorch-nightly
+  - rapidsai
+  - conda-forge
   - defaults
 dependencies:
-  - pytorch[version='<2']
-  - torchvision
   - pandas[version='<2']
   - scipy
   - numpy
@@ -21,4 +19,8 @@ dependencies:
   - mysql-connector-python
   - pip
   - pip:
+      - --extra-index-url https://download.pytorch.org/whl/nightly/cu118
+      - torch==2.1.0.dev20230822+cu118
+      - torchvision==0.16.0.dev20230822
       - tomotwin-cryoet
+
