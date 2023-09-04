@@ -110,42 +110,68 @@ class UmapTool(TomoTwinTool):
 
         return segmentation_array
 
-    def run(self, args):
-        print("Read data")
-        embeddings = pd.read_pickle(args.input)
-        out_pth = args.output
-        model = None
-        if args.model:
-            model = pickle.load(open(args.model, "rb"))
+    def _run(self,
+             input_pth: str,
+             out_pth: str,
+             fit_sample_size: int,
+             fit_chunk_size: int,
+             neighbors: int,
+             ncomponents: int,
+             model=None
+
+             ):
+        embeddings = pd.read_pickle(input_pth)
+
         umap_embeddings, fitted_umap = self.calcuate_umap(embeddings=embeddings,
-                                                          fit_sample_size=args.fit_sample_size,
-                                                          transform_chunk_size=args.chunk_size,
+                                                          fit_sample_size=fit_sample_size,
+                                                          transform_chunk_size=fit_chunk_size,
                                                           reducer=model,
-                                                          neighbors=args.neighbors,
-                                                          ncomponents=args.ncomponents)
+                                                          neighbors=neighbors,
+                                                          ncomponents=ncomponents)
 
-
-
-        os.makedirs(out_pth,exist_ok=True)
-        fname = os.path.splitext(os.path.basename(args.input))[0]
+        os.makedirs(out_pth, exist_ok=True)
+        fname = os.path.splitext(os.path.basename(input_pth))[0]
         df_embeddings = pd.DataFrame(umap_embeddings)
 
         print("Write embeedings to disk")
         df_embeddings.columns = [f"umap_{i}" for i in range(umap_embeddings.shape[1])]
-        df_embeddings.to_pickle(os.path.join(out_pth,fname+".tumap"))
+        ofile = os.path.join(out_pth, fname + ".tumap")
+        df_embeddings.to_pickle(ofile)
 
         print("Write umap model to disk")
         pickle.dump(fitted_umap, open(os.path.join(out_pth, fname + "_umap_model.pkl"), "wb"))
 
         print("Calculate label mask and write it to disk")
         embedding_mask = self.create_embedding_mask(embeddings)
+        ofile = os.path.join(
+            out_pth,
+            fname + "_label_mask.mrci",
+        )
         with mrcfile.new(
-                os.path.join(
-                    args.output,
-                    fname + "_label_mask.mrci",
-                ),
+                ofile,
                 overwrite=True,
         ) as mrc:
             mrc.set_data(embedding_mask)
 
         print("Done")
+
+    def run(self, args):
+        print("Read data")
+        input_pth = args.input
+        fit_sample_size = args.fit_sample_size
+        fit_chunk_size = args.chunk_size
+        out_pth = args.output
+        neighbors = args.neighbors
+        ncomponents = args.ncomponents
+
+        model = None
+        if args.model:
+            model = pickle.load(open(args.model, "rb"))
+
+        self._run(input_pth=input_pth,
+                  out_pth=out_pth,
+                  fit_sample_size=fit_sample_size,
+                  fit_chunk_size=fit_chunk_size,
+                  neighbors=neighbors,
+                  ncomponents=ncomponents,
+                  model=model)
