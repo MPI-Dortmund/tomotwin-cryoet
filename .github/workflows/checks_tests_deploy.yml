@@ -23,10 +23,10 @@ jobs:
         # "false" if necessary for your workflow
         android: true
         dotnet: false
-        haskell: true
-        large-packages: true
-        docker-images: true
-        swap-storage: true
+        haskell: false
+        large-packages: false
+        docker-images: false
+        swap-storage: false
     - uses: actions/checkout@v3
     - name: Set up conda ${{ matrix.python-version }}
       uses: conda-incubator/setup-miniconda@v2
