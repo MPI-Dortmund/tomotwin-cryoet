@@ -52,7 +52,7 @@ To update an existing TomoTwin installation just do:
 Download latest model
 ^^^^^^^^^^^^^^^^^^^^^
 
-:Last update: 05.2022
+:Last update: 09.2023
 
 :Number of proteins: 120
 
