@@ -83,6 +83,9 @@ class TestsEmbedMain(unittest.TestCase):
     )
     @pytest.mark.skipif(torch.cuda.is_available() == False, reason="Skipped because CUDA is not available")
     def test_embed_main_real_subvol_distributedtorchembeddor(self):
+        os.environ['MASTER_ADDR'] = '127.0.0.1'
+        os.environ['MASTER_PORT'] = '29' + str(random.randint(1, 500)).zfill(3)
+
         from tomotwin.embed_main import run as embed_main_func
 
         tomo = np.random.randn(37, 37, 37).astype(np.float32)
