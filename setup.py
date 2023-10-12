@@ -30,7 +30,7 @@ setup(
         "tensorboard",
         "numpy >= 1.20.0",
         "scikit-learn",
-        "scikit-image",
+        "scikit-image <= 0.21.0",  # because otherwise pylint complains
         "pystardb>=0.4.2",
         "pandas <= 2", # Because rapids does not support pandas > 1.5.3
         "pytorch-metric-learning<1.7",
