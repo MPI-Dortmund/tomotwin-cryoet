@@ -1,7 +1,7 @@
 name: tomotwin
 channels:
   - nvidia
-  - pytorch-nightly
+  - pytorch
   - rapidsai
   - conda-forge
   - defaults
