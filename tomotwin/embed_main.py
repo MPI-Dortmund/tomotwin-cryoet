@@ -601,7 +601,7 @@ def run_distr(config, world_size: int):
     """
     mp.set_sharing_strategy('file_system')
     limit = resource.getrlimit(resource.RLIMIT_NOFILE)
-    if limit[0] < 50000:
+    if limit[0] < 65000:
         print(
             f"Your user limit ('ulimit -n') is too low ({limit[0]}). Please run 'ulimit -n 65000' before running tomotwin_embed.")
         sys.exit(1)
