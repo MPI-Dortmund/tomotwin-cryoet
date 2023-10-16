@@ -375,7 +375,6 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
-import os
 from abc import ABC, abstractmethod
 
 import numpy as np
@@ -522,9 +521,6 @@ class TorchEmbedorDistributed(Embedor):
             workers: int = 0,
     ) -> None:
         """Inits the embedor"""
-
-        os.environ['MASTER_ADDR'] = '127.0.0.1'
-        os.environ['MASTER_PORT'] = '29500'
         tdist.init_process_group(backend='gloo', rank=rank, world_size=world_size)
         tdist.barrier()
         self.rank = rank
