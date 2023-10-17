@@ -374,7 +374,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   This Source Code Form is "Incompatible With Secondary Licenses", as
   defined by the Mozilla Public License, v. 2.0.
 """
-
+import copy
 from abc import ABC, abstractmethod
 
 import numpy as np
@@ -586,8 +586,9 @@ class TorchEmbedorDistributed(Embedor):
                 with torch.autocast(device_type='cuda', dtype=torch.float16):
                     subvolume = self.model.forward(subvolume).type(torch.HalfTensor)
                 subvolume = subvolume.data.cpu()
-                items_indicis.append(item_index.data.cpu())
-                embeddings.append(subvolume.data.cpu())
+                items_indicis.append(copy.deepcopy(item_index.data.cpu()))
+                embeddings.append(copy.deepcopy(subvolume.data.cpu()))
+                del subvolume
 
         ## Sync items
         items_indicis = torch.cat(items_indicis)  # .to(self.rank)  # necessary because of nccl
