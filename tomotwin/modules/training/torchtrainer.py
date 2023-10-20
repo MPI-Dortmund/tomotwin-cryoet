@@ -915,12 +915,17 @@ class TorchTrainer(Trainer):
                 path, self.best_model_f1, "best_f1.pth", self.best_epoch_f1, **kwargs
             )
 
-        if save_each_improvement and self.f1_improved:
+        if save_each_improvement:
+            mod = self.model
+            ep = self.current_epoch
+            add = "" + "_f1" if self.f1_improved else ""
+            add = add + "_loss" if self.loss_improved else ""
+
             self.write_model_to_disk(
                 path,
-                self.best_model_f1,
-                f"best_f1_{self.best_epoch_f1}.pth",
-                self.best_epoch_f1,
+                mod,
+                f"best_model_" + f"{ep + 1}".zfill(3) + f"{add}.pth",
+                ep,
                 **kwargs,
             )
 
