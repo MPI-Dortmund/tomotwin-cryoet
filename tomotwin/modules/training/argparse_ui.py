@@ -472,7 +472,7 @@ class TrainingArgParseUI(TrainingUI):
             "--save_after_improvement",
             action='store_true',
             default=False,
-            help="Save seperate model for each epoch where the F1 score improves",
+            help="Save separate model for each epoch.",
         )
 
 
