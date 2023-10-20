@@ -508,7 +508,7 @@ class TorchTrainer(Trainer):
             num_workers=self.workers,
             pin_memory=False,
             # prefetch_factor=5,
-            timeout=60,
+            timeout=180,
         )
 
         test_loader = None
