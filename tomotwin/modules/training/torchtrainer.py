@@ -924,7 +924,7 @@ class TorchTrainer(Trainer):
             self.write_model_to_disk(
                 path,
                 mod,
-                f"best_model_" + f"{ep + 1}".zfill(3) + f"{add}.pth",
+                "best_model_" + f"{ep + 1}".zfill(3) + f"{add}.pth",
                 ep,
                 **kwargs,
             )
