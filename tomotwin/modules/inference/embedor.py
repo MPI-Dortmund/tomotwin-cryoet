@@ -558,7 +558,12 @@ class TorchEmbedorDistributed(Embedor):
         self.model = torch.nn.parallel.DistributedDataParallel(self.model, device_ids=[self.rank])
 
     def get_unique_indicis(self, a):
-        # got this idea from https://github.com/pytorch/pytorch/issues/36748
+        """
+        got this idea from https://github.com/pytorch/pytorch/issues/36748
+
+        Behaves the same as np.unique(x,return_index=True)
+        """
+        #
         unique, inverse = torch.unique(a, sorted=True, return_inverse=True)
         perm = torch.arange(inverse.size(0), dtype=inverse.dtype, device=inverse.device)
         inverse, perm = inverse.flip([0]), perm.flip([0])
