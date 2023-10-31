@@ -58,8 +58,7 @@ class FilterTool(TomoTwinTool):
         def apply_thresh(tmap: pd.DataFrame, thresh: float, discard_lower: bool):
             if discard_lower:
                 return tmap >= thresh
-            else:
-                return tmap < thresh
+            return tmap < thresh
 
 
         filtered_embeddings = []
