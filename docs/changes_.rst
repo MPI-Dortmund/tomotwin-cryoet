@@ -1,12 +1,16 @@
 Changes
 =======
 
+
 Version 0.7.0
 *************
 
 * Fixes a bug in ``tomotwin_embed.py`` which leads to crashes because of duplicate embeddings
 * Adds the experimental flag `--cosine` to the command ``tomotwin_tools.py umap`` which in theory should give better umaps (but its also slower).
 * Adds the experimental floag ``--lower`` and ``--concat`` to the command ``tomotwin_tools.py filter_embedding``. With the new flags you can select embeddings which are at a certain distance to one or multiple references. This is handy if you want to fine tune your manuel selected reference targets.
+
+Version 0.6.1
+*************
 
 Version 0.6.0
 *************
