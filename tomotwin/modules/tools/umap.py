@@ -48,6 +48,11 @@ class UmapTool(TomoTwinTool):
         parser.add_argument('--chunk_size', type=int, default=400000,
                             help='Chunk size for transform all data')
 
+        parser.add_argument('--cosine',
+                            action='store_true',
+                            help="Use cosine metric for estimating metric",
+                            default=False)
+
         return parser
 
     def calcuate_umap(
@@ -56,7 +61,8 @@ class UmapTool(TomoTwinTool):
             transform_chunk_size: int,
             reducer: cuml.UMAP = None,
             ncomponents=2,
-            neighbors: int = 200) -> typing.Tuple[ArrayLike, cuml.UMAP]:
+            neighbors: int = 200,
+            metric: str = "euclidean") -> typing.Tuple[ArrayLike, cuml.UMAP]:
         print("Prepare data")
 
         fit_sample = embeddings.sample(n=min(len(embeddings),fit_sample_size), random_state=17)
@@ -68,7 +74,8 @@ class UmapTool(TomoTwinTool):
                 n_components=ncomponents,
                 n_epochs=None,  # means automatic selection
                 min_dist=0.0,
-                random_state=19
+                random_state=19,
+                metric=metric
             )
             print(f"Fit umap on {len(fit_sample)} samples")
             reducer.fit(fit_sample)
@@ -117,12 +124,16 @@ class UmapTool(TomoTwinTool):
         model = None
         if args.model:
             model = pickle.load(open(args.model, "rb"))
+        metric = "euclidean"
+        if args.cosine:
+            metric = "cosine"
         umap_embeddings, fitted_umap = self.calcuate_umap(embeddings=embeddings,
                                                           fit_sample_size=args.fit_sample_size,
                                                           transform_chunk_size=args.chunk_size,
                                                           reducer=model,
                                                           neighbors=args.neighbors,
-                                                          ncomponents=args.ncomponents)
+                                                          ncomponents=args.ncomponents,
+                                                          metric=metric)
 
 
 
