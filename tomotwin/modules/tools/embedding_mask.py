@@ -377,11 +377,11 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 import argparse
 import os
+import sys
 import tempfile
 from argparse import ArgumentParser
 from glob import glob
 from types import SimpleNamespace
-from typing import Callable
 
 import mrcfile
 import numpy as np
@@ -571,15 +571,6 @@ class EmbeddingMaskTool(TomoTwinTool):
             bin_mask = np.zeros_like(mask, dtype=np.float32)
             bin_mask[mask] = 1
 
-            # Save to disk
-            os.makedirs(output_path, exist_ok=True)
-            mask_pth = os.path.join(output_path, "mask.mrc")
-            with mrcfile.new(
-                    mask_pth, overwrite=True
-            ) as mrc:
-                mrc.set_data(bin_mask)
-
-            print(f"Mask saved to {mask_pth}")
             return bin_mask
 
     def intensity_mode(self, img: np.array) -> np.array:
@@ -598,15 +589,6 @@ class EmbeddingMaskTool(TomoTwinTool):
         mask = min_img < t
         return mask
 
-    def create_embedding_mask(self, img: np.array, mask_calc: Callable[[np.array], np.array]) -> np.array:
-        """
-        Calculating the mask
-        """
-        mask = mask_calc(img)
-        print(f"Masked out: {100 - np.sum(mask) * 100 / np.prod(mask.shape):.2f}%")
-
-        return mask
-
     def run(self, args):
         """
         Runs the tools
@@ -614,8 +596,6 @@ class EmbeddingMaskTool(TomoTwinTool):
 
 
         print("Calculate mask")
-        import sys
-        print(sys.argv[2])
         if sys.argv[2] == "median":
             mask = self.median_mode(tomo_pth=args.input,
                                     model_pth=args.modelpth,
