@@ -606,6 +606,16 @@ def run_distr(config, world_size: int):
         args=([config, world_size]),
         nprocs=world_size
     )
+
+
+def start(config):
+    # suppose we have 2 gpus
+    if config.distr_mode == DistrMode.DDP:
+        world_size = torch.cuda.device_count()
+        run_distr(config, world_size)
+    else:
+        run(None, config, None)
+
 def _main_():
     ########################
     # Get configuration from user interface
@@ -614,13 +624,8 @@ def _main_():
     ui.run()
     check_for_updates()
     config = ui.get_embed_configuration()
+    start(config)
 
-    # suppose we have 2 gpus
-    if config.distr_mode == DistrMode.DDP:
-        world_size = torch.cuda.device_count()
-        run_distr(config, world_size)
-    else:
-        run(None, config, None)
 
 
 if __name__ == "__main__":
