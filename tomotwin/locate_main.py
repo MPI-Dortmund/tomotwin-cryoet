@@ -454,11 +454,13 @@ def run_non_maximum_suppression(class_frames: List[pd.DataFrame], boxsize: int, 
 
 
 def scale_and_pad_heatmap(vol: np.array, stride: int, tomo_input_shape: tuple) -> np.array:
+    '''
+    Scales the calculated volume so that it fits the tomo_input_shape
+    '''
     def get_pad_tuble(total_pad):
         if total_pad % 2 == 0:
             return (total_pad // 2, total_pad // 2)
-        else:
-            return (total_pad // 2 + 1, total_pad // 2)
+        return (total_pad // 2 + 1, total_pad // 2)
 
     vol = zoom(vol, stride)
     vol = vol.swapaxes(0, 2)
