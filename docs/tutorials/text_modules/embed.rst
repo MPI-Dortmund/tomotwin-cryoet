@@ -17,7 +17,7 @@ To embed your tomogram using two GPUs and batchsize of 256 use:
 
     .. prompt:: bash $
 
-        tomotwin_tools.py embedding_mask -i your_tomo_a10.mrc -o out/mask/
+        tomotwin_tools.py embedding_mask intensity -i your_tomo_a10.mrc -o out/mask/
 
     The mask you find there can be used when running ``tomotwin_embed.py`` using the argument ``--mask``.
     As this is still experimental, please check if the masks do not exclude any important areas. You can do that easiliy with napari by opening the tomogram and your mask and then change the opacity of your mask:
