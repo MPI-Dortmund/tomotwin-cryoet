@@ -1,13 +1,13 @@
-Strategy 2: Speedup and Improvement of embeddings using median filtering
+Strategy 2: Speedup and improvement of embeddings using median filtering
 ========================================================================
 
 When to use it
 --------------
 
-You can use this strategy for two reasons:
+You may use this strategy for two reasons:
 
- 1. It makes the embedding step much faster. So you simply might want to save time.
- 2. It skips a large part of the empty areas of the tomogram which can improve the umap.
+ 1. It makes the embedding step much faster. So you might just want to save time.
+ 2. It skips a large part of the empty areas of the tomogram, which can improve the umap.
 
 What it does
 ------------
