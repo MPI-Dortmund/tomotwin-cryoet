@@ -14,4 +14,4 @@ To embed your tomogram using two GPUs and batchsize of 256 use:
 
     Using masks can dramatically speed up the embedding calculation. It can also improve the estimated umaps!
 
-    Check out the :ref:`corresponding strategy <strategy-01>`!
+    Check out the :ref:`corresponding strategy <strategy-02>`!
