@@ -5,10 +5,12 @@ When to use it
 --------------
 
 You have selected references or cluster targets, but you are not satisfied with the picking results. The embedding computed from a cluster or reference is not always an ideal representation. Some references just don't work well, and sometimes umap doesn't show all the structure that is actually in the umap embedding.
+
 What it does
 ------------
 
 This strategy takes your references/targets and collects all embeddings that are slightly similar to at least one of your references/targets (similarity > 0.5). These embeddings are then used to estimate a UMAP. In some cases, you will see new structures in the umap, where some of these new structures of the umap correspond to irrelevant embeddings (e.g. membranes). By finding the cluster in the umap that actually corresponds to your target protein, you can improve the picking!
+
 How to use it
 -------------
 
