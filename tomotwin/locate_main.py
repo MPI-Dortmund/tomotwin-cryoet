@@ -470,7 +470,7 @@ def scale_and_pad_heatmap(vol: np.array, stride: int, tomo_input_shape: tuple) -
             get_pad_tuble(np.abs(tomo_input_shape[1] - vol.shape[1])),
             get_pad_tuble(np.abs(tomo_input_shape[2] - vol.shape[2]))),
         "constant",
-        constant_values=np.min(vol))
+        constant_values=np.min(vol) - 0.01 * np.abs(np.min(vol)))
     return vol
 
 

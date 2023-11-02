@@ -377,13 +377,25 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 import argparse
 import os
+import tempfile
 from argparse import ArgumentParser
+from glob import glob
+from types import SimpleNamespace
 from typing import Callable
 
 import mrcfile
 import numpy as np
+import pandas as pd
 from scipy import ndimage as ndimg
+from skimage import morphology
 
+from tomotwin import embed_main as embed
+from tomotwin import locate_main as locate
+from tomotwin import map_main as tmap
+from tomotwin.modules.inference.embed_ui import EmbedConfiguration, EmbedMode, DistrMode
+from tomotwin.modules.inference.findmaxima_locator import FindMaximaLocator
+from tomotwin.modules.inference.map_ui import MapMode, MapConfiguration
+from tomotwin.modules.tools import median_embedding as median_tool
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
 
@@ -402,6 +414,8 @@ class EmbeddingMaskTool(TomoTwinTool):
         """
         :param parentparser: ArgumentPaser where the subparser for this tool needs to be added.
         :return: Argument parser that was added to the parentparser
+
+
         """
 
         parser = parentparser.add_parser(
@@ -409,7 +423,18 @@ class EmbeddingMaskTool(TomoTwinTool):
             help="(EXPERIMENTAL) Generates an ROI mask to speed up embeddings",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
-        parser.add_argument(
+        subparsers = parser.add_subparsers(help="Subcommand help")
+
+        parse_intensity = subparsers.add_parser("intensity",
+                                                help="Estimates potential ROIs purely based on intensity values.",
+                                                formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+        parse_median = subparsers.add_parser("median",
+                                             help="Estimates the ROI based on the median embedding.",
+                                             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+        # setup general
+        parse_intensity.add_argument(
             "-i",
             "--input",
             type=str,
@@ -417,13 +442,147 @@ class EmbeddingMaskTool(TomoTwinTool):
             help="Tomogram file that needs to be embedded",
         )
 
-        parser.add_argument(
+        parse_intensity.add_argument(
             "-o", "--output", type=str, required=True, help="Output folder"
+        )
+
+        # setup median
+
+        parse_median.add_argument(
+            "-i",
+            "--input",
+            type=str,
+            required=True,
+            help="Tomogram file that needs to be embedded",
+        )
+
+        parse_median.add_argument(
+            "-m",
+            "--modelpth",
+            type=str,
+            required=True,
+            help="Path to the tomotwin model",
+        )
+
+        parse_median.add_argument(
+            "-o", "--output", type=str, required=True, help="Output folder"
+        )
+
+        parse_median.add_argument(
+            "-s",
+            "--stride",
+            type=int,
+            default=5,
+            help="Stride of the sliding window. ",
+        )
+
+        parse_median.add_argument(
+            "-b",
+            "--batchsize",
+            type=int,
+            default=64,
+            help="Batch size during calculating the embeddings",
+        )
+
+        parse_median.add_argument(
+            "-t",
+            "--threshold",
+            type=float,
+            default=0.3,
+            help="Threshold between 0 - 1. As higher the threshold as more conservative mask is.",
+        )
+
+        parse_median.add_argument(
+            "-d",
+            "--dilation",
+            type=int,
+            default=1,
+            help="Dilation radius. Add an additional",
         )
 
         return parser
 
-    def threshold_mode(self, img: np.array) -> np.array:
+    def median_mode(self,
+                    tomo_pth: str,
+                    model_pth: str,
+                    output_path: str,
+                    stride: int,
+                    batch_size: int,
+                    threshold: float,
+                    dilation: float
+                    ):
+        with tempfile.TemporaryDirectory() as tmp_pth:
+            # Embed
+            emb_out_pth = os.path.join(tmp_pth, "embed")
+
+            conf = EmbedConfiguration(
+                model_path=model_pth,
+                volumes_path=tomo_pth,
+                output_path=emb_out_pth,
+                mode=EmbedMode.TOMO,
+                batchsize=batch_size,
+                stride=stride,
+                zrange=None,
+                maskpth=None,
+                distr_mode=DistrMode.DDP
+            )
+
+            embed.start(conf)
+
+            # Median embedding
+            median_out_pth = os.path.join(tmp_pth, "median_emb")
+            args = SimpleNamespace(input=glob(os.path.join(emb_out_pth, "*.temb"))[0], output=median_out_pth)
+            mtool = median_tool.MedianTool()
+            mtool.run(args)
+
+            # Map
+            map_out_pth = os.path.join(tmp_pth, "map")
+            map_conf = MapConfiguration(
+                reference_embeddings_path=glob(os.path.join(median_out_pth, "*.temb"))[0],
+                volume_embeddings_path=glob(os.path.join(emb_out_pth, "*.temb"))[0],
+                output_path=map_out_pth,
+                mode=MapMode.DISTANCE,
+                skip_refinement=True
+            )
+            tmap.run(map_conf)
+
+            # Heatmap
+            print("Calculate heatmap")
+            map_output = pd.read_pickle(glob(os.path.join(map_out_pth, "*.tmap"))[0])
+            raw_heatmap = FindMaximaLocator.to_volume(
+                df=map_output,
+                target_class=0,
+                stride=(stride, stride, stride),
+                window_size=map_output.attrs['window_size'],
+            )
+            raw_heatmap = raw_heatmap.astype(np.float32)
+            heatmap = locate.scale_and_pad_heatmap(raw_heatmap,
+                                                   stride=stride,
+                                                   tomo_input_shape=map_output.attrs['tomogram_input_shape'])
+            print("Binarize heatmap")
+            # Binarize heatmap
+            mask = np.logical_and(heatmap < threshold, heatmap > np.min(heatmap))
+
+            if dilation != 0:
+                mask = morphology.binary_dilation(
+                    mask, morphology.ball(radius=dilation)
+                )
+
+            bin_mask = np.zeros_like(mask, dtype=np.float32)
+            bin_mask[mask] = 1
+
+            # Save to disk
+            os.makedirs(output_path, exist_ok=True)
+            mask_pth = os.path.join(output_path, "mask.mrc")
+            with mrcfile.new(
+                    mask_pth, overwrite=True
+            ) as mrc:
+                mrc.set_data(bin_mask)
+
+            print(f"Mask saved to {mask_pth}")
+            return bin_mask
+
+    def intensity_mode(self, img: np.array) -> np.array:
         print("Background subtraction")
         filtered = ndimg.gaussian_filter(img, (10, 10, 10))
         background_removed = img - filtered
@@ -452,12 +611,27 @@ class EmbeddingMaskTool(TomoTwinTool):
         """
         Runs the tools
         """
-        print("Read data")
-        with mrcfile.open(args.input) as mrc:
-            img = mrc.data
+
 
         print("Calculate mask")
-        mask = self.create_embedding_mask(img=img, mask_calc=self.threshold_mode)
+        import sys
+        print(sys.argv[2])
+        if sys.argv[2] == "median":
+            mask = self.median_mode(tomo_pth=args.input,
+                                    model_pth=args.modelpth,
+                                    output_path=args.output,
+                                    stride=args.stride,
+                                    dilation=args.dilation,
+                                    threshold=args.threshold,
+                                    batch_size=args.batchsize)
+            print(f"Masked out: {100 - np.sum(mask) * 100 / np.prod(mask.shape):.2f}%")
+        elif sys.argv[2] == "intensity":
+            print("Read data")
+            with mrcfile.open(args.input) as mrc:
+                img = mrc.data
+
+            mask = self.intensity_mode(img)
+            print(f"Masked out: {100 - np.sum(mask) * 100 / np.prod(mask.shape):.2f}%")
         print("Write results to disk")
         os.makedirs(args.output, exist_ok=True)
         with mrcfile.new(
