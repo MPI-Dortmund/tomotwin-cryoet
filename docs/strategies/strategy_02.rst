@@ -25,7 +25,7 @@ In addition, and this is the second advantage, fewer background embeddings also 
 How to use it
 -------------
 
-1. Estimating the mask
+1. Estimate the mask
 
 To calculate the mask, all you need is your tomogram and the latest TomoTwin model:
 
@@ -33,7 +33,7 @@ To calculate the mask, all you need is your tomogram and the latest TomoTwin mod
 
     CUDA_VISIBLE_DEVICES=0,1 tomotwin_tools.py embedding_mask median -i tomo/tomo.mrc -m tomotwin_latest.pth -o mask
 
-2. Calculate the embedding
+2. Calculate the (filtered) embeddings
 
  .. prompt:: bash $
 
