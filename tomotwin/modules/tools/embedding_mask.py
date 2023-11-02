@@ -505,7 +505,6 @@ class EmbeddingMaskTool(TomoTwinTool):
     def median_mode(self,
                     tomo_pth: str,
                     model_pth: str,
-                    output_path: str,
                     stride: int,
                     batch_size: int,
                     threshold: float,
@@ -599,7 +598,6 @@ class EmbeddingMaskTool(TomoTwinTool):
         if sys.argv[2] == "median":
             mask = self.median_mode(tomo_pth=args.input,
                                     model_pth=args.modelpth,
-                                    output_path=args.output,
                                     stride=args.stride,
                                     dilation=args.dilation,
                                     threshold=args.threshold,
