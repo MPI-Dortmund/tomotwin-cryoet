@@ -453,6 +453,27 @@ def run_non_maximum_suppression(class_frames: List[pd.DataFrame], boxsize: int, 
     return class_frames
 
 
+def scale_and_pad_heatmap(vol: np.array, stride: int, tomo_input_shape: tuple) -> np.array:
+    def get_pad_tuble(total_pad):
+        if total_pad % 2 == 0:
+            return (total_pad // 2, total_pad // 2)
+        else:
+            return (total_pad // 2 + 1, total_pad // 2)
+
+    vol = zoom(vol, stride)
+    vol = vol.swapaxes(0, 2)
+
+    get_pad_tuble(np.abs(tomo_input_shape[0] - vol.shape[0]))
+    vol = np.pad(
+        vol, (
+            get_pad_tuble(np.abs(tomo_input_shape[0] - vol.shape[0])),
+            get_pad_tuble(np.abs(tomo_input_shape[1] - vol.shape[1])),
+            get_pad_tuble(np.abs(tomo_input_shape[2] - vol.shape[2]))),
+        "constant",
+        constant_values=np.min(vol))
+    return vol
+
+
 def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.array], stride: int,
                    tomo_input_shape: tuple) -> None:
     '''
@@ -464,11 +485,6 @@ def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.
     '''
     assert len(reference_names) == len(heatmaps), "Unequal number of references and heatmaps"
 
-    def get_pad_tuble(total_pad):
-        if total_pad % 2 == 0:
-            return (total_pad // 2, total_pad // 2)
-        else:
-            return (total_pad // 2 + 1, total_pad // 2)
     for ref_i, ref_name in tqdm.tqdm(
             enumerate(reference_names), desc="Write heatmaps"
     ):
@@ -478,17 +494,7 @@ def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.
             print("Write heatmap", os.path.join(out_path, ref_name + ".mrc"))
             vol = heatmaps[ref_i]
             vol = vol.astype(np.float32)
-            vol = zoom(vol, stride)
-            vol = vol.swapaxes(0, 2)
-
-            get_pad_tuble(np.abs(tomo_input_shape[0] - vol.shape[0]))
-            vol = np.pad(
-                vol, (
-                    get_pad_tuble(np.abs(tomo_input_shape[0] - vol.shape[0])),
-                    get_pad_tuble(np.abs(tomo_input_shape[1] - vol.shape[1])),
-                    get_pad_tuble(np.abs(tomo_input_shape[2] - vol.shape[2]))),
-                "constant",
-                constant_values=np.min(vol))
+            vol = scale_and_pad_heatmap(vol, stride, tomo_input_shape)
             mrc.set_data(vol)
 
 
