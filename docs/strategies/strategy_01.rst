@@ -4,22 +4,20 @@ Strategy 1: Refinement of references/targets using umaps
 When to use it
 --------------
 
-You have selected references or clusters targets but you are not happy with the picking results. The embedding that is calculated based on a cluster or a reference is not always a ideal representation. Some references simply don't work well and sometimes umap does not show all the structure that is actually in the umap embedding.
-
+You have selected references or cluster targets, but you are not satisfied with the picking results. The embedding computed from a cluster or reference is not always an ideal representation. Some references just don't work well, and sometimes umap doesn't show all the structure that is actually in the umap embedding.
 What it does
 ------------
 
-This stragey takes your references/targets and collects all embeddings that a slightly similar to at least one of your references/targets (similarity > 0.5). Those embeddings are then used to estimate a umap. In some cases, you start seeing new structure in the umap parts of the umap correspond to irrelevant embeddings (e.g. Membranes). By finding the cluster in the umap that actually corresponds to your target protein can improve the picking!
-
+This strategy takes your references/targets and collects all embeddings that are slightly similar to at least one of your references/targets (similarity > 0.5). These embeddings are then used to estimate a UMAP. In some cases, you will see new structures in the umap, where some of these new structures of the umap correspond to irrelevant embeddings (e.g. membranes). By finding the cluster in the umap that actually corresponds to your target protein, you can improve the picking!
 How to use it
 -------------
 
-I assume you have run the reference workflow in this example. But it can be easily used with cluster target embeddings as well.
+I assume you ran the reference workflow in this example. But it can easily be used with cluster target embeddings as well.
 
 1. Filter the tomogram embeddings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We first select those embeddings that are reasonable close (`-t 0.5`) to our reference embeddings
+We first select those embeddings that are reasonably close (`-t 0.5`) to our reference embeddings.
 
  .. prompt:: bash $
 
@@ -36,11 +34,11 @@ We first select those embeddings that are reasonable close (`-t 0.5`) to our ref
 3. Start napari and select regions of interest
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-After you have started napari, load the Clustering plugin: :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster umap embeddings`
+After starting napari, load the clustering plugin: :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster umap embeddings`.
 
-Within the plugin select the :file:`.tumap` file in :file:`umap/` folder and press "load".
+Within the plugin, select the :file:`.tumap` file in the :file:`umap/` folder and press :guilabel:`load`.
 
-Select your targets in the umap. By pressing `shift` you can select multiple targets. Save the targets when you are done. I assume you saved it under `cluster_targets/`
+Select your targets in the umap. You can select multiple targets by pressing `shift`. Save your targets when you are done. I assume you saved them in `cluster_targets/`.
 
 4. Map the cluster targets with the tomogram embeddings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
