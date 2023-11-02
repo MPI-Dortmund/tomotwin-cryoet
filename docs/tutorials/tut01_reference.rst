@@ -77,6 +77,12 @@ Now you can embed your reference:
 
     CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py subvolumes -m LATEST_TOMOTWIN_MODEL.pth -v reference/*.mrc -b 12 -o out/embed/reference/
 
+.. hint:: **Strategy: Refine your reference using umaps**
+
+    Some references just don’t work well - you can try to refine it using umaps.
+
+    Check out the :ref:`corresponding strategy <strategy-01>`!
+
 
 5. Map your tomogram
 ^^^^^^^^^^^^^^^^^^^^
