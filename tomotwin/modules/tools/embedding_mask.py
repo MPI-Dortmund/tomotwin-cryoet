@@ -509,7 +509,10 @@ class EmbeddingMaskTool(TomoTwinTool):
                     batch_size: int,
                     threshold: float,
                     dilation: float
-                    ):
+                    ) -> np.array:
+        '''
+        Calculates a mask based on median embedding
+        '''
         with tempfile.TemporaryDirectory() as tmp_pth:
             # Embed
             emb_out_pth = os.path.join(tmp_pth, "embed")
@@ -573,6 +576,9 @@ class EmbeddingMaskTool(TomoTwinTool):
             return bin_mask
 
     def intensity_mode(self, img: np.array) -> np.array:
+        '''
+        Calculates a mask based on intensity heuristics.
+        '''
         print("Background subtraction")
         filtered = ndimg.gaussian_filter(img, (10, 10, 10))
         background_removed = img - filtered

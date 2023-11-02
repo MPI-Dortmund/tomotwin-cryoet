@@ -609,7 +609,10 @@ def run_distr(config, world_size: int):
 
 
 def start(config):
-    # suppose we have 2 gpus
+    '''
+    Start the embedding procedure
+    '''
+
     if config.distr_mode == DistrMode.DDP:
         world_size = torch.cuda.device_count()
         run_distr(config, world_size)
