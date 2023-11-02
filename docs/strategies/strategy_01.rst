@@ -46,7 +46,7 @@ After starting napari, load the clustering plugin: :guilabel:`Plugins` -> :guila
 
 Within the plugin, select the :file:`.tumap` file in the :file:`umap/` folder and press :guilabel:`load`.
 
-Select your targets in the umap. You can select multiple targets by pressing `shift`. Save your targets when you are done. I assume you saved them in `cluster_targets/`.
+Select your targets in the umap. You can select multiple targets by pressing :kbd:`Shift`. Save your targets when you are done. I assume you saved them in `cluster_targets/`.
 
 4. Map the cluster targets with the tomogram embeddings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
