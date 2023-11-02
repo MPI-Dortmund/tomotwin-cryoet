@@ -27,7 +27,7 @@ How to use it
 
 1. Estimating the mask
 
-To calcualte the mask you simply need your tomogram and latest tomotwin model:
+To calculate the mask, all you need is your tomogram and the latest TomoTwin model:
 
  .. prompt:: bash $
 
@@ -39,4 +39,4 @@ To calcualte the mask you simply need your tomogram and latest tomotwin model:
 
     CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -v tomo/tomo.mrc -m tomotwin_latest.pth --mask mask/tomo_mask.mrc
 
-After having calculated the embedding, you can simply continue with either the reference or the clustering workflow.
+Once the embeddings are computed, you can simply continue with either the reference or clustering workflow.
