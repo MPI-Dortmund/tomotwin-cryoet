@@ -21,7 +21,7 @@ The command first calculates the embeddings of a tomogram using a large stride (
 This mask can then be used to compute the embeddings with a smaller stride (fine sampling). But using the mask effectively reduces the total number of embeddings and makes the embedding faster, which is the first advantage of this strategy.
 
 .. image:: ../img/strategies/mask_compare.png
-   :width: 500
+   :width: 550
    :align: center
 
 In addition, and this is the second advantage, fewer background embeddings also means that the umap can focus on those embeddings that are actually more important, which may yield more protein clusters.
