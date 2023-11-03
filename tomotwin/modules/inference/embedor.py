@@ -602,14 +602,12 @@ class TorchEmbedorDistributed(Embedor):
                 items_indicis.append(copy.deepcopy(item_index.data.cpu()))
                 embeddings.append(copy.deepcopy(subvolume.data.cpu()))
                 del subvolume
-
         ## Sync items
         items_indicis = torch.cat(items_indicis)  # .to(self.rank)  # necessary because of nccl
         items_gather_list = None
         if self.rank == 0:
             items_gather_list = [torch.zeros_like(items_indicis) for _ in range(tdist.get_world_size())]
         tdist.barrier()
-
         tdist.gather(items_indicis,
                      gather_list=items_gather_list,
                      dst=0)
@@ -621,11 +619,9 @@ class TorchEmbedorDistributed(Embedor):
             items_indicis = items_indicis[unique_elements]
         else:
             items_indicis = None
-
         ## Sync embeddings
         embeddings = torch.cat(embeddings)
         tdist.barrier()
-
         embeddings_gather_list = None
         if self.rank == 0:
             embeddings_gather_list = [torch.zeros_like(embeddings) for _ in range(tdist.get_world_size())]
