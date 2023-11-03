@@ -22,6 +22,7 @@ This mask can then be used to compute the embeddings with a smaller stride (fine
 
 .. image:: ../img/strategies/mask_compare.png
    :width: 500
+   :align: center
 
 In addition, and this is the second advantage, fewer background embeddings also means that the umap can focus on those embeddings that are actually more important, which may yield more protein clusters.
 
