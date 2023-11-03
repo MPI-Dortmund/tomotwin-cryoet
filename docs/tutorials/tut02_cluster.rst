@@ -82,6 +82,8 @@ You can use the |mag| icon to change the displayed area/zoom and the :guilabel:`
         :width: 650
         :align: center
 
+
+
 6. Save target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -120,7 +122,13 @@ Below the table, you need to adjust the :guilabel:`metric min` and :guilabel:`si
 .. image:: ../img/tutorial_1/after_optim.png
    :width: 650
 
-In the left panel, select the references you would like to pick (ctrl click on windows, cmd click on mac to select multiple). You can now press :guilabel:`File` -> :guilabel:`Save selected Layer(s)`. In the dialog, change the :guilabel:`Files of type` to  :guilabel:`Box Manager`. Choose filename like :guilabel:`selected_coords.tloc`. Make sure that the file ending is :file:`.tloc`.
+In the left panel, select the references you would like to pick (:kbd:`Control-LMB` click on windows, cmd click on mac to select multiple). You can now press :guilabel:`File` -> :guilabel:`Save selected Layer(s)`. In the dialog, change the :guilabel:`Files of type` to  :guilabel:`Box Manager`. Choose filename like :guilabel:`selected_coords.tloc`. Make sure that the file ending is :file:`.tloc`.
+
+.. hint:: **Strategy: Improve your picks by refining your cluster targets**
+
+    Cluster targets can sometimes be optimized using umaps!
+
+    Check out the :ref:`corresponding strategy <strategy-01>`!
 
 To convert the :file:`.tloc` file into :file:`.coords` you need to run
 

@@ -121,6 +121,12 @@ To convert the :file:`.tloc` file into :file:`.coords` you need to run
 
 You will find coordinate file for each reference in :file:`.coords` format in the :file:`coords/` folder.
 
+.. hint:: **Strategy: Improve your picks by refining your references**
+
+    Manual selected references can sometimes be optimized using umaps!
+
+    Check out the :ref:`corresponding strategy <strategy-01>`!
+
 8. Scale your coordinates
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
