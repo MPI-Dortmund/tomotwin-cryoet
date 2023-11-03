@@ -19,7 +19,7 @@ It takes advantage of the fact that the average position within a tomogram is un
 The command first calculates the embeddings of a tomogram using a large stride (coarse sampling). It then calculates the median embedding from the coarse tomogram embeddings. Using the median embedding, we can calculate a heatmap of how likely it is that a given position is a background embedding. From this heatmap, a mask is generated using only those positions that are highly dissimilar to the median embedding.
 
 .. figure:: ../img/strategies/mask.png
-   :width: 550
+   :width: 500
    :align: center
 
    Mask for a Tomogram using the default parameters of the median mask command.
