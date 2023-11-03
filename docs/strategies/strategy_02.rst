@@ -18,11 +18,19 @@ It takes advantage of the fact that the average position within a tomogram is un
 
 The command first calculates the embeddings of a tomogram using a large stride (coarse sampling). It then calculates the median embedding from the coarse tomogram embeddings. Using the median embedding, we can calculate a heatmap of how likely it is that a given position is a background embedding. From this heatmap, a mask is generated using only those positions that are highly dissimilar to the median embedding.
 
-This mask can then be used to compute the embeddings with a smaller stride (fine sampling). But using the mask effectively reduces the total number of embeddings and makes the embedding faster, which is the first advantage of this strategy.
-
-.. image:: ../img/strategies/mask_compare.png
+.. figure:: ../img/strategies/mask.png
    :width: 550
    :align: center
+
+   Mask for a Tomogram using the default parameters of the median mask command.
+
+This mask can then be used to compute the embeddings with a smaller stride (fine sampling). But using the mask effectively reduces the total number of embeddings and makes the embedding faster, which is the first advantage of this strategy.
+
+.. figure:: ../img/strategies/mask_compare.png
+   :width: 550
+   :align: center
+
+   Comparison of processing time using no mask, a mask based on intensity heuristics, and a mask based on the median embedding. All results were calculated using TomoTwin 0.7.
 
 In addition, and this is the second advantage, fewer background embeddings also means that the umap can focus on those embeddings that are actually more important, which may yield more protein clusters.
 
