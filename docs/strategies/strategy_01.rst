@@ -15,7 +15,7 @@ This strategy takes your references/targets and collects all embeddings that are
    :width: 600
    :align: center
 
-   Umap embeddings that have a slight similarity to two manually selected references. Both references either did not work or had too many false positives/false negatives. After selecting the cluster highlighted in green, the selection became much more precise.
+   Umap embeddings that have a slight similarity to two manually selected references. Both references either had too many false positives or false negatives. After selecting the cluster highlighted in green, the selection became much more precise.
 
 In some cases, you will see new structures in the umap, where some of these new structures of the umap correspond to irrelevant embeddings (e.g. membranes). By finding the cluster in the umap that actually corresponds to your target protein, you can improve the picking!
 
