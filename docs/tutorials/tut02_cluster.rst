@@ -122,7 +122,7 @@ Below the table, you need to adjust the :guilabel:`metric min` and :guilabel:`si
 .. image:: ../img/tutorial_1/after_optim.png
    :width: 650
 
-In the left panel, select the references you would like to pick (:kbd:`Control-LMB` click on windows, :kbd:`CMD` + :kbd:`LMB` on mac to select multiple). You can now press :guilabel:`File` -> :guilabel:`Save selected Layer(s)`. In the dialog, change the :guilabel:`Files of type` to  :guilabel:`Box Manager`. Choose filename like :guilabel:`selected_coords.tloc`. Make sure that the file ending is :file:`.tloc`.
+In the left panel, select the references you would like to pick (:kbd:`Control` + :kbd:`LMB` on windows, :kbd:`CMD` + :kbd:`LMB` on mac to select multiple). You can now press :guilabel:`File` -> :guilabel:`Save selected Layer(s)`. In the dialog, change the :guilabel:`Files of type` to  :guilabel:`Box Manager`. Choose filename like :guilabel:`selected_coords.tloc`. Make sure that the file ending is :file:`.tloc`.
 
 .. hint:: **Strategy: Improve your picks by refining your cluster targets**
 
