@@ -1,19 +1,22 @@
-from skimage.measure import label, regionprops
-import numpy as np
-from typing import List
-import mrcfile
-from tomotwin.modules.common.preprocess import label_filename
 import argparse
-import os
 import json
+import os
+from typing import List
+
+import mrcfile
+import numpy as np
+import skimage.measure as skm
+
+from tomotwin.modules.common.preprocess import label_filename
+
 
 def binarize(vol):
     t = np.max(vol) - (np.max(vol) - np.min(vol)) * 0.9
     return vol > t
 
 def boxsize(vol):
-    lbl = label(vol, background=0)
-    regs = regionprops(lbl)
+    lbl = skm.label(vol, background=0)
+    regs = skm.regionprops(lbl)
     size = -1
     for reg in regs:
         cand_size = np.max([np.abs(reg.bbox[i] - reg.bbox[i+3]) for i in range(int(len(reg.bbox)/2))])

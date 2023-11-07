@@ -524,8 +524,7 @@ class SiameseNet3D(TorchModel):
             Forward pass through the network
             :param inputtensor: Input tensor
             """
-
-            inputtensor = nn.functional.pad(inputtensor, (1, 2, 1, 2, 1, 2))
+            inputtensor = F.pad(inputtensor, (1, 2, 1, 2, 1, 2))
 
             out = self.conv_layer0(inputtensor)
             out = self.max_pooling(out)

@@ -30,8 +30,9 @@ User Guide: full table of contents
 
    installation
    tutorials/tutorials_overview
+   strategies/strategy_overview
    developer/devs
-   changes
+   Changes <https://github.com/MPI-Dortmund/tomotwin-cryoet/releases>
 
 Citation
 ========

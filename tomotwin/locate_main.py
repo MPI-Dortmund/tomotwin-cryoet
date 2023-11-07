@@ -452,7 +452,32 @@ def run_non_maximum_suppression(class_frames: List[pd.DataFrame], boxsize: int, 
         )
     return class_frames
 
-def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.array]) -> None:
+
+def scale_and_pad_heatmap(vol: np.array, stride: int, tomo_input_shape: tuple) -> np.array:
+    '''
+    Scales the calculated volume so that it fits the tomo_input_shape
+    '''
+    def get_pad_tuble(total_pad):
+        if total_pad % 2 == 0:
+            return (total_pad // 2, total_pad // 2)
+        return (total_pad // 2 + 1, total_pad // 2)
+
+    vol = zoom(vol, stride)
+    vol = vol.swapaxes(0, 2)
+
+    get_pad_tuble(np.abs(tomo_input_shape[0] - vol.shape[0]))
+    vol = np.pad(
+        vol, (
+            get_pad_tuble(np.abs(tomo_input_shape[0] - vol.shape[0])),
+            get_pad_tuble(np.abs(tomo_input_shape[1] - vol.shape[1])),
+            get_pad_tuble(np.abs(tomo_input_shape[2] - vol.shape[2]))),
+        "constant",
+        constant_values=np.min(vol) - 0.01 * np.abs(np.min(vol)))
+    return vol
+
+
+def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.array], stride: int,
+                   tomo_input_shape: tuple) -> None:
     '''
     Write heatmaps to disk
     :param reference_names: Name of the references
@@ -461,6 +486,7 @@ def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.
     :return: None
     '''
     assert len(reference_names) == len(heatmaps), "Unequal number of references and heatmaps"
+
     for ref_i, ref_name in tqdm.tqdm(
             enumerate(reference_names), desc="Write heatmaps"
     ):
@@ -470,9 +496,7 @@ def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.
             print("Write heatmap", os.path.join(out_path, ref_name + ".mrc"))
             vol = heatmaps[ref_i]
             vol = vol.astype(np.float32)
-            vol = zoom(vol, 2)
-            vol = np.pad(vol, ((18, 18), (18, 18), (18, 18)), "constant")
-            vol = vol.swapaxes(0, 2)
+            vol = scale_and_pad_heatmap(vol, stride, tomo_input_shape)
             mrc.set_data(vol)
 
 
@@ -523,6 +547,7 @@ def run(conf: LocateConfiguration) -> None:
     del map_result
 
 
+
     class_vols = [t.attrs['heatmap'] for t in class_frames_and_vols if 'heatmap' in t.attrs]
     class_frames_and_vols = run_non_maximum_suppression(class_frames_and_vols, conf.boxsize, size_dict=size_dict)
 
@@ -538,7 +563,7 @@ def run(conf: LocateConfiguration) -> None:
 
     # Write picking headmaps
     if conf.write_heatmaps:
-        write_heatmaps(map_attrs["references"], out_path, class_vols)
+        write_heatmaps(map_attrs["references"], out_path, class_vols, stride, map_attrs["tomogram_input_shape"])
 
 def _main_():
     ui = LocateArgParseUI()

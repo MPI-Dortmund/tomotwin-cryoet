@@ -377,8 +377,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 import glob
 import hashlib
 import os
-import resource
-import sys
+import random
 from typing import List
 
 import numpy as np
@@ -599,17 +598,27 @@ def run_distr(config, world_size: int):
     Starts a distributed run using DistributedDataParallel
     """
     mp.set_sharing_strategy('file_system')
-    limit = resource.getrlimit(resource.RLIMIT_NOFILE)
-    if limit[0] < 65000:
-        print(
-            f"Your user limit ('ulimit -n') is too low ({limit[0]}). Please run 'ulimit -n 65000' before running tomotwin_embed.")
-        sys.exit(1)
     print(f"Found {world_size} GPU(s). Start DDP + Compiling.")
+    os.environ['MASTER_ADDR'] = '127.0.0.1'
+    os.environ['MASTER_PORT'] = '29' + str(random.randint(1, 500)).zfill(3)
     mp.spawn(
         run,
         args=([config, world_size]),
         nprocs=world_size
     )
+
+
+def start(config):
+    '''
+    Start the embedding procedure
+    '''
+
+    if config.distr_mode == DistrMode.DDP:
+        world_size = torch.cuda.device_count()
+        run_distr(config, world_size)
+    else:
+        run(None, config, None)
+
 def _main_():
     ########################
     # Get configuration from user interface
@@ -618,13 +627,8 @@ def _main_():
     ui.run()
     check_for_updates()
     config = ui.get_embed_configuration()
+    start(config)
 
-    # suppose we have 2 gpus
-    if config.distr_mode == DistrMode.DDP:
-        world_size = torch.cuda.device_count()
-        run_distr(config, world_size)
-    else:
-        run(None, config, None)
 
 
 if __name__ == "__main__":

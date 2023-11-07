@@ -77,6 +77,12 @@ Now you can embed your reference:
 
     CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py subvolumes -m LATEST_TOMOTWIN_MODEL.pth -v reference/*.mrc -b 12 -o out/embed/reference/
 
+.. hint:: **Strategy: Refine your reference using umaps**
+
+    Some references just don’t work well - you can try to refine it using umaps.
+
+    Check out the :ref:`corresponding strategy <strategy-01>`!
+
 
 5. Map your tomogram
 ^^^^^^^^^^^^^^^^^^^^
@@ -111,7 +117,7 @@ Below the table, you need to adjust the :guilabel:`metric min` and :guilabel:`si
 .. image:: ../img/tutorial_1/after_optim.png
    :width: 650
 
-In the left panel, select the references you would like to pick (ctrl click on windows, cmd click on mac to select multiple). You can now press :guilabel:`File` -> :guilabel:`Save selected Layer(s)`. In the dialog, change the :guilabel:`Files of type` to  :guilabel:`Box Manager`. Choose filename like :guilabel:`selected_coords.tloc`. Make sure that the file ending is :file:`.tloc`.
+In the left panel, select the references you would like to pick (:kbd:`Control` + :kbd:`LMB`  on linux/windows, :kbd:`CMD` + :kbd:`LMB` on mac to select multiple). You can now press :guilabel:`File` -> :guilabel:`Save selected Layer(s)`. In the dialog, change the :guilabel:`Files of type` to  :guilabel:`Box Manager`. Choose filename like :guilabel:`selected_coords.tloc`. Make sure that the file ending is :file:`.tloc`.
 
 To convert the :file:`.tloc` file into :file:`.coords` you need to run
 
@@ -120,6 +126,12 @@ To convert the :file:`.tloc` file into :file:`.coords` you need to run
     tomotwin_pick.py -l coords.tloc -o coords/
 
 You will find coordinate file for each reference in :file:`.coords` format in the :file:`coords/` folder.
+
+.. hint:: **Strategy: Improve your picks by refining your references**
+
+    Manual selected references can sometimes be optimized using umaps!
+
+    Check out the :ref:`corresponding strategy <strategy-01>`!
 
 8. Scale your coordinates
 ^^^^^^^^^^^^^^^^^^^^^^^^^
