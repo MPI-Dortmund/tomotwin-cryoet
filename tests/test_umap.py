@@ -1,12 +1,9 @@
 import os
-import tempfile
-import unittest
-
 import pandas as pd
 import pytest
+import tempfile
 import torch
-
-from tomotwin.modules.tools.umap import UmapTool
+import unittest
 
 
 # from cuml.common.device_selection import using_device_type
@@ -16,6 +13,7 @@ class MyTestCase(unittest.TestCase):
 
     @pytest.mark.skipif(torch.cuda.is_available() == False, reason="Skipped because CUDA is not available")
     def test_something(self):
+        from tomotwin.modules.tools.umap import UmapTool
         tool = UmapTool()
         in_pth = os.path.join(os.path.dirname(__file__),
                               "../resources/tests/map_main/embed/tomo/tiltseries_cropped_embeddings.temb")
