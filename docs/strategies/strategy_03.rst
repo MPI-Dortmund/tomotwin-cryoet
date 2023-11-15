@@ -11,11 +11,11 @@ What it does
 
 This strategy takes the embeddings from a whole tomogram, calculates the median embedding, and removes any embeddings with a high similarity to the median.
 
-.. figure:: ../img/strategies/ref_refinement.png
+.. figure:: ../img/strategies/umap_filtered_mask.png
    :width: 600
    :align: center
 
-   BEFORE/AFTER MEDIAN FILTERING UMAP
+   Filtered embeddings created using the default application of this strategy. Total embedding size reduced by 58%.
 
 Note that this strategy is redundant with strategy #1. If you already performed masking during your embeddings do not use this strategy.
 
