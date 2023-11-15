@@ -1,4 +1,4 @@
-Strategy 1: Filtering tomogram embeddings based on the median embedding
+Strategy 3: Filtering tomogram embeddings based on the median embedding
 ========================================================
 
 When to use it
