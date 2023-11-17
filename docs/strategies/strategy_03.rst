@@ -43,7 +43,7 @@ Next we map the distance between the median embedding and the rest of the tomogr
     tomotwin_map.py distance -r median_embedding/embed_med.temb -v embed/tomo_embeddings.temb -o map_median/
 
 
-1. Filter the tomogram embeddings
+3. Filter the tomogram embeddings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Next we filter the tomogram embeddings to remove any embeddings reasonably close to the median `(t > 0.5)`.
@@ -52,7 +52,7 @@ Next we filter the tomogram embeddings to remove any embeddings reasonably close
 
     tomotwin_tools.py filter_embedding -i embed/tomo_embeddings.temb -m map_median/map.tmap -t 0.5 -o median_filtered/
 
-2. Estimate umap
+4. Estimate umap
 ^^^^^^^^^^^^^^^^
 
  .. prompt:: bash $
@@ -60,7 +60,7 @@ Next we filter the tomogram embeddings to remove any embeddings reasonably close
     tomotwin_tools.py umap -i median_filtered/tomo_embeddings_filtered_.temb -o umap/
 
 
-3. Start napari and select regions of interest
+5. Start napari and select regions of interest
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To start napari run:
@@ -75,7 +75,7 @@ Within the plugin, select the :file:`.tumap` file in the :file:`umap/` folder an
 
 Select your targets in the umap. You can select multiple targets by pressing :kbd:`Shift`. Save your targets when you are done. I assume you saved them in `cluster_targets/`.
 
-4. Map the cluster targets with the tomogram embeddings
+6. Map the cluster targets with the tomogram embeddings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
  .. prompt:: bash $
@@ -83,7 +83,7 @@ Select your targets in the umap. You can select multiple targets by pressing :kb
     tomotwin_map.py distance -r cluster_targets/cluster_targets.temb -v embed/tomo_embeddings.temb -o map_cluster/
 
 
-5. Locate the particles
+7. Locate the particles
 ^^^^^^^^^^^^^^^^^^^^^^^
 
  .. prompt:: bash $
