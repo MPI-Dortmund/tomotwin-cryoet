@@ -4,7 +4,11 @@ import pickle
 import typing
 from argparse import ArgumentParser
 
-import cuml
+try:
+    import cuml
+except ImportError:
+    print("cuml can't be loaded")
+
 import mrcfile
 import numpy as np
 import pandas as pd
@@ -59,10 +63,10 @@ class UmapTool(TomoTwinTool):
             self, embeddings : pd.DataFrame,
             fit_sample_size: int,
             transform_chunk_size: int,
-            reducer: cuml.UMAP = None,
+            reducer: "cuml.UMAP" = None,
             ncomponents=2,
             neighbors: int = 200,
-            metric: str = "euclidean") -> typing.Tuple[ArrayLike, cuml.UMAP]:
+            metric: str = "euclidean") -> typing.Tuple[ArrayLike, "cuml.UMAP"]:
         print("Prepare data")
 
         fit_sample = embeddings.sample(n=min(len(embeddings),fit_sample_size), random_state=17)
