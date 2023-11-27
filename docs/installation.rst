@@ -4,7 +4,7 @@ Installation and Download
 Installation
 ^^^^^^^^^^^^^
 
-We recommend to use the conda client `mamba <https://mamba.readthedocs.io/>`_ for installation. You should use `mambaforge <https://mamba.readthedocs.io/en/latest/installation.html>`_ for installation of mamba. Alternatively you can replace ``mamba`` with ``conda`` in the commands below.
+We recommend to use the conda client `mamba <https://mamba.readthedocs.io/>`_ for installation. You should use `mambaforge <https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html>`_ for installation of mamba. Alternatively you can replace ``mamba`` with ``conda`` in the commands below.
 
 There are three main steps to install TomoTwin:
 
