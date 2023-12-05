@@ -147,6 +147,7 @@ class UmapTool(TomoTwinTool):
 
         print("Write embeedings to disk")
         df_embeddings.columns = [f"umap_{i}" for i in range(umap_embeddings.shape[1])]
+        df_embeddings.attrs['embeddings_path'] = os.path.realpath(args.input)
         df_embeddings.to_pickle(os.path.join(out_pth,fname+".tumap"))
 
         print("Write umap model to disk")
