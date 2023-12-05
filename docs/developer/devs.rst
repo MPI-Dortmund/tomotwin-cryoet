@@ -53,7 +53,7 @@ https://github.com/MPI-Dortmund/tomotwin-cryoet/blob/main/resources/configs/conf
 3. Start the training
 ^^^^^^^^^^^^^^^^^^^^^
 
-To run it on one GPU do:
+To run it on one GPU for 300 epochs do:
 
  .. prompt:: bash $
 
