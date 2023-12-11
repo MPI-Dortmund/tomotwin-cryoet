@@ -146,11 +146,11 @@ class UmapTool(TomoTwinTool):
         df_embeddings = pd.DataFrame(umap_embeddings)
         df_embeddings.reset_index(drop=True, inplace=True)
         embeddings.reset_index(drop=True, inplace=True)
-        print("DF", df_embeddings.shape)
-        print("EMBEDDINGS", embeddings.shape, embeddings.dtypes)
+
         print("Write embeedings to disk")
         df_embeddings.columns = [f"umap_{i}" for i in range(umap_embeddings.shape[1])]
         df_embeddings = pd.concat([embeddings[['X', 'Y', 'Z']], df_embeddings], axis=1)
+        df_embeddings.attrs = embeddings.attrs
         df_embeddings.attrs['embeddings_path'] = os.path.realpath(args.input)
 
         df_embeddings.to_pickle(os.path.join(out_pth,fname+".tumap"))
