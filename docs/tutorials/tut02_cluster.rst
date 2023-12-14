@@ -23,8 +23,6 @@ Now we will approximate the tomogram embeddings to 2D to allow for efficient vis
     If you encounter an out of memory error here, you may need to reduce the :guilabel:`fit_sample_size` and/or :guilabel:`chunk_size` values (default 400,000).
 
 
-Additionally, it generated a mask (`tomo_embeddings_label_mask.mrci`) of the embeddings to allow us to track which UMAP values correspond to which points in the tomogram.
-
 4. Load data for clustering in Napari
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -32,10 +30,10 @@ Now that we have all the input files for the clustering workflow we can get star
 
 .. prompt:: bash $
 
-    napari your_tomo_a10.mrc out/clustering/your_tomo_a10_embedding_label_mask.mrci
+    napari your_tomo_a10.mrc
 
 Next open the napari-tomotwin clustering tool via :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster UMAP embeddings`. Then choose the :guilabel:`Path to UMAP` by clicking on :guilabel:`Select file` and provide the path to your :file:`your_tomo_a10_embeddings.tumap`. 
-Click :guilabel:`Load` and after a second, a 2D plot of the umap embeddings should appear in the plugin window.
+Click :guilabel:`Load` and a 2D plot of the umap embeddings should appear in the plugin window.
 
 5. Find target clusters
 ^^^^^^^^^^^^^^^^^^^^^^^^
