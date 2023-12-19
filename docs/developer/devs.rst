@@ -32,11 +32,32 @@ Now you are in principle set to train your network (see ``How to train TomoTwin`
 How to train TomoTwin
 *********************
 
+Here we describe how to train the SiameseNet (bad name, as it is actually a tripletnetwork). Hardwarewise, 12GB of GPU memory should be enough.
+
+1. Download training and validation data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Training and validation set can be found here:
 
 https://zenodo.org/record/6637456
 
-More will follow soon :-)
+Download and untar training and validation data.
+
+2. Download siamese network config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You find the configuration file here:
+
+https://github.com/MPI-Dortmund/tomotwin-cryoet/blob/main/resources/configs/config_siamese.json
+
+3. Start the training
+^^^^^^^^^^^^^^^^^^^^^
+
+To run it on one GPU for 300 epochs do:
+
+ .. prompt:: bash $
+
+    CUDA_VISIBLE_DEVICES=0 tomotwin_train.py -v path/train/volumes/ --validvolumes path/valid/volumes/ -o out_train -nc path/to/siamese_network.json --epochs 300
 
 
 How to evaluate TomoTwin

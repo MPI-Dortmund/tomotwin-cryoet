@@ -48,7 +48,7 @@ To start napari run:
 
  .. prompt:: bash $
 
-    napari tomo/tomo.mrc umap/tomo_embeddings_filtered_allrefs_label_mask.mrci
+    napari tomo/tomo.mrc
 
 After starting napari, load the clustering plugin: :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster umap embeddings`.
 
