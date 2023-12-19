@@ -20,6 +20,7 @@ In case you have on old TomoTwin version installed, please remove the old one fi
 .. prompt:: bash $
 
     mamba env create -n tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_tomotwin.yml
+    pip install tomotwin-cryoet
 
 2. Install Napari
 """""""""""""""""""
@@ -53,6 +54,8 @@ To update an existing TomoTwin installation just do:
 .. prompt:: bash $
 
     mamba env update -n tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_tomotwin.yml --prune
+    conda activate tomotwin
+    pip install tomotwin-cryoet
     mamba env update -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_napari.yml --prune
 
 Download latest model
