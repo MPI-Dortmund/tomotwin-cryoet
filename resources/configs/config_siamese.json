@@ -20,7 +20,7 @@
     "learning_rate": 5.945e-05,
     "optimizer": "Adam",
     "weight_decay": 0,
-    "batchsize": 35,
+    "batchsize": 10,
     "patience": 50,
     "aug_train_shift_distance": 2
   },
