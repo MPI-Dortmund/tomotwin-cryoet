@@ -389,7 +389,7 @@ class LossPyML(nn.Module):
     def __init__(
         self,
         loss_func: losses.BaseMetricLossFunction,
-        miner: miners.BaseTupleMiner = None,
+            miner: miners.BaseMiner = None,
         only_negative_labels = None
     ):
         super().__init__()

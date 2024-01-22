@@ -33,7 +33,7 @@ setup(
         "scikit-image",
         "pystardb>=0.4.2",
         "pandas <= 2", # Because rapids does not support pandas > 1.5.3
-        "pytorch-metric-learning<1.7",
+        # "pytorch-metric-learning<1.7",
         "numba",
         "tabulate",
         "setuptools_scm",
