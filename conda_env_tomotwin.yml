@@ -18,7 +18,7 @@ dependencies:
   - protobuf[version='>3.20']
   - tensorboard
   - optuna
-  - mysql-connector-python
+  #- mysql-connector-python # we need it for optuna, but it does not go together with cuml 23.12
   - pytorch-metric-learning
   - pip
   #- pip:
