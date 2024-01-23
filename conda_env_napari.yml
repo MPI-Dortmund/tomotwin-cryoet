@@ -1,11 +1,15 @@
 name: napari-tomotwin
 channels:
-  - defaults
+  - nvidia
+  - rapidsai
   - conda-forge
+  - defaults
 dependencies:
   - python=3.10
   - napari=0.4.17
   - pyqt
+  - cuml=23.12
+  - cuda-version=11.8
   - pip
   - pip:
       - napari-boxmanager
