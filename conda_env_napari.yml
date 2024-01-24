@@ -13,6 +13,6 @@ dependencies:
   - pip
   - pip:
       - napari-boxmanager
-      - napari-tomotwin=0.4.0b1
+      - napari-tomotwin==0.4.0b1
       - napari-clusters-plotter@git+https://github.com/BiAPoL/napari-clusters-plotter.git@5e937dc
 
