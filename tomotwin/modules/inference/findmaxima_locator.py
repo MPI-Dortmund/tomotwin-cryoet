@@ -491,21 +491,27 @@ class FindMaximaLocator(Locator):
 
         import itertools
         import dask
-
+        from tqdm import tqdm
         lazy_results = []
         offsets = []
         indicis = list(itertools.product(*map(range, da_vol.blocks.shape)))
-        # with tqdm
-        for inds in indicis:
-            chunk = da_vol.blocks[inds]
-            offsets.append([a * b for a, b in zip(da_vol.chunksize, inds)])
-            lr = dask.delayed(find_maxima)(np.asarray(chunk), tolerance=tolerance, global_min=global_min,
-                                           tqdm_pos=kwargs.get("tqdm_pos"))
-            lazy_results.append(lr)
+        with tqdm(total=len(indicis), position=kwargs.get("tqdm_pos"),
+                  desc=f"Locate class {kwargs['tqdm_pos']}") as pbar:
 
-        # futures = dask.persist(*lazy_results)
-        a = dask.compute(*lazy_results)
-        # maximas, _
+            def find_max_bar_wrapper(*args, **kwargs):
+                pbar.update(1)
+                return find_maxima(*args, **kwargs)
+
+            for inds in indicis:
+                chunk = da_vol.blocks[inds]
+                offsets.append([a * b for a, b in zip(da_vol.chunksize, inds)])
+                lr = dask.delayed(find_max_bar_wrapper)(np.asarray(chunk), tolerance=tolerance, global_min=global_min,
+                                                        tqdm_pos=kwargs.get("tqdm_pos"), pbar=pbar)
+                lazy_results.append(lr)
+
+            # futures = dask.persist(*lazy_results)
+            a = dask.compute(*lazy_results)
+            # maximas, _
 
         # apply offsets
         maximas = []
