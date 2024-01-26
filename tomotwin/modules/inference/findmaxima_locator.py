@@ -375,12 +375,16 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
+import itertools
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor as Pool
 from typing import List, Tuple
 
+import dask
+import dask.array as da
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 from tomotwin.modules.common.findmax.findmax import find_maxima
 from tomotwin.modules.inference.locator import Locator
@@ -486,12 +490,7 @@ class FindMaximaLocator(Locator):
         :return: List with 3 elements. First element is the maxima position, second element is the size (region growing), third element is maxima value
         '''
 
-        import dask.array as da
         da_vol = da.from_array(vol, chunks=100)  # really constant 100?
-
-        import itertools
-        import dask
-        from tqdm import tqdm
         lazy_results = []
         offsets = []
         indicis = list(itertools.product(*map(range, da_vol.blocks.shape)))
