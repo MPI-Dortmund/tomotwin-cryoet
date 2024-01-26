@@ -467,7 +467,6 @@ def get_avg_pos(classes: List[int], regions: np.array, region_max_value: List, i
     return maxima_coords
 
 def find_maxima(volume: np.array, tolerance: float, global_min: float = 0.5, **kwargs) -> tuple[list, np.array]:
-
     """
     :param volume: 3D volume
     :param tolerance: Tolerance for detection

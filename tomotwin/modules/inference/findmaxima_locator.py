@@ -486,8 +486,39 @@ class FindMaximaLocator(Locator):
         :return: List with 3 elements. First element is the maxima position, second element is the size (region growing), third element is maxima value
         '''
 
-        maximas, _ = find_maxima(vol, tolerance, global_min=global_min, tqdm_pos=kwargs.get("tqdm_pos"))
-        del _
+        import dask.array as da
+        da_vol = da.from_array(vol, chunks=100)  # really constant 100?
+
+        import itertools
+        import dask
+
+        lazy_results = []
+        offsets = []
+        indicis = list(itertools.product(*map(range, da_vol.blocks.shape)))
+        # with tqdm
+        for inds in indicis:
+            chunk = da_vol.blocks[inds]
+            offsets.append([a * b for a, b in zip(da_vol.chunksize, inds)])
+            lr = dask.delayed(find_maxima)(np.asarray(chunk), tolerance=tolerance, global_min=global_min,
+                                           tqdm_pos=kwargs.get("tqdm_pos"))
+            lazy_results.append(lr)
+
+        # futures = dask.persist(*lazy_results)
+        a = dask.compute(*lazy_results)
+        # maximas, _
+
+        # apply offsets
+        maximas = []
+        # k = 0
+        for k, (maximas_in_chunk, _) in enumerate(a):
+            off_chunk = offsets[k]
+            for s_i, single_maxima in enumerate(maximas_in_chunk):
+                new_pos = tuple([a + b for a, b in zip(single_maxima[0], off_chunk)])
+                new_entry = [new_pos]
+                new_entry.extend(single_maxima[1:])
+                maximas_in_chunk[s_i] = new_entry
+            maximas.extend(maximas_in_chunk)
+            # k = k + 1
 
         maximas = [
             m for m in maximas if m[1] > 1
