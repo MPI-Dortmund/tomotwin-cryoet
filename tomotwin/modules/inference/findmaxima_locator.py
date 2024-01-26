@@ -476,11 +476,11 @@ class FindMaximaLocator(Locator):
         return dat
 
     @staticmethod
-    def apply_findmax(vol: np.array,
-                      tolerance: float,
-                      global_min: float,
-                      **kwargs
-                      ) -> List[Tuple]:
+    def apply_findmax_dask(vol: np.array,
+                           tolerance: float,
+                           global_min: float,
+                           **kwargs
+                           ) -> List[Tuple]:
         '''
         Applies the findmax procedure the 3d volume
         :param vol: Volume where maximas needs to be detected.
@@ -490,7 +490,7 @@ class FindMaximaLocator(Locator):
         :return: List with 3 elements. First element is the maxima position, second element is the size (region growing), third element is maxima value
         '''
 
-        da_vol = da.from_array(vol, chunks=100)  # really constant 100?
+        da_vol = da.from_array(vol, chunks=200)  # really constant 200?
         lazy_results = []
         offsets = []
         indicis = list(itertools.product(*map(range, da_vol.blocks.shape)))
@@ -498,8 +498,9 @@ class FindMaximaLocator(Locator):
                   desc=f"Locate class {kwargs['tqdm_pos']}") as pbar:
 
             def find_max_bar_wrapper(*args, **kwargs):
+                r = find_maxima(*args, **kwargs)
                 pbar.update(1)
-                return find_maxima(*args, **kwargs)
+                return r
 
             for inds in indicis:
                 chunk = da_vol.blocks[inds]
@@ -525,6 +526,26 @@ class FindMaximaLocator(Locator):
             maximas.extend(maximas_in_chunk)
             # k = k + 1
 
+        return maximas
+
+    @staticmethod
+    def apply_findmax(vol: np.array,
+                      tolerance: float,
+                      global_min: float,
+                      **kwargs
+                      ) -> List[Tuple]:
+        '''
+        Applies the findmax procedure the 3d volume
+        :param vol: Volume where maximas needs to be detected.
+        :param tolerance: Prominence of the peak
+        :param global_min: global minimum
+        :param kwargs: kwargs arguments
+        :return: List with 3 elements. First element is the maxima position, second element is the size (region growing), third element is maxima value
+        '''
+
+        maximas, _ = find_maxima(vol, tolerance, global_min=global_min, tqdm_pos=kwargs.get("tqdm_pos"))
+        del _
+
         maximas = [
             m for m in maximas if m[1] > 1
         ]  # more than one pixel coordinate must be involved.
@@ -540,13 +561,18 @@ class FindMaximaLocator(Locator):
                      global_min: float,
                      ) -> Tuple[pd.DataFrame, np.array]:
         vol = FindMaximaLocator.to_volume(map_output, target_class=class_id, window_size=window_size, stride=stride)
-        maximas = FindMaximaLocator.apply_findmax(vol=vol,
-                                                  class_id=class_id,
-                                                  window_size=window_size,
-                                                  stride=stride,
-                                                  tolerance=tolerance,
-                                                  global_min=global_min,
-                                                  tqdm_pos=class_id)
+        maximas = FindMaximaLocator.apply_findmax_dask(vol=vol,
+                                                       class_id=class_id,
+                                                       window_size=window_size,
+                                                       stride=stride,
+                                                       tolerance=tolerance,
+                                                       global_min=global_min,
+                                                       tqdm_pos=class_id)
+
+        maximas = [
+            m for m in maximas if m[1] > 1
+        ]  # more than one pixel coordinate must be involved.
+
         print("done", class_id)
         particle_df = FindMaximaLocator.maxima_to_df(
             maximas, class_id, stride=stride, boxsize=window_size
