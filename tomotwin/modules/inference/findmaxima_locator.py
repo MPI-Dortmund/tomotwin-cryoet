@@ -375,12 +375,16 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 """
 
+import itertools
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor as Pool
 from typing import List, Tuple
 
+import dask
+import dask.array as da
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 from tomotwin.modules.common.findmax.findmax import find_maxima
 from tomotwin.modules.inference.locator import Locator
@@ -472,6 +476,59 @@ class FindMaximaLocator(Locator):
         return dat
 
     @staticmethod
+    def apply_findmax_dask(vol: np.array,
+                           tolerance: float,
+                           global_min: float,
+                           **kwargs
+                           ) -> List[Tuple]:
+        '''
+        Applies the findmax procedure the 3d volume
+        :param vol: Volume where maximas needs to be detected.
+        :param tolerance: Prominence of the peak
+        :param global_min: global minimum
+        :param kwargs: kwargs arguments
+        :return: List with 3 elements. First element is the maxima position, second element is the size (region growing), third element is maxima value
+        '''
+
+        da_vol = da.from_array(vol, chunks=200)  # really constant 200?
+        lazy_results = []
+        offsets = []
+        indicis = list(itertools.product(*map(range, da_vol.blocks.shape)))
+        with tqdm(total=len(indicis), position=kwargs.get("tqdm_pos"),
+                  desc=f"Locate class {kwargs['tqdm_pos']}") as pbar:
+
+            def find_max_bar_wrapper(*args, **kwargs):
+                r = find_maxima(*args, **kwargs)
+                pbar.update(1)
+                return r
+
+            for inds in indicis:
+                chunk = da_vol.blocks[inds]
+                offsets.append([a * b for a, b in zip(da_vol.chunksize, inds)])
+                lr = dask.delayed(find_max_bar_wrapper)(np.asarray(chunk), tolerance=tolerance, global_min=global_min,
+                                                        tqdm_pos=kwargs.get("tqdm_pos"), pbar=pbar)
+                lazy_results.append(lr)
+
+            # futures = dask.persist(*lazy_results)
+            a = dask.compute(*lazy_results)
+            # maximas, _
+
+        # apply offsets
+        maximas = []
+        # k = 0
+        for k, (maximas_in_chunk, _) in enumerate(a):
+            off_chunk = offsets[k]
+            for s_i, single_maxima in enumerate(maximas_in_chunk):
+                new_pos = tuple([a + b for a, b in zip(single_maxima[0], off_chunk)])
+                new_entry = [new_pos]
+                new_entry.extend(single_maxima[1:])
+                maximas_in_chunk[s_i] = new_entry
+            maximas.extend(maximas_in_chunk)
+            # k = k + 1
+
+        return maximas
+
+    @staticmethod
     def apply_findmax(vol: np.array,
                       tolerance: float,
                       global_min: float,
@@ -504,13 +561,18 @@ class FindMaximaLocator(Locator):
                      global_min: float,
                      ) -> Tuple[pd.DataFrame, np.array]:
         vol = FindMaximaLocator.to_volume(map_output, target_class=class_id, window_size=window_size, stride=stride)
-        maximas = FindMaximaLocator.apply_findmax(vol=vol,
-                                                  class_id=class_id,
-                                                  window_size=window_size,
-                                                  stride=stride,
-                                                  tolerance=tolerance,
-                                                  global_min=global_min,
-                                                  tqdm_pos=class_id)
+        maximas = FindMaximaLocator.apply_findmax_dask(vol=vol,
+                                                       class_id=class_id,
+                                                       window_size=window_size,
+                                                       stride=stride,
+                                                       tolerance=tolerance,
+                                                       global_min=global_min,
+                                                       tqdm_pos=class_id)
+
+        maximas = [
+            m for m in maximas if m[1] > 1
+        ]  # more than one pixel coordinate must be involved.
+
         print("done", class_id)
         particle_df = FindMaximaLocator.maxima_to_df(
             maximas, class_id, stride=stride, boxsize=window_size
