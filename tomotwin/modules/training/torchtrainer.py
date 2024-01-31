@@ -463,6 +463,7 @@ class TorchTrainer(Trainer):
         self.save_epoch_seperately = save_epoch_seperately
         self.f1_improved = False
         self.loss_improved = False
+        self.swa_model = None
 
         # Write graph to tensorboard
         dummy_input = torch.zeros([12, 1, 37, 37, 37])
@@ -750,7 +751,8 @@ class TorchTrainer(Trainer):
             raise RuntimeError("Training data is not set")
 
         train_loader, test_loader = self.get_train_test_dataloader()
-
+        from torch.optim.swa_utils import AveragedModel, get_ema_multi_avg_fn
+        self.swa_model = AveragedModel(self.model, multi_avg_fn=get_ema_multi_avg_fn(0.95))
         # Training Loop
         for epoch in tqdm(
             range(self.start_epoch, self.epochs),
@@ -762,6 +764,7 @@ class TorchTrainer(Trainer):
             self.loss_improved = False
             self.current_epoch = epoch
             train_loss = self.epoch(train_loader=train_loader)
+            self.swa_model.update_parameters(self.model)
 
             print(f"Epoch: {epoch + 1}/{self.epochs} - Training Loss: {train_loss:.4f}")
             self.writer.add_scalar("Loss/train", train_loss, epoch)
@@ -781,10 +784,11 @@ class TorchTrainer(Trainer):
             self.writer.flush()
 
             if self.output_path is not None:
+                torch.optim.swa_utils.update_bn(train_loader, self.swa_model)
                 self.write_results_to_disk(
                     self.output_path, save_each_improvement=self.save_epoch_seperately
                 )
-
+            torch.optim.swa_utils.update_bn(train_loader, self.swa_model)
         return self.model
 
     def set_training_data(self, training_data: TripletDataset) -> None:
@@ -909,10 +913,22 @@ class TorchTrainer(Trainer):
                 **kwargs,
             )
 
+            self.write_model_to_disk(
+                path,
+                self.swa_model,
+                "best_loss_avg.pth",
+                self.best_epoch_loss,
+                **kwargs,
+            )
+
         if self.best_model_f1 is not None:
             # The best_model can be None, after a training restart.
             self.write_model_to_disk(
                 path, self.best_model_f1, "best_f1.pth", self.best_epoch_f1, **kwargs
+            )
+
+            self.write_model_to_disk(
+                path, self.swa_model, "best_f1_avg.pth", self.best_epoch_f1, **kwargs
             )
 
         if save_each_improvement:
