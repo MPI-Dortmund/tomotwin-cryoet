@@ -903,7 +903,7 @@ class TorchTrainer(Trainer):
                 os.remove(os.path.join(path, "final.pth"))
             os.rename(os.path.join(path, "latest.pth"), os.path.join(path, "final.pth"))
 
-        if self.best_model_loss is not None:
+        if self.best_model_loss is not None and self.loss_improved:
             # The best_model can be None, after a training restart.
             self.write_model_to_disk(
                 path,
@@ -921,7 +921,7 @@ class TorchTrainer(Trainer):
                 **kwargs,
             )
 
-        if self.best_model_f1 is not None:
+        if self.best_model_f1 is not None and self.f1_improved:
             # The best_model can be None, after a training restart.
             self.write_model_to_disk(
                 path, self.best_model_f1, "best_f1.pth", self.best_epoch_f1, **kwargs
