@@ -871,8 +871,12 @@ class TorchTrainer(Trainer):
         :param epoch: Epoch of the model
         :return: None
         """
-        if isinstance(model_to_save, nn.DataParallel):
+        # if isinstance(model_to_save, nn.DataParallel):
+        #    print("Extract module")
+        try:
             model_to_save = model_to_save.module
+        except:
+            print("Error extracting the module")
 
         self._write_model(
             path=os.path.join(path, model_name),
