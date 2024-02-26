@@ -63,15 +63,19 @@ Outline a set of points in the 2D plot and these points will become highlighted 
     :width: 650
     :align: center
 
+    TomoTwin with multiple cluster selected. Each cluster gets highlighted with a different color in the Tomogram.
+
 .. admonition:: **Use log scale to see weak clusters**
     
     When the abundance of the protein is low, the clusters are often difficult to detect. Using a log scale for the plot may show clusters that are otherwise difficult to spot. To activate the log scale click on :guilabel:`Advanced settings` :guilabel:`Log scale`.
 
-Alternatively you can click in the tomogram and a small red circle appears around the embedding for this position in the tomogram.
+Alternatively you can click in the tomogram and a small circle appears around the embedding for this position in the tomogram.
 
 .. figure:: ../img/tutorial_2/img3.png
     :width: 650
     :align: center
+
+    Clicking on the tomogram creates an "anchor" in the UMAP. The anchor can help you to locate a cluster in the UMAP.
 
 .. |mag| image:: ../img/tutorial_2/mag.png
     :width: 20
@@ -82,6 +86,8 @@ You can use the |mag| icon to change the displayed area/zoom and the :guilabel:`
 .. image:: ../img/tutorial_2/img2.png
     :width: 650
     :align: center
+
+    Zooming into the UMAP helps to draw a cluster with the lasso tool.
 
 Evaluate cluster targets
 ~~~~~~~~~~~~~~~~~~~~~~~~
