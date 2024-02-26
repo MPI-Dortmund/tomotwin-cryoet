@@ -15,7 +15,9 @@ In case you have on old TomoTwin version installed, please remove the old one fi
 
 .. prompt:: bash $
 
-    mamba env create -n tomotwin
+    mamba env remove -n tomotwin
+
+Next you can create the TomoTwin environment:
 
 .. prompt:: bash $
 
