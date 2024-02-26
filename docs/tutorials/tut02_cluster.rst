@@ -100,15 +100,22 @@ The following image shows a tomogram with two obvious particle populations (yell
 .. figure:: ../img/tutorial_2/fine_tune_01.png
     :width: 650
     :align: center
+    :class: with-border
 
-Suppose you are interested in the toxin population. fter some search, you can find the cluster that includes the toxins, but also the ribosomes.
+    Tomogram with umap as inset. Two rather obvious particle populations can be identified. The yellow circle highlights a toxin particle, the blue circle a ribosome particle.
+
+Suppose you are interested in the toxin population. After some search, you can find the cluster that includes the toxins, but also the ribosomes.
 
 .. figure:: ../img/tutorial_2/fine_tune_02.png
     :width: 650
     :align: center
 
+    Tomogram with umap as inset. The selected clusters contains both particle populations.
+
 
 This is not satisfying, as you want to pick the toxins exclusively.
+
+Other than finding clusters that represent your protein as exlusive as possible, it is also important for optimal picking, the clusters ideally only includes the embeddings in the center of the protein.
 
 .. admonition:: **Improved centering**
 
