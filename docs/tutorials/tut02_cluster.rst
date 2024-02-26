@@ -75,7 +75,7 @@ Alternatively you can click in the tomogram and a small circle appears around th
     :width: 650
     :align: center
 
-    Clicking on the tomogram creates an "anchor" in the UMAP. The anchor can help you to locate a cluster in the UMAP.
+    Clicking on the tomogram creates an "anchor" (a little circle) in the UMAP. The anchor can help you to locate a cluster in the UMAP.
 
 .. |mag| image:: ../img/tutorial_2/mag.png
     :width: 20
