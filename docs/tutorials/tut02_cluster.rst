@@ -2,15 +2,15 @@ Tutorial 2: Clustering based particle picking
 ============================================
 
 1. Downscale your Tomogram to 10 Å
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 .. include:: text_modules/downscale_clustering.rst
 
 2. Embed your Tomogram
-^^^^^^^^^^^^^^^^^^^^^^^
+----------------------
 .. include:: text_modules/embed.rst
 
 3. Estimate UMAP manifold and Generate Embedding Mask
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------------------------------
 
 Now we will approximate the tomogram embeddings to 2D to allow for efficient visualization. To calculate a UMAP:
 
@@ -24,7 +24,7 @@ Now we will approximate the tomogram embeddings to 2D to allow for efficient vis
 
 
 4. Load data for clustering in Napari
-^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------
 
 Now that we have all the input files for the clustering workflow we can get started in Napari. First open your tomogram and the embedding mask by:
 
@@ -33,10 +33,14 @@ Now that we have all the input files for the clustering workflow we can get star
     napari your_tomo_a10.mrc
 
 Next open the napari-tomotwin clustering tool via :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Cluster UMAP embeddings`. Then choose the :guilabel:`Path to UMAP` by clicking on :guilabel:`Select file` and provide the path to your :file:`your_tomo_a10_embeddings.tumap`. 
-Click :guilabel:`Load` and a 2D plot of the umap embeddings should appear in the plugin window.
+Click :guilabel:`Load` and a 2D plot of the umap embeddings should appear in the plugin window. It will do some calculating in the background and might take a few seconds.
+
+The other buttons :guilabel:`Recalculate UMAP for selected clusters` and :guilabel:`Show target embedding positions` will be described in the next section.
+
+
 
 5. Find target clusters
-^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 The next step is to generate potential targets from the 2D umap using the interactive lasso (freehand) tool from the napari-clusters-plotter.
 
@@ -71,6 +75,13 @@ You can use the |mag| icon to change the displayed area/zoom and the :guilabel:`
     :width: 650
     :align: center
 
+Evaluate cluster targets
+^^^^^^^^^^^^^^^^^^^^^^^^
+Must be implemented.
+
+Fine-tune cluster targets
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 .. admonition:: **Improved centering**
 
@@ -83,7 +94,7 @@ You can use the |mag| icon to change the displayed area/zoom and the :guilabel:`
 
 
 6. Save target clusters
-^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 Once you have outlined a target cluster for each protein of interest, it is time to save these targets to be used as picking references in this and additional tomograms.
 
@@ -91,7 +102,7 @@ This can be done with :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :gui
 
 
 7. Map your tomogram
-^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 The map command will calculate the pairwise distances/similarity between the targets and the tomogram subvolumes and generate a localization map:
 
@@ -100,7 +111,7 @@ The map command will calculate the pairwise distances/similarity between the tar
     tomotwin_map.py distance -r out/clustering/cluster_targets.temb -v out/embed/tomo/your_tomo_a10_embeddings.temb -o out/map/
 
 8. Localize potential particles
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------
 
 .. include:: text_modules/locate.rst
 
@@ -137,7 +148,7 @@ To convert the :file:`.tloc` file into :file:`.coords` you need to run
 You will find coordinate file for each reference in :file:`.coords` format in the :file:`coords/` folder.
 
 9. Scale your coordinates
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 .. include:: text_modules/scale.rst
 
