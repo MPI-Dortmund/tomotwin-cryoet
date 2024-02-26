@@ -110,10 +110,25 @@ Suppose you are interested in the toxin population. After some search, you can f
     :width: 650
     :align: center
 
-    Tomogram with umap as inset. The selected clusters contains both particle populations.
+    Tomogram with UMAP as inset. The selected cluster contains both particle populations.
+
+This is not satisfying, as you want to pick the toxins exclusively. By pressing :guilabel:`Recalculate UMAP for selected clusters` a new UMAP is calculating for the embeddings that are included by the selected cluster.
+
+.. figure:: ../img/tutorial_2/fine_tune_03.png
+    :width: 300
+    :align: center
+
+    Recalculated UMAP for the embeddigns contained in the previously selected cluster.
+
+The new umap brings up some new structure. If we select the rather highly populated area, we have identified the cluster that exclusively represents the toxin cluster:
+
+.. figure:: ../img/tutorial_2/fine_tune_04.png
+    :width: 650
+    :align: center
+
+    Tomogram with refined UMAP as inset. Now only the toxin particles are selected.
 
 
-This is not satisfying, as you want to pick the toxins exclusively.
 
 Other than finding clusters that represent your protein as exlusive as possible, it is also important for optimal picking, the clusters ideally only includes the embeddings in the center of the protein.
 
