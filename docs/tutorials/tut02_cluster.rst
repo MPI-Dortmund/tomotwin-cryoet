@@ -83,7 +83,7 @@ Alternatively you can click in the tomogram and a small circle appears around th
 
 You can use the |mag| icon to change the displayed area/zoom and the :guilabel:`Home` icon to reset it.
 
-.. image:: ../img/tutorial_2/img2.png
+.. figure:: ../img/tutorial_2/img2.png
     :width: 650
     :align: center
 
