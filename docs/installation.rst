@@ -31,7 +31,7 @@ Here we assume that you don't have napari installed. Please do:
 
 .. prompt:: bash $
 
-    mamba env create -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_napari.yml
+    mamba env create -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/napari-tomotwin/main/conda_env.yml
 
 3. Link Napari
 """""""""""""""""""
