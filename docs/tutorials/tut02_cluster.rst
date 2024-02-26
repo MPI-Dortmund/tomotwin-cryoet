@@ -101,6 +101,15 @@ The following image shows a tomogram with two obvious particle populations (yell
     :width: 650
     :align: center
 
+Suppose you are interested in the toxin population. fter some search, you can find the cluster that includes the toxins, but also the ribosomes.
+
+.. figure:: ../img/tutorial_2/fine_tune_02.png
+    :width: 650
+    :align: center
+
+
+This is not satisfying, as you want to pick the toxins exclusively.
+
 .. admonition:: **Improved centering**
 
     When generating targets to pick large proteins, it is best to outline points that only lay in the center of your protein rather than covering the entire protein. Note that due to the way embeddings are generated from the tomogram, this likely won't be in the center of the cluster. This will help ensure that your resulting picks are centered.
