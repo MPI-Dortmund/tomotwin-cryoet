@@ -95,7 +95,7 @@ Fine-tune cluster targets
 
 TomoTwin uses UMAPs to reduce the 32 dimensional embeddings space to a 2 dimensional space that can be visualized. However, this reduction is not perfect and sometime a cluster can actually contain multiple sub-clusters. The :guilabel:`Recalculate UMAP for selected clusters` tool allows you to refine your clusters as shown by the following example.
 
-The following image shows a tomogram with two obvious particle populations (yellow: Tc-Toxin, blue: ribosome).
+The following image shows a tomogram with two distinct particle populations (yellow: Tc toxin, blue: ribosome).
 
 .. figure:: ../img/tutorial_2/fine_tune_01.png
     :width: 650
@@ -104,7 +104,7 @@ The following image shows a tomogram with two obvious particle populations (yell
 
     Tomogram with umap as inset. Two rather obvious particle populations can be identified. The yellow circle highlights a toxin particle, the blue circle a ribosome particle.
 
-Suppose you are interested in the toxin population. After some search, you can find the cluster that includes the toxins, but also the ribosomes.
+Suppose you are interested in the toxin population. After some searching, you can find the cluster that contains the toxins, but also the ribosomes.
 
 .. figure:: ../img/tutorial_2/fine_tune_02.png
     :width: 650
@@ -112,15 +112,15 @@ Suppose you are interested in the toxin population. After some search, you can f
 
     Tomogram with UMAP as inset. The selected cluster contains both particle populations.
 
-This is not satisfying, as you want to pick the toxins exclusively. By pressing :guilabel:`Recalculate UMAP for selected clusters` a new UMAP is calculating for the embeddings that are included by the selected cluster.
+This is not satisfactory, as you want to select only the toxins. By pressing :guilabel:`Recompute UMAP for selected clusters` a new UMAP will be calculated for the embeddings contained by the selected cluster.
 
 .. figure:: ../img/tutorial_2/fine_tune_03.png
     :width: 300
     :align: center
 
-    Recalculated UMAP for the embeddigns contained in the previously selected cluster.
+    Recalculated UMAP for the embeddings contained in the previously selected cluster.
 
-The new umap brings up some new structure. If we select the rather highly populated area on the left, we have identified the cluster that exclusively represents the toxin cluster:
+The new umap shows new structure. If we select the rather densely populated area on the left, we have identified the cluster that exclusively represents the toxin cluster:
 
 .. figure:: ../img/tutorial_2/fine_tune_04.png
     :width: 650
@@ -129,7 +129,7 @@ The new umap brings up some new structure. If we select the rather highly popula
     Tomogram with refined UMAP as inset. Now only the toxin particles are selected.
 
 
-Other than finding clusters that represent your protein as exlusive as possible, it is also important for optimal picking, the clusters ideally only includes the embeddings in the center of the protein which is shown by the next version.
+In addition to finding clusters that represent your protein as exclusively as possible, it is also important for optimal picking that the clusters ideally contain only the embeddings in the center of the protein, as shown in the next video.
 
 .. admonition:: **Improved centering**
 
