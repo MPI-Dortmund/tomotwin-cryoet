@@ -1,7 +1,8 @@
 .. _tutorial-reference:
 
+*********************************************
 Tutorial 1: Reference based particle picking
-============================================
+*********************************************
 
 In this tutorial we describe how to use TomoTwin for picking in tomograms using references.
 
