@@ -86,11 +86,20 @@ You can use the |mag| icon to change the displayed area/zoom and the :guilabel:`
 Evaluate cluster targets
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Must be implemented.
+In TomoTwin, a cluster that you might find interesting is reduced and represented by a single embedding point (the cluster center). It is a good sanity check to visualize which of the points in your cluster represents your cluster. By clicking :guilabel:`Show target embedding positions`, the center (medoid) is calculated and visualized in the tomogram by a circle in the cluster color.
+
+If the circle is roughly centered on your protein of interest, its probably a good target. If it is not centered on a target, you should continue to refine your cluster target, which is described in the next section.
 
 Fine-tune cluster targets
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+TomoTwin uses UMAPs to reduce the 32 dimensional embeddings space to a 2 dimensional space that can be visualized. However, this reduction is not perfect and sometime a cluster can actually contain multiple sub-clusters. The :guilabel:`Recalculate UMAP for selected clusters` tool allows you to refine your clusters as shown by the following example.
+
+The following image shows a tomogram with two obvious particle populations (yellow: Tc-Toxin, blue: ribosome).
+
+.. figure:: ../img/tutorial_2/fine_tune_01.png
+    :width: 650
+    :align: center
 
 .. admonition:: **Improved centering**
 
