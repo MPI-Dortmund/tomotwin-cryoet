@@ -9,6 +9,7 @@ Tutorial 2: Clustering based particle picking
 
 2. Embed your Tomogram
 ######################
+
 .. include:: text_modules/embed.rst
 
 3. Estimate UMAP manifold and Generate Embedding Mask
