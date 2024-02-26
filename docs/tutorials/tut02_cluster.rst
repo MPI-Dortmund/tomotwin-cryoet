@@ -129,15 +129,13 @@ The new umap shows new structure. If we select the rather densely populated area
     Tomogram with refined UMAP as inset. Now only the toxin particles are selected.
 
 
-In addition to finding clusters that represent your protein as exclusively as possible, it is also important for optimal picking that the clusters ideally contain only the embeddings in the center of the protein, as shown in the next video.
+In addition to finding clusters that represent your protein as exclusively as possible, it is also important to outline points that only lay in the center of your protein rather than covering the entire protein. Note that due to the way embeddings are generated from the tomogram, this likely won't be in the center of the cluster.
 
-.. admonition:: **Improved centering**
+.. image:: ../img/tutorial_2/img4.png
+    :width: 650
+    :align: center
 
-    When generating targets to pick large proteins, it is best to outline points that only lay in the center of your protein rather than covering the entire protein. Note that due to the way embeddings are generated from the tomogram, this likely won't be in the center of the cluster. This will help ensure that your resulting picks are centered.
-
-    .. image:: ../img/tutorial_2/img4.png
-        :width: 650
-        :align: center
+    The center of the protein located in the cluster.
 
 
 
