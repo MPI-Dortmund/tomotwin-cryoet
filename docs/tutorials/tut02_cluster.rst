@@ -120,7 +120,7 @@ This is not satisfying, as you want to pick the toxins exclusively. By pressing 
 
     Recalculated UMAP for the embeddigns contained in the previously selected cluster.
 
-The new umap brings up some new structure. If we select the rather highly populated area, we have identified the cluster that exclusively represents the toxin cluster:
+The new umap brings up some new structure. If we select the rather highly populated area on the left, we have identified the cluster that exclusively represents the toxin cluster:
 
 .. figure:: ../img/tutorial_2/fine_tune_04.png
     :width: 650
@@ -129,8 +129,7 @@ The new umap brings up some new structure. If we select the rather highly popula
     Tomogram with refined UMAP as inset. Now only the toxin particles are selected.
 
 
-
-Other than finding clusters that represent your protein as exlusive as possible, it is also important for optimal picking, the clusters ideally only includes the embeddings in the center of the protein.
+Other than finding clusters that represent your protein as exlusive as possible, it is also important for optimal picking, the clusters ideally only includes the embeddings in the center of the protein which is shown by the next version.
 
 .. admonition:: **Improved centering**
 
