@@ -2,8 +2,12 @@
 Tutorial 2: Clustering based particle picking
 *********************************************
 
+----------------------
+My subtitle
+----------------------
+
 1. Downscale your Tomogram to 10 Å
-**********************************
+==================================
 
 .. include:: text_modules/downscale_clustering.rst
 
