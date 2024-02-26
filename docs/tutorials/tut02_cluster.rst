@@ -106,7 +106,6 @@ The following image shows a tomogram with two distinct particle populations (yel
 .. figure:: ../img/tutorial_2/fine_tune_01.png
     :width: 650
     :align: center
-    :class: with-border
 
     Tomogram with UMAP inset. Two quite distinct particle populations can be identified. The yellow circle highlights a toxin particle, the blue circle a ribosome particle.
 
