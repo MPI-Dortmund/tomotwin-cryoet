@@ -98,6 +98,15 @@ As a sanity check, we can press :guilabel:`Show target` for each cluster in the 
 
 Now that we are satisfied with our selection, we can add both clusters to the candidate list by selecting each cluster in the drop-down list and pressing :guilabel:`Add candidate`.
 
+
+We recommend that you change the label of each candidate by double-clicking with the left mouse button in one of the label cells.
+
+.. figure:: ../img/tutorial_2/cluster_manager.png
+    :width: 400
+    :align: center
+
+Finally, we can save the the corresponding labels to disk by pressing “Save candidates”
+
 5. Find target clusters
 -----------------------
 
