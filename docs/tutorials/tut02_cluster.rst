@@ -64,6 +64,8 @@ Once you loaded a umap by the previous step, a set of tools will open.
 
     When the abundance of the protein is low, the clusters are often difficult to detect. Using a log scale for the plot may show clusters that are otherwise difficult to spot. To activate the log scale click on :guilabel:`Advanced settings` :guilabel:`Log scale`.
 
+Locate potential targets
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 The next step is to generate potential targets from the 2D umap. We will use a tomogram that shows two distinct particle populations (yellow: Tc toxin, blue: ribosome) as example:
 
@@ -89,6 +91,9 @@ You can use the interactive lasso (freehand) tool from the "napari cluster plott
         :width: 450
         :align: center
 
+Refine cluster targets
+~~~~~~~~~~~~~~~~~~~~~~
+
 The selection we made is not satisfactory as both the toxins and the ribosomes are selected. TomoTwin uses UMAPs to reduce the 32-dimensional embedding space to a 2-dimensional space that can be visualized. However, this reduction is not perfect and sometimes a cluster can actually contain several sub-clusters. Pressing :guilabel:`Recompute UMAP` will compute a new UMAP for the embeddings contained in the selected cluster.
 
 .. figure:: ../img/tutorial_2/fine_tune_03.png
@@ -108,6 +113,9 @@ The new umap shows new structure. If we select the rather densely populated area
 For the ribosome, we could get a more "complete" highlighting if we had selected the entire area. However, the way we did it is preferable because we only get the center of the ribosome, which results in better centered picks.
 
 As a sanity check, we can press :guilabel:`Show target` for each cluster in the dropdown list. In TomoTwin, a cluster is reduced and represented by a single embedding point (the cluster center). It is a good sanity check to visualize which of the points in your cluster represents your cluster. By clicking :guilabel:`Show target`, the center (medoid) is calculated and visualized in the tomogram by a circle in the cluster color. If the circle is roughly centered on your protein of interest, its probably a good target. If the circle is approximately centered on your protein of interest, it is probably a good target. If it is not centered on a target, but rather on background, other structures or contamination, you should continue to refine your cluster target. Here, both cases are centered on the toxin and ribosome, respectively.
+
+Add and save candidates
+~~~~~~~~~~~~~~~~~~~~~~
 
 Now that we are satisfied with our selection, we can add both clusters to the candidate list by selecting each cluster in the drop-down list and pressing :guilabel:`Add candidate`.
 
