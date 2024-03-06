@@ -122,102 +122,10 @@ We recommend that you change the label of each candidate by double-clicking with
 
 Finally, we can save the the corresponding labels to disk by pressing :guilabel:`Save candidates`
 
-5. Find target clusters
------------------------
-
-
-The next step is to generate potential targets from the 2D umap using the interactive lasso (freehand) tool from the napari-clusters-plotter.
-
 .. admonition:: **Check out the video demo of selecting clusters**
 
     ..  youtube:: PaJlaPAfqtI
        :align: center
-
-Outline a set of points in the 2D plot and these points will become highlighted in your tomogram. To select multiple targets at once hold :kbd:`Shift` when outlining points.
-
-.. figure:: ../img/tutorial_2/img1.png
-    :width: 650
-    :align: center
-
-    TomoTwin with multiple cluster selected. Each cluster gets highlighted with a different color in the Tomogram.
-
-.. admonition:: **Use log scale to see weak clusters**
-    
-    When the abundance of the protein is low, the clusters are often difficult to detect. Using a log scale for the plot may show clusters that are otherwise difficult to spot. To activate the log scale click on :guilabel:`Advanced settings` :guilabel:`Log scale`.
-
-Alternatively you can click in the tomogram and a small circle appears around the embedding for this position in the tomogram.
-
-.. figure:: ../img/tutorial_2/img3.png
-    :width: 650
-    :align: center
-
-    Clicking on the tomogram creates an "anchor" (a little circle) in the UMAP. The anchor can help you to locate a cluster in the UMAP.
-
-.. |mag| image:: ../img/tutorial_2/mag.png
-    :width: 20
-
-
-You can use the |mag| icon to change the displayed area/zoom and the Home icon to reset it.
-
-.. figure:: ../img/tutorial_2/img2.png
-    :width: 650
-    :align: center
-
-    Zooming into the UMAP helps to draw a cluster with the lasso tool.
-
-Evaluate cluster targets
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-In TomoTwin, a cluster that you might find interesting is reduced and represented by a single embedding point (the cluster center). It is a good sanity check to visualize which of the points in your cluster represents your cluster. By clicking :guilabel:`Show target embedding positions`, the center (medoid) is calculated and visualized in the tomogram by a circle in the cluster color.
-
-If the circle is roughly centered on your protein of interest, its probably a good target. If it is not centered on a target, you should continue to refine your cluster target, which is described in the next section.
-
-Fine-tune cluster targets
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-TomoTwin uses UMAPs to reduce the 32 dimensional embeddings space to a 2 dimensional space that can be visualized. However, this reduction is not perfect and sometime a cluster can actually contain multiple sub-clusters. The :guilabel:`Recalculate UMAP for selected clusters` tool allows you to refine your clusters as shown by the following example.
-
-The following image shows a tomogram with two distinct particle populations (yellow: Tc toxin, blue: ribosome).
-
-.. figure:: ../img/tutorial_2/fine_tune_01.png
-    :width: 650
-    :align: center
-
-    Tomogram with UMAP inset. Two quite distinct particle populations can be identified. The yellow circle highlights a toxin particle, the blue circle a ribosome particle.
-
-Suppose you are interested in the toxin population. After some searching, you can find the cluster that contains the toxins, but also the ribosomes.
-
-.. figure:: ../img/tutorial_2/fine_tune_02.png
-    :width: 650
-    :align: center
-
-    Tomogram with UMAP as inset. The selected cluster contains both particle populations.
-
-This is not satisfactory, as you want to select only the toxins. By pressing :guilabel:`Recompute UMAP for selected clusters` a new UMAP will be calculated for the embeddings contained by the selected cluster.
-
-.. figure:: ../img/tutorial_2/fine_tune_03.png
-    :width: 300
-    :align: center
-
-    Recalculated UMAP for the embeddings contained in the previously selected cluster.
-
-The new umap shows new structure. If we select the rather densely populated area on the left, we have identified the cluster that exclusively represents the toxin cluster:
-
-.. figure:: ../img/tutorial_2/fine_tune_04.png
-    :width: 650
-    :align: center
-
-    Tomogram with refined UMAP as inset. Now only the toxin particles are selected.
-
-
-In addition to finding clusters that represent your protein as exclusively as possible, it is also important to outline points that only lay in the center of your protein rather than covering the entire protein. Note that due to the way embeddings are generated from the tomogram, this likely won't be in the center of the cluster.
-
-.. figure:: ../img/tutorial_2/img4.png
-    :width: 650
-    :align: center
-
-    The center of the protein located in the cluster.
-
 
 
 6. Save target clusters
