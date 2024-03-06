@@ -62,6 +62,23 @@ Once you loaded a umap by the previous step, a set of tools will open.
 
 The next step is to generate potential targets from the 2D umap. We will use a tomogram that shows two distinct particle populations (yellow: Tc toxin, blue: ribosome) as example:
 
+.. figure:: ../img/tutorial_2/fine_tune_01.png
+    :width: 650
+    :align: center
+
+    Tomogram with UMAP inset. Two quite distinct particle populations can be identified. The yellow circle highlights a toxin particle, the blue circle a ribosome particle.
+
+You can use the interactive lasso (freehand) tool from the "napari cluster plotter" to select clusters in the UMAP. When you outline an area in the UMAP, the corresponding area in the tomogram is highlighted.
+
+.. figure:: ../img/tutorial_2/fine_tune_02.png
+    :width: 650
+    :align: center
+
+    Tomogram with UMAP as inset. The selected cluster contains both particle populations.
+
+The selection we made is not satisfactory as both the toxins and the ribosomes are selected. TomoTwin uses UMAPs to reduce the 32-dimensional embedding space to a 2-dimensional space that can be visualized. However, this reduction is not perfect and sometimes a cluster can actually contain several sub-clusters.
+
+Pressing :guilabel:`Recompute UMAP` will compute a new UMAP for the embeddings contained in the selected cluster.
 
 5. Find target clusters
 -----------------------
