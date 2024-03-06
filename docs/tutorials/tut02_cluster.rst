@@ -44,8 +44,8 @@ Click :guilabel:`Load` and a 2D plot of the umap embeddings should appear in the
 
 The other buttons :guilabel:`Recalculate UMAP for selected clusters` and :guilabel:`Show target embedding positions` will be described in the next section.
 
-5. Find target cluster new
---------------------------
+5. Find target cluster
+----------------------
 
 Once you loaded a umap by the previous step, a set of tools will open.
 
