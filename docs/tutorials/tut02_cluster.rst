@@ -81,9 +81,9 @@ You can use the interactive lasso (freehand) tool from the "napari cluster plott
 
     Tomogram with UMAP as inset. The selected cluster contains both particle populations.
 
-.. admonition:: **Anchor tool: Map positions from tomogram the UMAP**
+.. admonition:: **The Anchor tool helps to locate clusters in the UMAP**
 
-    Clicking on the tomogram creates an “anchor” (a little circle) in the UMAP. The anchor can help you to locate a cluster in the UMAP. Buy holding :kbd:`Shift` you can add multiple anchors.
+    Clicking on the tomogram creates an “anchor” (a little circle) in the UMAP. The anchor can help you to locate a cluster in the UMAP. By holding :kbd:`Shift` you can add multiple anchors.
 
     .. image:: ../img/tutorial_2/figure_anchor.png
         :width: 450
