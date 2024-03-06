@@ -130,9 +130,9 @@ We recommend that you change the label of each candidate by double-clicking with
 
 Finally, we can save the the corresponding labels to disk by pressing :guilabel:`Save candidates`. Select a folder and write the candidate to disk. The folder will contain several files:
 
-- :file:`cluster_targets.temb`: This file you will use in the next steps. It contains the medoid embedding for each cluster.
-- :file:`embeddings_CLUSTER_LABEL.temb`: One file per cluster. It contains all embeddings that are part of this cluster.
-- :file:`medoid_CLUSTER_LABEL.coords`: The coordinates of the cluster center (medoid). It the same what you get when you click :guilabel:`Show target`
+- :file:`cluster_targets.temb`: This is the file you will use in the next steps. It contains the medoid embedding for each cluster.
+- :file:`embeddings_CLUSTER_LABEL.temb`: One file per cluster. It contains all the embeddings that are part of that cluster.
+- :file:`medoid_CLUSTER_LABEL.coords`: The coordinates of the cluster centre (medoid). This is the same as what you get when you click on :guilabel:`Show target`
 
 .. admonition:: **Check out the video demo of selecting clusters**
 
