@@ -49,9 +49,11 @@ The other buttons :guilabel:`Recalculate UMAP for selected clusters` and :guilab
 
 Once you loaded a umap by the previous step, a set of tools will open.
 
-.. image:: ../img/tutorial_2/find_cluster_targets_overview.png
+.. figure:: ../img/tutorial_2/find_cluster_targets_overview.png
    :align: right
-   :width: 400
+   :width: 350
+
+    GUI for the clustering workflow.
 
 * **Clustering area:** Here you can select clusters within the umap using the lasso (freehand) tool.
 * **Plotting parameters:** Only two options are relevant for TomoTwin. The :guilabel:`Layer` combo box allows you to select which UMAP you want to visualize. At the beginning only one UMAP is available. Later in the workflow, more may appear. If you change it, you need to press the :guilabel:`Plot` button to update the UMAP. The second relevant option is the :guilabel:`Log scale` plot. For this you need to expand the :guilabel:`advanced options` and check the :guilabel:`log scale` checkbox.
