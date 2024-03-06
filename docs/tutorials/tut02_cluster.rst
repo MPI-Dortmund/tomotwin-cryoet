@@ -128,7 +128,11 @@ We recommend that you change the label of each candidate by double-clicking with
 
     All potential targets are listed and labeled candidates table. Right click on a row allow to :guilabel:`Delete` the candidate or by pressing :guilabel:`Show` to restore the UMAP selection.
 
-Finally, we can save the the corresponding labels to disk by pressing :guilabel:`Save candidates`
+Finally, we can save the the corresponding labels to disk by pressing :guilabel:`Save candidates`. Select a folder and write the candidate to disk. The folder will contain several files:
+
+- :file:`cluster_targets.temb`: This file you will use in the next steps. It contains the medoid embedding for each cluster.
+- :file:`embeddings_CLUSTER_LABEL.temb`: One file per cluster. It contains all embeddings that are part of this cluster.
+- :file:`medoid_CLUSTER_LABEL.coords`: The coordinates of the cluster center (medoid). It the same what you get when you click :guilabel:`Show target`
 
 .. admonition:: **Check out the video demo of selecting clusters**
 
@@ -136,16 +140,7 @@ Finally, we can save the the corresponding labels to disk by pressing :guilabel:
        :align: center
 
 
-6. Save target clusters
------------------------
-
-
-Once you have outlined a target cluster for each protein of interest, it is time to save these targets to be used as picking references in this and additional tomograms.
-
-This can be done with :guilabel:`Plugins` -> :guilabel:`napari-tomotwin` -> :guilabel:`Save cluster targets` and providing an output directory :file:`cluster_targets.temb` will be written.
-
-
-7. Map your tomogram
+6. Map your tomogram
 --------------------
 
 
@@ -155,7 +150,7 @@ The map command will calculate the pairwise distances/similarity between the tar
 
     tomotwin_map.py distance -r out/clustering/cluster_targets.temb -v out/embed/tomo/your_tomo_a10_embeddings.temb -o out/map/
 
-8. Localize potential particles
+7. Localize potential particles
 -------------------------------
 
 .. include:: text_modules/locate.rst
@@ -192,7 +187,7 @@ To convert the :file:`.tloc` file into :file:`.coords` you need to run
 
 You will find coordinate file for each reference in :file:`.coords` format in the :file:`coords/` folder.
 
-9. Scale your coordinates
+8. Scale your coordinates
 -------------------------
 
 
