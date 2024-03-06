@@ -92,6 +92,11 @@ The new umap shows new structure. If we select the rather densely populated area
 
     In the recalculated UMAP we can now separate the toxin from the ribosome cluster.
 
+For the ribosome, we could get a more "complete" highlighting if we had selected the entire area. However, the way we did it is preferable because we only get the center of the ribosome, which results in better centered picks.
+
+As a sanity check, we can press :guilabel:`Show target` for each cluster in the dropdown list. In TomoTwin, a cluster is reduced and represented by a single embedding point (the cluster center). It is a good sanity check to visualize which of the points in your cluster represents your cluster. By clicking :guilabel:`Show target`, the center (medoid) is calculated and visualized in the tomogram by a circle in the cluster color. If the circle is roughly centered on your protein of interest, its probably a good target. If the circle is approximately centered on your protein of interest, it is probably a good target. If it is not centered on a target, but rather on background, other structures or contamination, you should continue to refine your cluster target. Here, both cases are centered on the toxin and ribosome, respectively.
+
+Now that we are satisfied with our selection, we can add both clusters to the candidate list by selecting each cluster in the drop-down list and pressing :guilabel:`Add candidate`.
 
 5. Find target clusters
 -----------------------
