@@ -60,6 +60,10 @@ Once you loaded a umap by the previous step, a set of tools will open.
 * **Tools**: Here you will find some helpful tools. First you need to select a cluster from the dropdown box. :guilabel:`Show target` will help you evaluate if a cluster might be a good target. :guilabel:`Recompute UMAP` allows you to refine a selected cluster. Once you have found a good cluster, you can add it to the candidate list with :guilabel:`Add candidate`.
 * **Candidates**: Each row represents a candidate target. The labels are label changeable. Left clicking on the table allows to :guilabel:`Show` or the :guilabel:`Delete` a candidate. Sve the candidate targets to disk by pressing :guilabel:`Save candidates`.
 
+.. admonition:: **Use log scale to see weak clusters**
+
+    When the abundance of the protein is low, the clusters are often difficult to detect. Using a log scale for the plot may show clusters that are otherwise difficult to spot. To activate the log scale click on :guilabel:`Advanced settings` :guilabel:`Log scale`.
+
 The next step is to generate potential targets from the 2D umap. We will use a tomogram that shows two distinct particle populations (yellow: Tc toxin, blue: ribosome) as example:
 
 .. figure:: ../img/tutorial_2/fine_tune_01.png
