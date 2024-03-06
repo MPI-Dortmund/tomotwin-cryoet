@@ -64,6 +64,7 @@ Once you loaded a umap by the previous step, a set of tools will open.
 
     When the abundance of the protein is low, the clusters are often difficult to detect. Using a log scale for the plot may show clusters that are otherwise difficult to spot. To activate the log scale click on :guilabel:`Advanced settings` :guilabel:`Log scale`.
 
+
 The next step is to generate potential targets from the 2D umap. We will use a tomogram that shows two distinct particle populations (yellow: Tc toxin, blue: ribosome) as example:
 
 .. figure:: ../img/tutorial_2/fine_tune_01.png
@@ -79,6 +80,14 @@ You can use the interactive lasso (freehand) tool from the "napari cluster plott
     :align: center
 
     Tomogram with UMAP as inset. The selected cluster contains both particle populations.
+
+.. admonition:: **Anchor tool: Map positions from tomogram the UMAP**
+
+    Clicking on the tomogram creates an “anchor” (a little circle) in the UMAP. The anchor can help you to locate a cluster in the UMAP. Buy holding :kbd:`Shift` you can add multiple anchors.
+
+    .. image:: ../img/tutorial_2/figure_anchor.png
+        :width: 450
+        :align: center
 
 The selection we made is not satisfactory as both the toxins and the ribosomes are selected. TomoTwin uses UMAPs to reduce the 32-dimensional embedding space to a 2-dimensional space that can be visualized. However, this reduction is not perfect and sometimes a cluster can actually contain several sub-clusters. Pressing :guilabel:`Recompute UMAP` will compute a new UMAP for the embeddings contained in the selected cluster.
 
