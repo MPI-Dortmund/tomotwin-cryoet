@@ -105,7 +105,9 @@ We recommend that you change the label of each candidate by double-clicking with
     :width: 400
     :align: center
 
-Finally, we can save the the corresponding labels to disk by pressing “Save candidates”
+    All potential targets are listed and labeled candidates table. Right click on a row allow to :guilabel:`Delete` the candidate or by pressing :guilabel:`Show` to restore the UMAP selection.
+
+Finally, we can save the the corresponding labels to disk by pressing :guilabel:`Save candidates`
 
 5. Find target clusters
 -----------------------
