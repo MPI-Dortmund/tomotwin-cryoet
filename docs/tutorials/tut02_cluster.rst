@@ -76,15 +76,22 @@ You can use the interactive lasso (freehand) tool from the "napari cluster plott
 
     Tomogram with UMAP as inset. The selected cluster contains both particle populations.
 
-The selection we made is not satisfactory as both the toxins and the ribosomes are selected. TomoTwin uses UMAPs to reduce the 32-dimensional embedding space to a 2-dimensional space that can be visualized. However, this reduction is not perfect and sometimes a cluster can actually contain several sub-clusters.
-
-Pressing :guilabel:`Recompute UMAP` will compute a new UMAP for the embeddings contained in the selected cluster.
+The selection we made is not satisfactory as both the toxins and the ribosomes are selected. TomoTwin uses UMAPs to reduce the 32-dimensional embedding space to a 2-dimensional space that can be visualized. However, this reduction is not perfect and sometimes a cluster can actually contain several sub-clusters. Pressing :guilabel:`Recompute UMAP` will compute a new UMAP for the embeddings contained in the selected cluster.
 
 .. figure:: ../img/tutorial_2/fine_tune_03.png
     :width: 300
     :align: center
 
     Recalculated UMAP for the embeddings contained in the previously selected cluster.
+
+The new umap shows new structure. If we select the rather densely populated area on the left, we have identified the cluster that exclusively represents the toxin cluster. To select the ribosome cluster, we lasso the tip of the larger and fuzzier area by holding :kbd:`Shift` while outlining the area.
+
+.. figure:: ../img/tutorial_2/cluster_refine_05.png
+    :width: 300
+    :align: center
+
+    In the recalculated UMAP we can now separate the toxin from the ribosome cluster.
+
 
 5. Find target clusters
 -----------------------
