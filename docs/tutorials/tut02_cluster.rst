@@ -50,7 +50,7 @@ The other buttons :guilabel:`Recalculate UMAP for selected clusters` and :guilab
 Once you loaded a umap by the previous step, a set of tools will open.
 
 .. figure:: ../img/tutorial_2/find_cluster_targets_overview.png
-   :align: right
+   :align: left
    :width: 350
 
     GUI for the clustering workflow.
