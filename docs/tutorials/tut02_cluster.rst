@@ -80,6 +80,12 @@ The selection we made is not satisfactory as both the toxins and the ribosomes a
 
 Pressing :guilabel:`Recompute UMAP` will compute a new UMAP for the embeddings contained in the selected cluster.
 
+.. figure:: ../img/tutorial_2/fine_tune_03.png
+    :width: 300
+    :align: center
+
+    Recalculated UMAP for the embeddings contained in the previously selected cluster.
+
 5. Find target clusters
 -----------------------
 
