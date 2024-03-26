@@ -15,7 +15,9 @@ In case you have on old TomoTwin version installed, please remove the old one fi
 
 .. prompt:: bash $
 
-    mamba env create -n tomotwin
+    mamba env remove -n tomotwin
+
+Next you can create the TomoTwin environment:
 
 .. prompt:: bash $
 
@@ -29,7 +31,8 @@ Here we assume that you don't have napari installed. Please do:
 
 .. prompt:: bash $
 
-    mamba env create -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_napari.yml
+    mamba env create -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/napari-tomotwin/main/conda_env.yml
+    pip install napari-tomotwin
 
 3. Link Napari
 """""""""""""""""""
