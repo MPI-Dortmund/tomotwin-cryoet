@@ -14,7 +14,7 @@ In this tutorial we describe how to use TomoTwin for picking in tomograms using 
     Download: `https <https://ftp.gwdg.de/pub/misc/sphire/TomoTwin/data/reference_picking/example_reference_picking.tar.gz>`_
 
 
-1. Downscale your Tomogram to 10 Å
+1. Rescale your Tomogram
 ----------------------------------
 
 .. include:: text_modules/downscale_reference.rst
