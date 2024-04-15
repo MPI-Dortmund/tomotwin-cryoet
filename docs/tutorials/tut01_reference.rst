@@ -1,7 +1,7 @@
 .. _tutorial-reference:
 
 Tutorial 1: Reference based particle picking
-============================================
+=============================================
 
 In this tutorial we describe how to use TomoTwin for picking in tomograms using references.
 
@@ -14,13 +14,13 @@ In this tutorial we describe how to use TomoTwin for picking in tomograms using 
     Download: `https <https://ftp.gwdg.de/pub/misc/sphire/TomoTwin/data/reference_picking/example_reference_picking.tar.gz>`_
 
 
-1. Downscale your Tomogram to 10 Å
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. Rescale your Tomogram
+----------------------------------
 
 .. include:: text_modules/downscale_reference.rst
 
 2. Pick and extract your reference
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 
 For the reference based approach you need, of course, references. To pick them follow the next steps:
 
@@ -63,13 +63,13 @@ You will find your extracted references in `reference/protein_a_X.mrc` where X i
 
 
 3. Embed your Tomogram
-^^^^^^^^^^^^^^^^^^^^^^
+----------------------
 
 .. include:: text_modules/embed.rst
 
 
 4. Embed your reference
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 Now you can embed your reference:
 
@@ -85,7 +85,7 @@ Now you can embed your reference:
 
 
 5. Map your tomogram
-^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 The map command will calculate the pairwise distances/similarity between the references and the subvolumes and generate a localization map:
 
@@ -94,12 +94,12 @@ The map command will calculate the pairwise distances/similarity between the ref
     tomotwin_map.py distance -r out/embed/reference/embeddings.temb -v out/embed/tomo/your_tomo_a10_embeddings.temb -o out/map/
 
 6. Localize potential particles
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------
 
 .. include:: text_modules/locate.rst
 
 7. Inspect your particles with the boxmanager
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------------------
 
 
 Open your particles with the following command or drag the files into an open napari window:
@@ -134,6 +134,6 @@ You will find coordinate file for each reference in :file:`.coords` format in th
     Check out the :ref:`corresponding strategy <strategy-01>`!
 
 8. Scale your coordinates
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 .. include:: text_modules/scale.rst
