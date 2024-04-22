@@ -1,10 +1,10 @@
-Strategy 1: Refinement of references/targets using umaps
+Strategy 1: Refinement of references using umaps
 ========================================================
 
 When to use it
 --------------
 
-You have selected references or cluster targets, but you are not satisfied with the picking results. The embedding computed from a cluster or reference is not always an ideal representation. Some references just don't work well, and sometimes umap doesn't show all the structure that is actually in the umap embedding.
+You have selected references, but you are not satisfied with the picking results. The embedding computed from a cluster or reference is not always an ideal representation. Some references just don't work well, and sometimes umap doesn't show all the structure that is actually in the umap embedding.
 
 What it does
 ------------
