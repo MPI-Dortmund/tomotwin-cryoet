@@ -424,7 +424,8 @@ class TorchTrainer(Trainer):
                 self.write_results_to_disk(
                     self.output_path, save_each_improvement=self.save_epoch_seperately
                 )
-            torch.optim.swa_utils.update_bn(train_loader, self.swa_model)
+            else:
+                torch.optim.swa_utils.update_bn(train_loader, self.swa_model)
         return self.model
 
     def set_training_data(self, training_data: TripletDataset) -> None:
