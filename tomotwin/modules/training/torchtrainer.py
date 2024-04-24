@@ -388,7 +388,7 @@ class TorchTrainer(Trainer):
 
         train_loader, test_loader = self.get_train_test_dataloader()
         from torch.optim.swa_utils import AveragedModel, get_ema_multi_avg_fn
-        self.swa_model = AveragedModel(self.model, multi_avg_fn=get_ema_multi_avg_fn(0.95))
+        self.swa_model = AveragedModel(self.model, multi_avg_fn=get_ema_multi_avg_fn(0.999))
         # Training Loop
         for epoch in tqdm(
             range(self.start_epoch, self.epochs),
