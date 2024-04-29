@@ -538,11 +538,13 @@ class TorchTrainer(Trainer):
         :return: None
         """
         self.write_model_to_disk(path, self.model, "latest.pth", self.current_epoch)
+        self.write_model_to_disk(path, self.swa_model, "latest_avg.pth", self.current_epoch)
 
         if self.current_epoch == self.epochs - 1:
             if os.path.exists(os.path.join(path, "final.pth")):
                 os.remove(os.path.join(path, "final.pth"))
             os.rename(os.path.join(path, "latest.pth"), os.path.join(path, "final.pth"))
+            os.rename(os.path.join(path, "latest_avg.pth"), os.path.join(path, "final_avg.pth"))
 
         if self.best_model_loss is not None and self.loss_improved:
             # The best_model can be None, after a training restart.
