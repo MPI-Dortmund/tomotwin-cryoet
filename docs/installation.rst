@@ -59,7 +59,7 @@ To update an existing TomoTwin installation just do:
     mamba env update -n tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_tomotwin.yml --prune
     conda activate tomotwin
     pip install tomotwin-cryoet
-    mamba env update -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_napari.yml --prune
+    mamba env update -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/napari-tomotwin/main/conda_env.yml --prune
 
 Download latest model
 ^^^^^^^^^^^^^^^^^^^^^
