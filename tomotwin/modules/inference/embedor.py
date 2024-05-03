@@ -93,17 +93,21 @@ class TorchEmbedor(Embedor):
         self.model = NetworkManager.create_network(self.tomotwin_config).get_model()
         print(type(self.model))
         before_parallel_failed = False
+        state_dict = {}
+
+        for key in checkpoint["model_state_dict"]:
+            state_dict[key.replace("module.", "")] = checkpoint["model_state_dict"][key]
 
         if checkpoint is not None:
             try:
-                self.model.load_state_dict(checkpoint["model_state_dict"])
+                self.model.load_state_dict(state_dict)
             except RuntimeError:
                 print("Load before failed")
                 before_parallel_failed = True
 
         self.model = torch.nn.DataParallel(self.model)
         if before_parallel_failed:
-            self.model.load_state_dict(checkpoint["model_state_dict"])
+            self.model.load_state_dict(state_dict)
 
     def embed(self, volume_data: VolumeDataset) -> np.array:
         """Calculates the embeddings. The volumes showed have the dimension NxBSxBSxBS where N is the number of nu"""
@@ -182,16 +186,23 @@ class TorchEmbedorDistributed(Embedor):
                 print(self.tomotwin_config)
 
         self.model = NetworkManager.create_network(self.tomotwin_config).get_model()
+        before_parallel_failed = False
+
+        state_dict = {}
+        for key in checkpoint["model_state_dict"]:
+            state_dict[key.replace("module.", "")] = checkpoint["model_state_dict"][key]
         if checkpoint is not None:
             try:
-                self.model.load_state_dict(checkpoint["model_state_dict"])
+                self.model.load_state_dict(state_dict)
             except RuntimeError:
                 print("Load before failed")
+                before_parallel_failed = True
 
         self.model.to(self.rank)
-
         self.model = torch.compile(self.model, mode="reduce-overhead")
         self.model = torch.nn.parallel.DistributedDataParallel(self.model, device_ids=[self.rank])
+        if before_parallel_failed:
+            self.model.load_state_dict(state_dict)
 
     def get_unique_indicis(self, a):
         """
