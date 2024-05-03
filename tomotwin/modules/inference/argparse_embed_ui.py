@@ -44,7 +44,9 @@ class EmbedArgParseUI(EmbedUI):
 
         if "subvolumes" in sys.argv[1]:
             self.mode = EmbedMode.VOLUMES
-            self.distr_mode = DistrMode.DP
+            self.distr_mode = DistrMode.DDP
+            if args.distribution_mode == 0:
+                self.distr_mode = DistrMode.DP
 
         if "tomogram" in sys.argv[1]:
             self.mode = EmbedMode.TOMO
@@ -101,6 +103,16 @@ class EmbedArgParseUI(EmbedUI):
             default=128,
             required=False,
             help="Batch size during calculating the embeddings",
+        )
+
+        parser.add_argument(
+            "-d",
+            "--distribution_mode",
+            type=int,
+            required=False,
+            choices=[0, 1],
+            default=1,
+            help="0: DataParallel,  1: Faster parallelism mode using DistributedDataParallel"
         )
 
         parser.add_argument(
