@@ -233,6 +233,10 @@ def get_loss_func(
         loss_func = losses.TripletMarginLoss(
             margin=train_conf["tl_margin"], distance=distance
         )
+    elif train_conf["loss"] == "MultiSimilarityLoss":
+        loss_func = losses.MultiSimilarityLoss(
+            distance=distance
+        )
     else:
         raise exceptions.UnknownLoss("Specified loss not known")
 
