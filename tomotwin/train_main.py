@@ -331,10 +331,18 @@ def _main_():
     # Setup miners and loss
     ########################
     miner = None
-    if config["train_config"]["miner"]:
-        miner = miners.TripletMarginMiner(
-            margin=config["train_config"]["miner_margin"], type_of_triplets="semihard"
-        )
+    try:
+        if config["train_config"]["miner"]['name'] == "TripletMarginMiner":
+            miner = miners.TripletMarginMiner(
+                margin=config["train_config"]["miner"]["miner_margin"], type_of_triplets="semihard"
+            )
+        elif config["train_config"]["miner"]['name'] == "DistanceWeightedMiner":
+            miner = miners.DistanceWeightedMiner(
+                cutoff=config["train_config"]["miner"]["cutoff"],
+                nonzero_loss_cutoff=config["train_config"]["miner"]["nonzero_loss_cutoff"],
+            )
+    except:
+        print("No valid miner configuration found. Use none")
 
     loss_func = get_loss_func(
         net_conf=config["network_config"],
