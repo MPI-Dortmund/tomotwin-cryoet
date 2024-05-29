@@ -243,6 +243,24 @@ def get_loss_func(
     return loss_func
 
 
+def get_miner(miner_conf: dict):
+    miner = None
+    if miner_conf is None:
+        return miner
+
+    if miner_conf['name'] == "TripletMarginMiner":
+        miner = miners.TripletMarginMiner(
+            margin=miner_conf["miner_margin"], type_of_triplets="semihard"
+        )
+    elif miner_conf['name'] == "DistanceWeightedMiner":
+        miner = miners.DistanceWeightedMiner(
+            cutoff=miner_conf["cutoff"],
+            nonzero_loss_cutoff=miner_conf["nonzero_loss_cutoff"],
+        )
+    return miner
+
+
+
 def _main_():
     seed = 17  # seed value
     np.random.seed(seed)
@@ -330,19 +348,7 @@ def _main_():
     ########################
     # Setup miners and loss
     ########################
-    miner = None
-    try:
-        if config["train_config"]["miner"]['name'] == "TripletMarginMiner":
-            miner = miners.TripletMarginMiner(
-                margin=config["train_config"]["miner"]["miner_margin"], type_of_triplets="semihard"
-            )
-        elif config["train_config"]["miner"]['name'] == "DistanceWeightedMiner":
-            miner = miners.DistanceWeightedMiner(
-                cutoff=config["train_config"]["miner"]["cutoff"],
-                nonzero_loss_cutoff=config["train_config"]["miner"]["nonzero_loss_cutoff"],
-            )
-    except:
-        print("No valid miner configuration found. Use none")
+    miner = get_miner(config["train_config"].get("miner", None))
 
     loss_func = get_loss_func(
         net_conf=config["network_config"],

@@ -24,7 +24,6 @@ from importlib_metadata import version
 from optuna.pruners import MedianPruner
 from optuna.storages import RetryFailedTrialCallback
 from optuna.trial import TrialState
-from pytorch_metric_learning import miners
 from tqdm import tqdm
 
 from tomotwin.modules.common.distances import DistanceManager
@@ -166,7 +165,7 @@ def objective(trial: optuna.Trial) -> float:
     weight_decay = settings["weight_decay"]
     EPOCHS = settings["epochs"]
     BATCH_SIZE = settings["batchsize"]
-    use_miner = settings["miner"]
+    miner_conf = settings.get("miner", None)
     patience = settings["patience"]
 
     print("NUMBER OF EPOCHS", EPOCHS)
@@ -187,11 +186,7 @@ def objective(trial: optuna.Trial) -> float:
         net_conf=settings, train_conf=settings, distance=distance
     )
 
-    miner = None
-    if use_miner:
-        miner = miners.TripletMarginMiner(
-            margin=settings["miner_margin"], type_of_triplets="semihard"
-        )
+    miner = tmain.get_miner(miner_conf)
 
     ########################
     # Setup network
