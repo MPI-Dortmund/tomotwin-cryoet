@@ -437,7 +437,7 @@ def _main_():
     global BASIC_OUTPUT
     global EPOCHS
     global PARAMS
-    print("TomoTwin Version:", version("tomotwin"))
+    print("TomoTwin Version:", version("tomotwin-cryoet"))
     parser = create_parser()
     args = parser.parse_args()
     PDB_PATH = args.pdbpath
