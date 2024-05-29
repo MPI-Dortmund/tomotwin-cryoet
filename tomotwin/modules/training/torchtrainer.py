@@ -556,14 +556,14 @@ class TorchTrainer(Trainer):
             ep = self.current_epoch
             add = "" + "_f1" if self.f1_improved else ""
             add = add + "_loss" if self.loss_improved else ""
-
-            self.write_model_to_disk(
-                path,
-                mod,
-                "best_model_" + f"{ep + 1}".zfill(3) + f"{add}.pth",
-                ep,
-                **kwargs,
-            )
+            if self.f1_improved or self.loss_improved:
+                self.write_model_to_disk(
+                    path,
+                    mod,
+                    "best_model_" + f"{ep + 1}".zfill(3) + f"{add}.pth",
+                    ep,
+                    **kwargs,
+                )
 
     def get_model(self) -> Any:
         """
