@@ -257,6 +257,16 @@ def get_miner(miner_conf: dict):
             cutoff=miner_conf["cutoff"],
             nonzero_loss_cutoff=miner_conf["nonzero_loss_cutoff"],
         )
+    elif miner_conf['name'] == "UniformHistogramMiner":
+        miner = miners.UniformHistogramMiner(
+            num_bins=miner_conf["num_bins"],
+            pos_per_bin=miner_conf["pos_per_bin"],
+            neg_per_bin=miner_conf["neg_per_bin"],
+            distance=distances.CosineSimilarty()
+        )
+    elif miner_conf['name'] == "MultiSimilarityMiner":
+        miner = miners.MultiSimilarityMiner(epsilon=miner_conf["epsilon"])
+
     return miner
 
 
