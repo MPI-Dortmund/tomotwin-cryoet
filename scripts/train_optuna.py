@@ -100,7 +100,7 @@ def objective(trial: optuna.Trial) -> float:
     settings = generate_settings3(trial, PARAMS)
     learning_rate = settings["train_config"]["learning_rate"]
     optimizer_name = settings["train_config"]["optimizer"]
-    amsgrad = settings["train_config"]["amsgrad"]
+    amsgrad = settings["train_config"].get("amsgrad", False)
     weight_decay = settings["train_config"]["weight_decay"]
     EPOCHS = settings["train_config"]["epochs"]
     BATCH_SIZE = settings["train_config"]["batchsize"]
