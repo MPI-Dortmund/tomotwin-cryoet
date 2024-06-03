@@ -12,6 +12,7 @@ may affect the distribution and modification of this software.
 """
 
 import argparse
+import copy
 import json
 import os
 import sys
@@ -50,11 +51,24 @@ class UnknownTargetError(Exception):
     pass
 
 
+def generate_settings3(trial, optuna_conf: dict) -> Dict:
+    def resolve_suggest(child_dict, parent_key=None, parent=None):
+        for k, v in child_dict.items():
+            if isinstance(v, dict):
+                if k in ["suggest_int", "suggest_float", "suggest_categorical"]:
+                    parent[parent_key] = getattr(trial, k)(parent_key, **v)
+                else:
+                    resolve_suggest(v, k, child_dict)
+
+    optuna_conf_copy = copy.deepcopy(optuna_conf)
+    resolve_suggest(optuna_conf_copy)
+    return optuna_conf_copy
+
 def generate_settings2(trial: optuna.Trial, optuna_conf: Dict) -> Dict:
     val = {}
 
     for suggest_func in optuna_conf:
-        if suggest_func == "general":
+        if suggest_func == "optuna":
             continue
         if suggest_func.startswith("c_"):
             for c_param in optuna_conf[suggest_func]:
@@ -77,95 +91,20 @@ def generate_settings2(trial: optuna.Trial, optuna_conf: Dict) -> Dict:
     return val
 
 
-def generate_settings(trial: optuna.Trial, optuna_conf: Dict) -> Dict:
-    val = {}
-
-    if "suggest_categorical" in optuna_conf:
-        for param in optuna_conf["suggest_categorical"]:
-            sparam = optuna_conf["suggest_categorical"][param]
-            val[param] = trial.suggest_categorical(param, **sparam)
-
-    if "suggest_float" in optuna_conf:
-        for param in optuna_conf["suggest_float"]:
-            sparam = optuna_conf["suggest_float"][param]
-            val[param] = trial.suggest_float(param, **sparam)
-
-    if "suggest_int" in optuna_conf:
-        for param in optuna_conf["suggest_int"]:
-            sparam = optuna_conf["suggest_int"][param]
-            val[param] = trial.suggest_int(param, **sparam)
-
-    if "constant" in optuna_conf:
-        for param in optuna_conf["constant"]:
-            sparam = optuna_conf["constant"][param]
-            val[param] = sparam["value"]
-
-    if "c_suggest_int" in optuna_conf:
-        for c_param in optuna_conf["c_suggest_int"]:
-            conditional_param = optuna_conf["c_suggest_int"][c_param]
-            c_var = conditional_param["condition_variable"]
-            c_val = conditional_param["condition_value"]
-            if c_var in val:
-                if val[c_var] == c_val:
-                    trial.suggest_int(c_param, **conditional_param["param"])
-
-    return val
-
-def setup_network_config(settings: Dict) -> Dict:
-
-    def add_norm_to_config():
-        config["network_config"]["norm_name"] = settings["norm"]
-
-        if settings["norm"] == "GroupNorm":
-            config["network_config"]["norm_kwargs"] = {"num_groups": settings["group_size"]}
-        else:
-            config["network_config"]["norm_kwargs"] = {}
-
-    if settings["network"] == "SiameseNet":
-        config = {
-            "identifier": settings["network"],
-            "network_config": {
-                "output_channels": settings["output_channels"],
-                "dropout": settings["dropout"],
-                "repeat_layers": settings["repeats"],
-            },
-        }
-        add_norm_to_config()
-
-    if settings["network"] == "ResNet":
-        config = {
-            "identifier": settings["network"],
-            "network_config": {
-                "out_head": settings["out_head"],
-                "model_depth": settings["model_depth"],
-            },
-        }
-
-        add_norm_to_config()
-
-    dm = DistanceManager()
-    distance = dm.get_distance(settings["distance"])
-    config["distance"] = distance.name()
-
-    return config
-
-
 def objective(trial: optuna.Trial) -> float:
     output_path = os.path.join(BASIC_OUTPUT, str(trial.number))
     print("TRIAL NUMBER:", trial.number)
     ########################
     # Generate Optuna parameters
     ########################
-    settings = generate_settings2(trial, PARAMS)
-    settings["distance"] = DISTANCE
-    print(settings)
-    learning_rate = settings["learning_rate"]
-    optimizer_name = settings["optimizer"]
-    amsgrad = settings["amsgrad"]
-    weight_decay = settings["weight_decay"]
-    EPOCHS = settings["epochs"]
-    BATCH_SIZE = settings["batchsize"]
-    miner_conf = settings.get("miner", None)
+    settings = generate_settings3(trial, PARAMS)
+    learning_rate = settings["train_config"]["learning_rate"]
+    optimizer_name = settings["train_config"]["optimizer"]
+    amsgrad = settings["train_config"]["amsgrad"]
+    weight_decay = settings["train_config"]["weight_decay"]
+    EPOCHS = settings["train_config"]["epochs"]
+    BATCH_SIZE = settings["train_config"]["batchsize"]
+    miner_conf = settings["train_config"].get("miner", None)
     patience = settings["patience"]
 
     print("NUMBER OF EPOCHS", EPOCHS)
@@ -174,7 +113,7 @@ def objective(trial: optuna.Trial) -> float:
     # Init distance function
     ########################
     dm = DistanceManager()
-    distance = dm.get_distance(settings["distance"])
+    distance = dm.get_distance(DISTANCE)
     print("Use distance function", distance.name())
 
     ########################
@@ -183,7 +122,7 @@ def objective(trial: optuna.Trial) -> float:
     from tomotwin import train_main as tmain
 
     loss_func = tmain.get_loss_func(
-        net_conf=settings, train_conf=settings, distance=distance
+        net_conf=settings["network_config"], train_conf=settings["train_config"], distance=distance
     )
 
     miner = tmain.get_miner(miner_conf)
@@ -192,8 +131,7 @@ def objective(trial: optuna.Trial) -> float:
     # Setup network
     ########################
     nw = NetworkManager()
-    config = setup_network_config(settings=settings)
-    network = nw.create_network(config)
+    network = nw.create_network(settings)
 
     ############################
     # Check if restart is necessary
@@ -295,7 +233,7 @@ def objective(trial: optuna.Trial) -> float:
         weight_decay=weight_decay,
         patience=patience
     )
-    trainer.set_network_config(config)
+    trainer.set_network_config(settings["network_config"])
 
     train_loader, test_loader = trainer.get_train_test_dataloader()
 
@@ -328,28 +266,28 @@ def objective(trial: optuna.Trial) -> float:
         if trainer.output_path is not None:
             trainer.write_results_to_disk(trainer.output_path)
 
-        if PARAMS["general"]["target"].upper() == "F1":
+        if PARAMS["optuna"]["target"].upper() == "F1":
             trial.report(current_val_f1, epoch)
             optuna_values["ret_value"] = float(current_val_f1)
-        elif PARAMS["general"]["target"].upper() == "VAL_LOSS":
+        elif PARAMS["optuna"]["target"].upper() == "VAL_LOSS":
             trial.report(current_val_loss, epoch)
             optuna_values["ret_value"] = float(current_val_loss)
-        elif PARAMS["general"]["target"].upper() == "F1_AT_VAL_LOSS":
+        elif PARAMS["optuna"]["target"].upper() == "F1_AT_VAL_LOSS":
             if current_val_loss < optuna_values["best_loss"]:
                 optuna_values["best_loss"] = float(current_val_loss)
                 optuna_values["ret_value"] = float(current_val_f1)
             trial.report(optuna_values["ret_value"], epoch)
         else:
             raise UnknownTargetError(
-                f"Target {PARAMS['general']['target']} is not known."
+                f"Target {PARAMS['optuna']['target']} is not known."
             )
         if optuna_values["best"] == None:
             optuna_values["best"] = optuna_values["ret_value"]
         else:
-            if PARAMS["general"]["minmax"] == "maximize":
+            if PARAMS["optuna"]["minmax"] == "maximize":
                 if optuna_values["ret_value"] > optuna_values["best"]:
                     optuna_values["best"] = optuna_values["ret_value"]
-            if PARAMS["general"]["minmax"] == "minimize":
+            if PARAMS["optuna"]["minmax"] == "minimize":
                 if optuna_values["ret_value"] < optuna_values["best"]:
                     optuna_values["best"] = optuna_values["ret_value"]
 
@@ -463,27 +401,27 @@ def _main_():
     """
     optuna.logging.set_verbosity(optuna.logging.DEBUG)
 
-    print(PARAMS["general"])
+    print(PARAMS["optuna"])
 
     heartbeat_intervall = None
 
-    storage_url = PARAMS["general"]["STORAGE"]
+    storage_url = PARAMS["optuna"]["STORAGE"]
     # f"sqlite:///{STUDY_NAME}.db"
     storage = None
-    if PARAMS["general"]["RDB"] is True:
+    if PARAMS["optuna"]["RDB"] is True:
 
         retry_callback = None
-        if PARAMS["general"]["retry"] is True:
+        if PARAMS["optuna"]["retry"] is True:
             retry_callback = RetryFailedTrialCallback(
-                max_retry=PARAMS["general"]["max_retry"]
+                max_retry=PARAMS["optuna"]["max_retry"]
             )
 
         pruner = None
-        if PARAMS["general"]["prune"] is True:
-            pruner = MedianPruner(n_warmup_steps=PARAMS["general"]["n_warmup"])
+        if PARAMS["optuna"]["prune"] is True:
+            pruner = MedianPruner(n_warmup_steps=PARAMS["optuna"]["n_warmup"])
 
-        if "heartbeat" in PARAMS["general"]:
-            heartbeat_intervall = PARAMS["general"]["heartbeat"]
+        if "heartbeat" in PARAMS["optuna"]:
+            heartbeat_intervall = PARAMS["optuna"]["heartbeat"]
             print("Use heartbeat interval ", heartbeat_intervall)
 
         storage = optuna.storages.RDBStorage(
@@ -496,7 +434,7 @@ def _main_():
         storage = storage_url
 
     study = optuna.create_study(
-        direction=PARAMS["general"]["minmax"],
+        direction=PARAMS["optuna"]["minmax"],
         sampler=samplers.RandomSampler(),
         pruner=pruner,
         study_name=STUDY_NAME,
