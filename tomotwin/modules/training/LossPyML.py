@@ -36,6 +36,10 @@ class LossPyML(nn.Module):
             self.only_negative_labels = []
         else:
             self.only_negative_labels = only_negative_labels
+        self.is_validation = False
+
+    def set_validation(self, state: True):
+        self.is_validation = state
 
     def forward(
         self, anchor: torch.Tensor, positive: torch.Tensor, negative: torch.Tensor, **kwargs
@@ -58,7 +62,7 @@ class LossPyML(nn.Module):
         emb = torch.cat([anchor,positive,negative],dim=0) # concat all embeddings
         hard_pairs = None
 
-        if self.miner:
+        if self.miner and not self.is_validation:
             hard_pairs = self.miner(emb, labels)
 
             ## Remove only negative labels
