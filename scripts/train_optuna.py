@@ -27,6 +27,7 @@ from optuna.storages import RetryFailedTrialCallback
 from optuna.trial import TrialState
 from tqdm import tqdm
 
+from tomotwin import train_main as tmain
 from tomotwin.modules.common.distances import DistanceManager
 from tomotwin.modules.common.preprocess import label_filename
 from tomotwin.modules.networks.networkmanager import NetworkManager
@@ -116,16 +117,7 @@ def objective(trial: optuna.Trial) -> float:
     distance = dm.get_distance(DISTANCE)
     print("Use distance function", distance.name())
 
-    ########################
-    # Setup miners and loss
-    ########################
-    from tomotwin import train_main as tmain
 
-    loss_func = tmain.get_loss_func(
-        net_conf=settings["network_config"], train_conf=settings["train_config"], distance=distance
-    )
-
-    miner = tmain.get_miner(miner_conf)
 
     ########################
     # Setup network
@@ -188,10 +180,7 @@ def objective(trial: optuna.Trial) -> float:
     )
     train_triplets, test_triplets = generate_triplets(tconf)
 
-    if "aug_distance" in settings:
-        aug_dist = settings["aug_distance"]
-    else:
-        aug_dist = 2
+    aug_dist = settings.get("aug_distance", 2)
     print("Use augmentation distance of", aug_dist)
     use_pdb_as_anchor = tconf.pdb_path is not None
     aug_anchor, aug_volumes = get_augmentations(aug_dist, use_pdb_as_anchor=use_pdb_as_anchor)
@@ -213,6 +202,13 @@ def objective(trial: optuna.Trial) -> float:
     ########################
     # Create trainer and start training
     ########################
+
+    loss_func = tmain.get_loss_func(
+        net_conf=settings["network_config"], train_conf=settings["train_config"], distance=distance
+    )
+
+    miner = tmain.get_miner(miner_conf)
+
     trainer = TorchTrainer(
         epochs=tconf.num_epochs,
         batchsize=int(BATCH_SIZE),
@@ -238,7 +234,6 @@ def objective(trial: optuna.Trial) -> float:
     train_loader, test_loader = trainer.get_train_test_dataloader()
 
     # Training Loop
-
 
     for epoch in tqdm(
         range(trainer.start_epoch, trainer.epochs),
