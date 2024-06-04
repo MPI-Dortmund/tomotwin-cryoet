@@ -105,7 +105,7 @@ def objective(trial: optuna.Trial) -> float:
     EPOCHS = settings["train_config"]["epochs"]
     BATCH_SIZE = settings["train_config"]["batchsize"]
     miner_conf = settings["train_config"].get("miner", None)
-    patience = settings["patience"]
+    patience = settings["train_config"]["patience"]
 
     print("NUMBER OF EPOCHS", EPOCHS)
 
