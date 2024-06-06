@@ -20,7 +20,6 @@ import mrcfile
 import numpy as np
 import pandas as pd
 import tqdm
-
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
 
@@ -123,12 +122,24 @@ class ExtractReference(TomoTwinTool):
         os.makedirs(path_output,exist_ok=True)
         # Extract X Y Z coords from correct csv file
         #coords = pd.read_csv(path_ref, sep='    ', header=None)
-        coords = pd.read_csv(path_ref,
-                             delim_whitespace=True,
-                             header=None,
-                             index_col=False,
-                             dtype=float,
-                             )
+        try:
+            coords = pd.read_csv(path_ref,
+                                 delim_whitespace=True,
+                                 header=None,
+                                 index_col=False,
+                                 dtype=float,
+                                 )
+        except:
+            print("Error while reading. Try to skip first row")
+            coords = pd.read_csv(path_ref,
+                                 delim_whitespace=True,
+                                 header=None,
+                                 index_col=False,
+                                 dtype=float,
+                                 skiprows=1
+                                 )
+            
+
         coords.columns = ['X', 'Y', 'Z']
         mrc = mrcfile.mmap(path_tomo, permissive=True, mode='r')
 
