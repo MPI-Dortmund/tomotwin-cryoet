@@ -1,3 +1,7 @@
+#!/raven/u/ymetwally/miniforge3/envs/tomotwin/bin/python3.10
+# -*- coding: utf-8 -*-
+
+
 import argparse
 from typing import Dict, Union
 
@@ -13,6 +17,7 @@ import os
 import numpy as np
 import torch
 from torch.utils.data import Dataset
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 class AutoEncoder(TorchModel):
 
@@ -84,7 +89,7 @@ class AutoEncoder(TorchModel):
                 nn.Identity() 
             )
 
-            self.up_sampling = nn.Upsample(scale_factor =2)
+            self.up_sampling = nn.Upsample(scale_factor =2, mode='trilinear', align_corners = True)
 
         @staticmethod
         def _make_conv_layer(in_c: int, out_c: int, norm: nn.Module, padding: int = 1, kernel_size: int =3):
@@ -267,7 +272,7 @@ def loss_function(recon_x, x):
     mse_loss = F.mse_loss(recon_x, x)
     return mse_loss
 
-def train_autoencoder(model, data_loader,val_loader, optimizer, logging, num_epochs=10, device='cuda'):
+def train_autoencoder(model, data_loader,val_loader, optimizer,scheduler, logging, num_epochs=10, device='cuda'):
     writer = SummaryWriter(logging)
     model.to(device)
     model.train()
@@ -296,6 +301,7 @@ def train_autoencoder(model, data_loader,val_loader, optimizer, logging, num_epo
                    
 
         val_loss = validate_autoencoder(model,val_loader,writer, epoch+1,num_epochs)
+        scheduler.step(val_loss)
         if val_loss < best_loss:
             torch.save(model.state_dict(), f"{logging}/weights/model_weights_epoch_{epoch+1}.pt")
             best_loss = val_loss
@@ -341,14 +347,15 @@ def main(args):
     if args.checkpoint_path:
         load_model_weights(model, args.checkpoint_path)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=10, verbose=True)
 
     
-    train_autoencoder(model, data_loader, val_loader, optimizer,  args.logging, args.num_epochs, args.device)
+    train_autoencoder(model, data_loader, val_loader, optimizer,scheduler,  args.logging, args.num_epochs, args.device)
 
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description="Training script for autoencoder")
-    parser.add_argument("--batch_size", type=int, default=64, help="Batch size for training")
+    parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training")
     parser.add_argument("--num_epochs", type=int, default=1000, help="Number of epochs for training")
     parser.add_argument("--learning_rate", type=float, default=0.001, help="Learning rate for optimizer")
     parser.add_argument("--num_workers", type=int, default=4, help="Number of workers for data loader")
