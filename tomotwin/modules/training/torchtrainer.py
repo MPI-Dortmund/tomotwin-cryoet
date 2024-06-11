@@ -220,12 +220,15 @@ class TorchTrainer(Trainer):
                 anchor_vol = batch["anchor"].to(self.device, non_blocking=True)
                 positive_vol = batch["positive"].to(self.device, non_blocking=True)
                 negative_vol = batch["negative"].to(self.device, non_blocking=True)
+                full_input = torch.cat((anchor_vol,positive_vol,negative_vol), dim=0)
                 filenames = batch["filenames"]
                 with autocast():
-                    # TODO: Probably concat anchor, positive and vol into one batch and run only one forward pass is enough.
-                    anchor_out = self.model.forward(anchor_vol)
-                    positive_out = self.model.forward(positive_vol)
-                    negative_out = self.model.forward(negative_vol)
+
+                    out = self.model.forward(full_input)
+                    out = torch.split(out, anchor_vol.shape[0], dim=0)
+                    anchor_out = out[0]
+                    positive_out = out[1]
+                    negative_out = out[2]
 
                     anchor_out_np = anchor_out.cpu().detach().numpy()
                     for i, anchor_filename in enumerate(filenames[0]):
@@ -258,16 +261,15 @@ class TorchTrainer(Trainer):
         anchor_vol = batch["anchor"].to(self.device, non_blocking=True)
         positive_vol = batch["positive"].to(self.device, non_blocking=True)
         negative_vol = batch["negative"].to(self.device, non_blocking=True)
+        full_input = torch.cat((anchor_vol,positive_vol,negative_vol), dim=0)
         with autocast():
-            # TODO: Probably concat anchor, positive and vol into one batch and run only on forward pass is enough.
-            anchor_out = self.model.forward(anchor_vol)
-            positive_out = self.model.forward(positive_vol)
-            negative_out = self.model.forward(negative_vol)
+            out = self.model.forward(full_input)
+            out = torch.split(out, anchor_vol.shape[0], dim=0)
 
             loss = self.criterion(
-                anchor_out,
-                positive_out,
-                negative_out,
+                out[0],
+                out[1],
+                out[2],
                 label_anchor=batch["label_anchor"],
                 label_positive=batch["label_positive"],
                 label_negative=batch["label_negative"],
