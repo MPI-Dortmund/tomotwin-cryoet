@@ -221,13 +221,15 @@ class TorchTrainer(Trainer):
                 positive_vol = batch["positive"].to(self.device, non_blocking=True)
                 negative_vol = batch["negative"].to(self.device, non_blocking=True)
                 full_input = torch.cat((anchor_vol,positive_vol,negative_vol), dim=0)
+                full_input = torch.cat((anchor_vol,positive_vol,negative_vol), dim=0)
                 filenames = batch["filenames"]
                 with autocast():
+
                     out = self.model.forward(full_input)
                     out = torch.split(out, anchor_vol.shape[0], dim=0)
                     anchor_out = out[0]
                     positive_out = out[1]
-                    negative_out = out[2]                    
+                    negative_out = out[2]
 
                     anchor_out_np = anchor_out.cpu().detach().numpy()
                     for i, anchor_filename in enumerate(filenames[0]):
@@ -261,10 +263,15 @@ class TorchTrainer(Trainer):
         positive_vol = batch["positive"].to(self.device, non_blocking=True)
         negative_vol = batch["negative"].to(self.device, non_blocking=True)
         full_input = torch.cat((anchor_vol,positive_vol,negative_vol), dim=0)
+        full_input = torch.cat((anchor_vol,positive_vol,negative_vol), dim=0)
         with autocast():
             out = self.model.forward(full_input)
             out = torch.split(out, anchor_vol.shape[0], dim=0)
+
             loss = self.criterion(
+                out[0],
+                out[1],
+                out[2],
                 out[0],
                 out[1],
                 out[2],
