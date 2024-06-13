@@ -22,6 +22,7 @@ Next you can create the TomoTwin environment:
 .. prompt:: bash $
 
     mamba env create -n tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/tomotwin-cryoet/main/conda_env_tomotwin.yml
+    conda activate tomotwin
     pip install tomotwin-cryoet
 
 2. Install Napari
@@ -32,6 +33,7 @@ Here we assume that you don't have napari installed. Please do:
 .. prompt:: bash $
 
     mamba env create -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/napari-tomotwin/main/conda_env.yml
+    conda activate napari-tomotwin
     pip install napari-tomotwin
 
 3. Link Napari
