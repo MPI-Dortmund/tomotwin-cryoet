@@ -27,7 +27,7 @@ def check_for_updates():
                 print("Latest version:\t\t", latest_version)
                 print(
                     "More information here:\n",
-                    "https://tomotwin-cryoet.readthedocs.io/en/stable/changes.html",
+                    "https://github.com/MPI-Dortmund/tomotwin-cryoet/releases",
                 )
                 print("###############################################")
             else:
