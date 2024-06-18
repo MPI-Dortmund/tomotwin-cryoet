@@ -23,9 +23,6 @@ import tqdm
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
 
-class EvenBoxSizeException(Exception):
-    ...
-
 class ExtractReference(TomoTwinTool):
     '''
     Extracts a subvolume (reference) from a volume and save it to disk.
@@ -73,22 +70,20 @@ class ExtractReference(TomoTwinTool):
         :param basename: Basename for files, index and filename are added automatically.
         :return: List with paths of written subvolumes.
         '''
-        if box_size % 2 == 0:
-            raise EvenBoxSizeException()
 
         files_written = []
         for index, row in tqdm.tqdm(positions.iterrows()):
             x = row['X']
             y = row['Y']
             z = row['Z']
-
+            odd_factor = box_size % 2 == 0
             # Define corners of box
-            nx1 = (x - (box_size - 1) // 2)
-            nx2 = (x + (box_size - 1) // 2 + 1)
-            ny1 = (y - (box_size - 1) // 2)
-            ny2 = (y + (box_size - 1) // 2 + 1)
-            nz1 = (z - (box_size - 1) // 2)
-            nz2 = (z + (box_size - 1) // 2 + 1)
+            nx1 = (x - (box_size - odd_factor) // 2)
+            nx2 = (x + (box_size - odd_factor) // 2 + odd_factor)
+            ny1 = (y - (box_size - odd_factor) // 2)
+            ny2 = (y + (box_size - odd_factor) // 2 + odd_factor)
+            nz1 = (z - (box_size - odd_factor) // 2)
+            nz2 = (z + (box_size - odd_factor) // 2 + odd_factor)
 
 
             subvol = volume[int(nz1): int(nz2), int(ny1): int(ny2), int(nx1): int(nx2)]
