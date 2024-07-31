@@ -27,7 +27,7 @@ class MRCTripletHandler(TripletHandler):
     @staticmethod
     def read_mrc_and_norm(pth: str) -> np.array:
         vol = MrcFormat.read(pth)
-        vol = preprocess.norm(vol)
+        vol = preprocess.norm2(vol)
         return vol
 
     def handle(self, triplet: FilePathTriplet) -> NumpyTriplet:

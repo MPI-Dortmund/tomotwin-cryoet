@@ -258,14 +258,16 @@ class TorchTrainer(Trainer):
         :param batch: Dictionary with batch data
         :return: Loss of the batch
         """
-        anchor_vol = batch["anchor"].to(self.device, non_blocking=True)
-        positive_vol = batch["positive"].to(self.device, non_blocking=True)
-        negative_vol = batch["negative"].to(self.device, non_blocking=True)
-        full_input = torch.cat((anchor_vol,positive_vol,negative_vol), dim=0)
+        #anchor_vol = batch["anchor"].to(self.device, non_blocking=True)
+        #positive_vol = batch["positive"].to(self.device, non_blocking=True)
+        #negative_vol = batch["negative"].to(self.device, non_blocking=True)
+        anchor_vol = batch["anchor"]
+        positive_vol = batch["positive"]
+        negative_vol = batch["negative"]
+        full_input = torch.cat((anchor_vol,positive_vol,negative_vol), dim=0).to(self.device, non_blocking=True)
         with autocast():
             out = self.model.forward(full_input)
             out = torch.split(out, anchor_vol.shape[0], dim=0)
-
             loss = self.criterion(
                 out[0],
                 out[1],

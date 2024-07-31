@@ -262,10 +262,10 @@ def _main_():
     pth_log_err = os.path.join(tconf.output_path, "err.txt")
     print("Redirecting stdout to", pth_log_out)
     print("Redirecting stderr to", pth_log_err)
-    f = open(pth_log_out, "a", encoding="utf-8")
-    sys.stdout = f
-    f = open(pth_log_err, "a", encoding="utf-8")
-    sys.stderr = f
+    #f = open(pth_log_out, "a", encoding="utf-8")
+    #sys.stdout = f
+    #f = open(pth_log_err, "a", encoding="utf-8")
+    #sys.stderr = f
     print("TomoTwin Version:", version("tomotwin-cryoet"))
 
 
@@ -352,7 +352,7 @@ def _main_():
         criterion=LossPyML(
             loss_func=loss_func, miner=miner, only_negative_labels=only_negative_labels
         ),
-        workers=12,
+        workers=20,
         log_dir=os.path.join(tconf.output_path, "tensorboard"),
         training_data=train_ds,
         test_data=test_ds,
