@@ -4,3 +4,4 @@
 tomotwin/__init__.py
 VERSION.txt
 /coverage.xml
+/resources/optuna_config/storage_adress

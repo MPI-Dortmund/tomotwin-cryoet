@@ -38,6 +38,7 @@
     },
     "optimizer": "Adam",
     "weight_decay": 0,
+    "epoch": 100,
     "batchsize": {
       "suggest_int": {
         "low": 32,
@@ -61,6 +62,6 @@
     "n_warmup": 100,
     "heartbeat": 60,
     "RDB": true,
-    "STORAGE": ""
+    "STORAGE": "add storage url here
   }
 }
