@@ -1,0 +1,19 @@
+{
+  "identifier": "resunet",
+  "network_config": {},
+
+  "train_config":{
+    "loss": "TripletLoss",
+    "tl_margin": 0.539,
+    "miner": true,
+    "miner_margin": 0.734,
+    "learning_rate": 5.945e-05,
+    "optimizer": "Adam",
+    "weight_decay": 0,
+    "batchsize": 35,
+    "patience": 50,
+    "aug_train_shift_distance": 2
+  },
+
+  "distance": "COSINE"
+}
