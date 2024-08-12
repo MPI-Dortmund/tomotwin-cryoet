@@ -17,6 +17,9 @@ from typing import Dict
 from tomotwin.modules.networks.SiameseNet3D import SiameseNet3D
 from tomotwin.modules.networks.resnet import Resnet
 from tomotwin.modules.networks.torchmodel import TorchModel
+from tomotwin.modules.networks.Unet import UNet
+from tomotwin.modules.networks.Unet_GN import UNet_GN
+from tomotwin.modules.networks.resunet import resunet
 
 
 class NetworkNotExistError(Exception):
@@ -34,6 +37,9 @@ class NetworkManager:
     network_identifier_map = {
         "SiameseNet".upper(): SiameseNet3D,
         "ResNet".upper(): Resnet,
+        "UNet".upper(): UNet,
+        "UNet_GN".upper(): UNet_GN,
+        "resunet".upper(): resunet
     }
 
 

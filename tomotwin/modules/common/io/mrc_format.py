@@ -19,8 +19,8 @@ class MrcFormat:
     def read(pth: str) -> np.array:
         vol = None
         try:
-            with mrcfile.open(pth, mode="r", permissive=True) as mrc:
-                vol = mrc.data
+            with mrcfile.open(pth, permissive=True) as mrc:
+                vol = mrc.data.astype(np.float32)
         except ValueError as e:
             raise Exception(f"Failed reading {pth}") from e
         return vol

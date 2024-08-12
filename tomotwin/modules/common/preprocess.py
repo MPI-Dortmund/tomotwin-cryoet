@@ -29,3 +29,9 @@ def label_filename(path: str) -> str:
 def norm(vol: np.array) -> np.array:
     """Applies standard normalization"""
     return (vol-np.mean(vol))/np.std(vol)
+
+def norm2(vol: np.array) -> np.array:
+    min_val = np.min(vol)
+    max_val = np.max(vol)
+    normalized_vol = (vol - min_val) / (max_val - min_val)
+    return normalized_vol
