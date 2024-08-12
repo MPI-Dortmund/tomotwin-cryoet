@@ -1,9 +1,4 @@
-#!/raven/u/ymetwally/miniforge3/envs/tomotwin/bin/python3.10
-# -*- coding: utf-8 -*-
-
-
 import argparse
-import random
 from typing import Dict, Union
 
 import torch
@@ -16,18 +11,18 @@ from torch.utils.data import DataLoader
 from tomotwin.modules.training.mrctriplethandler import MRCTripletHandler
 import os
 import numpy as np
+import torch
 from torch.utils.data import Dataset
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-import mrcfile
 
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(DoubleConv, self).__init__()
         self.double_conv = nn.Sequential(
-            nn.Conv3d(in_channels, out_channels, kernel_size=3, padding='same'),
+            nn.Conv3d(in_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm3d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv3d(out_channels, out_channels, kernel_size=3, padding='same'),
+            nn.Conv3d(out_channels, out_channels, kernel_size=3, padding=1),
             nn.BatchNorm3d(out_channels),
             nn.ReLU(inplace=True)
         )
@@ -53,29 +48,27 @@ class Up(nn.Module):
         if bilinear:
             self.up = nn.Upsample(scale_factor=2, mode='trilinear', align_corners=True)
         else:
-            self.up = nn.ConvTranspose3d(in_channels , in_channels , kernel_size=2, stride=2)
+            self.up = nn.ConvTranspose3d(in_channels // 2, in_channels // 2, kernel_size=2, stride=2)
 
         self.conv = DoubleConv(in_channels, out_channels)
 
     def forward(self, x1, x2):
         x1 = self.up(x1)
-        #diffZ = x2.size(2) - x1.size(2)
-        #diffY = x2.size(3) - x1.size(3)
-        #diffX = x2.size(4) - x1.size(4)
+        diffZ = x2.size(2) - x1.size(2)
+        diffY = x2.size(3) - x1.size(3)
+        diffX = x2.size(4) - x1.size(4)
 
-        #x1 = F.pad(x1, [diffX // 2, diffX - diffX // 2,
-         #               diffY // 2, diffY - diffY // 2,
-          #              diffZ // 2, diffZ - diffZ // 2])
+        x1 = F.pad(x1, [diffX // 2, diffX - diffX // 2,
+                        diffY // 2, diffY - diffY // 2,
+                        diffZ // 2, diffZ - diffZ // 2])
         
-        #x = torch.cat([x2, x1], dim=1)
-        return self.conv(x1)
+        x = torch.cat([x2, x1], dim=1)
+        return self.conv(x)
 
 class OutConv(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(OutConv, self).__init__()
-        self.conv = nn.Sequential( nn.Conv3d(in_channels, out_channels, kernel_size=3, padding ='same'),
-                                  nn.Sigmoid())
-
+        self.conv = nn.Conv3d(in_channels, out_channels, kernel_size=1)
 
     def forward(self, x):
         return self.conv(x)
@@ -91,41 +84,25 @@ class UNet3D(nn.Module):
         self.down1 = Down(64, 128)
         self.down2 = Down(128, 256)
         self.down3 = Down(256, 512)
-
-        self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(512 * 5 * 5 * 5, 512*4*4*4)  
-        self.fc2 = nn.Linear(6400, 640)
-        self.fc3 = nn.Linear(640, 64)
-        self.fc4 = nn.Linear(64, 640)
-        self.fc5 = nn.Linear(640, 6400)
-        self.fc6 = nn.Linear(512*4*4*4, 512 * 5 * 5 * 5)
-
-        self.up3 = Up(512, 256, bilinear)
-        self.up4 = Up(256, 128, bilinear)
-        self.up5 = Up(128,64)
+        self.down4 = Down(512, 512)
+        self.up1 = Up(1024, 256, bilinear)
+        self.up2 = Up(512, 128, bilinear)
+        self.up3 = Up(256, 64, bilinear)
+        self.up4 = Up(128, 64, bilinear)
         self.outc = OutConv(64, out_channels)
 
         self._initialize_weights()
 
     def forward(self, x):
-        x = F.pad(x, (1, 2, 1, 2, 1, 2))
         x1 = self.inc(x)
         x2 = self.down1(x1)
         x3 = self.down2(x2)
         x4 = self.down3(x3)
-
-        x_flat = self.flatten(x4)
-        x_flat = F.relu(self.fc1(x_flat))
-        #x_flat = F.relu(self.fc2(x_flat))
-        #x_flat = F.relu(self.fc3(x_flat))
-        #x_flat = F.relu(self.fc4(x_flat))
-        #x_flat = F.relu(self.fc5(x_flat))
-        x_flat = F.relu(self.fc6(x_flat))
-        x4 = x_flat.view(x4.size())
-
-        x = self.up3(x4, x3)
-        x = self.up4(x, x2)
-        x = self.up5(x, x1)
+        x5 = self.down4(x4)
+        x = self.up1(x5, x4)
+        x = self.up2(x, x3)
+        x = self.up3(x, x2)
+        x = self.up4(x, x1)
         logits = self.outc(x)
         return logits
     
@@ -147,14 +124,7 @@ class MRCVolumeDataset(Dataset):
     def __init__(self, root_dir):
         self.root_dir = root_dir
         self.file_paths = self._get_file_paths()
-
-    def read_and_normalize_mrc(self, file_path):
-        with mrcfile.open(file_path, permissive=True) as mrc:
-            data = mrc.data.astype(np.float32)
-            min_val = np.min(data)
-            max_val = np.max(data)
-            normalized_data = (data - min_val) / (max_val - min_val)
-        return normalized_data
+        self.reader = MRCTripletHandler()
 
     def _get_file_paths(self):
         file_paths = []
@@ -167,7 +137,6 @@ class MRCVolumeDataset(Dataset):
                         mrc_files = [f for f in os.listdir(tomo_path) if f.endswith('.mrc')]
                         for mrc_file in mrc_files:
                             file_paths.append(os.path.join(tomo_path, mrc_file))
-                                                                                     
         return file_paths
 
     def __len__(self):
@@ -175,10 +144,9 @@ class MRCVolumeDataset(Dataset):
 
     def __getitem__(self, idx):
         mrc_path = self.file_paths[idx]
-        volume = self.read_and_normalize_mrc(mrc_path)
+        volume = self.reader.read_mrc_and_norm(mrc_path)
 
         return {'input': volume, 'target': volume}
-
     
 
 def loss_function(recon_x, x):
@@ -197,30 +165,32 @@ def train_autoencoder(model, data_loader, val_loader, optimizer, scheduler, logg
 
     for epoch in range(num_epochs):
         total_loss = 0.0
-        model.train()
         with tqdm(data_loader, desc=f"Epoch {epoch+1}/{num_epochs}", unit="batch") as progress_bar:
             for batch_idx, data in enumerate(progress_bar):
                 input_data = data['input'].to(device)
-                input_data = input_data.unsqueeze(1)
+                input_data = input_data.reshape(-1,1,37,37,37)
                 target_data = data['target'].to(device)
-                target_data = target_data.unsqueeze(1)
-                target_data = F.pad(target_data, (1, 2, 1, 2, 1, 2))  
+                target_data = target_data.reshape(-1,1,37,37,37)
                 optimizer.zero_grad()
                 recon_data = model(input_data)
                 loss = loss_function(recon_data, target_data)
                 loss.backward()
                 optimizer.step()
+                
                 total_loss += loss.item()
                 avg_loss = total_loss / (batch_idx + 1)
                 writer.add_scalar('Loss/train', avg_loss, epoch * len(data_loader) + batch_idx)
                 progress_bar.set_postfix(loss=avg_loss)
-                
+                   
         val_loss = validate_autoencoder(model,val_loader,writer, epoch+1,num_epochs)
         scheduler.step(val_loss)
         if val_loss < best_loss:
             torch.save(model.state_dict(), f"{logging}/weights/model_weights_epoch_{epoch+1}.pt")
             best_loss = val_loss
             early_stopping_counter = 0
+            checkpoint_files = os.listdir(f"{logging}/weights")
+            if len(checkpoint_files) > 3:
+                os.remove(f"{logging}/weights/{checkpoint_files[0]}")
         else:
             early_stopping_counter += 1
             if early_stopping_counter >= patience:
@@ -239,10 +209,9 @@ def validate_autoencoder(model, data_loader, writer, epoch,num_epochs, device='c
         with tqdm(data_loader, desc=f"Validation Epoch {epoch}/{num_epochs}", unit="batch") as progress_bar:
             for batch_idx, data in enumerate(progress_bar):
                 input_data = data['input'].to(device)
-                input_data = input_data.unsqueeze(1)
+                input_data = input_data.reshape(-1, 1, 37, 37, 37)
                 target_data = data['target'].to(device)
-                target_data = target_data.unsqueeze(1)
-                target_data = F.pad(target_data, (1, 2, 1, 2, 1, 2))  
+                target_data = target_data.reshape(-1, 1, 37, 37, 37)
                 recon_data = model(input_data)
                 loss = loss_function(recon_data, target_data)
                 total_loss += loss.item()
@@ -300,28 +269,18 @@ def load_model_weights(model, checkpoint_path):
     #state_dict = {k.replace('module.', ''): v for k, v in checkpoint.items()}
     model.load_state_dict(checkpoint)
 
-def set_seed(seed):
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)  
-    np.random.seed(seed)  
-    random.seed(seed)  
-    torch.backends.cudnn.benchmark = False
-    torch.backends.cudnn.deterministic = True
-
 def main(args):
-    set_seed(1)
     dataset = MRCVolumeDataset(args.dataset_root)
     data_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
     val_set = MRCVolumeDataset(args.val_root)
     val_loader = DataLoader(val_set, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
     model = UNet3D(1,1)
     model = nn.DataParallel(model)
-    #os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"
     if args.checkpoint_path:
         load_model_weights(model, args.checkpoint_path)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=10, verbose=True)
 
     
     train_autoencoder(model, data_loader, val_loader, optimizer,  scheduler,args.logging, args.num_epochs, args.device)
