@@ -76,7 +76,7 @@ def get_window_size(model_path: str) -> int:
     :return: Window size
     '''
 
-    checkpoint = torch.load(model_path)
+    checkpoint = torch.load(model_path, weights_only=False)
     if "window_size" in checkpoint["tomotwin_config"]:
         return int(checkpoint["tomotwin_config"]["window_size"][0])
     print("Can't find window size in model. Use window size of 37.")
