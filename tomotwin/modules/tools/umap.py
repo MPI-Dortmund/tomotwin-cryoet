@@ -43,7 +43,7 @@ class UmapTool(TomoTwinTool):
                             help='Previously fitted model')
         parser.add_argument('-n', '--ncomponents', type=int, required=False, default=2,
                             help='Number of components')
-        parser.add_argument('--neighbors', type=int, required=False, default=200,
+        parser.add_argument('--neighbors', type=int, required=False, default=64,
                             help='Previously fitted model')
         parser.add_argument('--fit_sample_size', type=int, default=400000,
                             help='Sample size using for the fit of the umap')
