@@ -1,3 +1,4 @@
+sphinx<7
 sphinx-prompt
 sphinx-rtd-theme
 sphinxcontrib-youtube
