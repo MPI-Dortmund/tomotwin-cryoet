@@ -10,3 +10,6 @@ Strategies
 
 .. _strategy-03:
 .. include:: strategy_03.rst
+
+.. _strategy-04:
+.. include:: strategy_04.rst

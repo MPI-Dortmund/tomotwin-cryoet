@@ -51,6 +51,6 @@ To calculate the mask, all you need is your tomogram and the latest TomoTwin mod
 
  .. prompt:: bash $
 
-    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -v tomo/tomo.mrc -m tomotwin_latest.pth --mask mask/tomo_mask.mrc
+    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -v tomo/tomo.mrc -m tomotwin_latest.pth --mask mask/tomo_mask.mrc -o out/embed/tomo/ -s 2
 
 Once the embeddings are computed, you can simply continue with either the reference or clustering workflow.
