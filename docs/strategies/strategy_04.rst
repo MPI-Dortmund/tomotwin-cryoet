@@ -1,4 +1,4 @@
-Strategy 3: Manually refining UMAPs from selected embeddings (Napari GPU workaround)
+Strategy 4: Manually refining UMAPs from selected embeddings (Napari GPU workaround)
 ========================================================
 
 When to use it
