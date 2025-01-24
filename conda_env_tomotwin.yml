@@ -6,7 +6,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - pytorch[version='>=2.1']
+  - pytorch[version='==2.3']
   - torchvision
   - pandas
   - scipy
