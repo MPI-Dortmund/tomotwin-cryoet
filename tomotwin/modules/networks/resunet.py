@@ -2,6 +2,7 @@ from typing import Dict, Union
 import torch
 import torch.nn as nn
 from tomotwin.modules.networks.torchmodel import TorchModel
+import torch.nn.functional as F
 
 
 class ResidualBlock(nn.Module):
@@ -78,7 +79,8 @@ class UNet3D(nn.Module):
         self.down1 = Down(64, 64)
         self.down2 = Down(64, 64)
         self.down3 = Down(64, 64)
-        self.ls = nn.Conv3d(64, 64, kernel_size=3, padding='same')
+        self.ls = nn.Conv3d(64, 1, kernel_size=3, padding='same')
+        #self.f = nn.Linear(64*64, 64*64)
 
         self.Flatten = nn.Flatten()
         self._initialize_weights()
@@ -90,6 +92,7 @@ class UNet3D(nn.Module):
         x4 = self.down3(x3)
         ls = self.ls(x4)
         x_flat = self.Flatten(ls)
+        #x_flat = self.f(x_flat)
         x_flat = torch.nn.functional.normalize(x_flat, p=2.0, dim=1)
         return x_flat
 

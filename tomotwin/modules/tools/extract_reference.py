@@ -74,8 +74,7 @@ class ExtractReference(TomoTwinTool):
         :param basename: Basename for files, index and filename are added automatically.
         :return: List with paths of written subvolumes.
         '''
-        if box_size % 2 == 0:
-            raise EvenBoxSizeException()
+        odd_fact = box_size % 2
 
         files_written = []
         for index, row in tqdm.tqdm(positions.iterrows()):
@@ -84,12 +83,12 @@ class ExtractReference(TomoTwinTool):
             z = row['Z']
 
             # Define corners of box
-            nx1 = (x - (box_size - 1) // 2)
-            nx2 = (x + (box_size - 1) // 2 + 1)
-            ny1 = (y - (box_size - 1) // 2)
-            ny2 = (y + (box_size - 1) // 2 + 1)
-            nz1 = (z - (box_size - 1) // 2)
-            nz2 = (z + (box_size - 1) // 2 + 1)
+            nx1 = (x - (box_size - odd_fact) // 2)
+            nx2 = (x + (box_size - odd_fact) // 2 + odd_fact)
+            ny1 = (y - (box_size - odd_fact) // 2)
+            ny2 = (y + (box_size - odd_fact) // 2 + odd_fact)
+            nz1 = (z - (box_size - odd_fact) // 2)
+            nz2 = (z + (box_size - odd_fact) // 2 + odd_fact)
 
 
             subvol = volume[int(nz1): int(nz2), int(ny1): int(ny2), int(nx1): int(nx2)]
@@ -133,4 +132,4 @@ class ExtractReference(TomoTwinTool):
         mrc = mrcfile.mmap(path_tomo, permissive=True, mode='r')
 
         ExtractReference.extract_and_save(mrc.data, coords, boxsize, path_output, filebasename, apix=mrc.voxel_size)
-        print(f'wrote subvolume reference to {path_output}')
+        print(f'wrote subvolume references to {path_output}')

@@ -44,7 +44,7 @@ class TorchVolumeDataset(Dataset):
     def __getitem__(self, item_index):
         vol = self.volumes[item_index]
         vol = vol.astype(np.float32)
-        vol = pp.norm(vol)
+        vol = pp.norm2(vol)
         vol = vol[np.newaxis]
         if torch.cuda.is_available():
             vol = vol.astype(np.float16)  # Gives a speedup, when its done already here. However, does not work on CPUs.
@@ -97,7 +97,8 @@ class TorchEmbedor(Embedor):
         if checkpoint is not None:
             try:
                 self.model.load_state_dict(checkpoint["model_state_dict"])
-            except RuntimeError:
+            except RuntimeError as e:
+                print(e)
                 print("Load before failed")
                 before_parallel_failed = True
 

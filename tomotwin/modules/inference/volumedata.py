@@ -80,14 +80,15 @@ class SimpleVolumeData(VolumeDataset):
         """
         self.volumes = volumes
         self.roi = roi
+        self.odd_fact = self.roi.box_size % 2 
 
     def __len__(self) -> int:
         return len(self.roi.center_coords)
 
     def __getitem__(self, itemindex) -> np.array:
         p = self.roi.center_coords[itemindex].astype(int)
-        p_min = p - int((self.roi.box_size - 1) / 2)
-        p_max = p + int((self.roi.box_size - 1) / 2 + 1)
+        p_min = p - int((self.roi.box_size - self.odd_fact) / 2)
+        p_max = p + int((self.roi.box_size - self.odd_fact) / 2 + self.odd_fact)
         v = self.volumes[p_min[0]:p_max[0], p_min[1]:p_max[1], p_min[2]:p_max[2]]
         return v
 
