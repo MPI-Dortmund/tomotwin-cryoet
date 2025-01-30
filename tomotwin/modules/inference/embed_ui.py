@@ -48,6 +48,7 @@ class EmbedConfiguration:
     zrange: Tuple[int, int] = None
     maskpth: str = None
     distr_mode: DistrMode = None
+    padding: int = None
 
 
 class EmbedUI(ABC):
