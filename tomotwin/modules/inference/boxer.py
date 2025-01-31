@@ -79,7 +79,10 @@ class SlidingWindowBoxer(Boxer):
                 range(sliding_window_strides.shape[2]))
             )
         )
-        center_coords = indicies * stride + (box_size - 1) / 2
+
+        odd_factor = box_size % 2
+        center_coords = indicies * stride + (box_size - odd_factor) / 2
+        
         if zrange is not None:
             center_coords[:, 0] = zrange[0] + center_coords[:, 0]
         relevant_center_coords = []
