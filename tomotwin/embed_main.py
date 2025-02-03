@@ -46,11 +46,11 @@ def sliding_window_embedding(
     if embeddings is None:
         return None
     positions = []
-    if padding is not None: 
-        positions = positions - padding
     for i in range(embeddings.shape[0]):
         positions.append(boxes.get_localization(i))
     positions = np.array(positions)
+    if padding is not None: 
+        positions = positions - padding
     embeddings = np.hstack([positions, embeddings])
 
     return embeddings
