@@ -145,7 +145,7 @@ def embed_tomogram(
             maxz,
         )  # here we need to take make sure that the box size is subtracted etc.
 
-    if conf.padding:
+    if conf.padding == True:
         print('hello')
         tomo = np.pad(tomo, int((window_size - odd_factor) // 2), mode='reflect')
         print(f"padded the tomogram with padding value of {conf.padding}, new shape is {tomo.shape}")
