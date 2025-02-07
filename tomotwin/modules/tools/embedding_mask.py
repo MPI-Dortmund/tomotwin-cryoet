@@ -137,11 +137,19 @@ class EmbeddingMaskTool(TomoTwinTool):
         )
 
         parse_median.add_argument(
-            "-p",
+            "-p"
             "--padding",
-            type=bool,
-            default=False,
+            dest="padding",
+            action="store_true",
+            default=True,
             help="Add padding of half box size to the tomogram so that it is all included in the mask",
+        )
+
+        parse_median.add_argument(
+        "--no-padding",
+        dest="padding",
+        action="store_false",
+        help="Disable padding"
         )
 
         return parser
