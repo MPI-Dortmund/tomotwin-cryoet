@@ -131,12 +131,13 @@ def embed_tomogram(
     Embeds a tomogram
     :return: DataFrame of embeddings
     """
+    odd_factor = box_size % 2
 
-    if mask is not None:
+    if mask is not None and conf.padding == True:
         assert tomo.shape == mask.shape, f"Tomogram shape ({tomo.shape}) and mask shape ({mask.shape}) need to be equal."
 
     if conf.zrange:
-        hb = int((window_size - 1) // 2)
+        hb = int((window_size - odd_factor) // 2)
         minz = max(0, conf.zrange[0] - hb)
         maxz = min(conf.zrange[1] + hb, tomo.shape[0])
         conf.zrange = (
@@ -144,11 +145,12 @@ def embed_tomogram(
             maxz,
         )  # here we need to take make sure that the box size is subtracted etc.
 
-    if conf.padding is not None:
-        tomo = np.pad(tomo, conf.padding, mode='reflect')
+    if conf.padding:
+        print('hello')
+        tomo = np.pad(tomo, int((window_size - odd_factor) // 2), mode='reflect')
         print(f"padded the tomogram with padding value of {conf.padding}, new shape is {tomo.shape}")
         if mask is not None:
-            mask = np.pad(tomo, conf.padding, mode='reflect')
+            assert tomo.shape == mask.shape, f"Tomogram shape ({tomo.shape}) and mask shape ({mask.shape}) need to be equal."
 
     boxer = SlidingWindowBoxer(
         box_size=window_size, stride=conf.stride, zrange=conf.zrange, mask=mask

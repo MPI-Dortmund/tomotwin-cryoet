@@ -194,9 +194,9 @@ class EmbedArgParseUI(EmbedUI):
         parser.add_argument(
             "-p",
             "--padding",
-            type=int,
+            type=float,
             required=False,
-            default=None,
+            default=True,
             help="padding value added to all axis of the tomogram from both sides, can be useful to pick particles at the edges"
         )
 
