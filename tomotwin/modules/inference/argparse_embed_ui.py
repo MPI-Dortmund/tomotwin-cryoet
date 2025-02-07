@@ -58,6 +58,7 @@ class EmbedArgParseUI(EmbedUI):
             self.padding = args.padding
             if args.distribution_mode == 0:
                 self.distr_mode = DistrMode.DP
+            self.padding = args.padding
 
     def get_embed_configuration(self) -> EmbedConfiguration:
         conf = EmbedConfiguration(
@@ -194,7 +195,7 @@ class EmbedArgParseUI(EmbedUI):
         parser.add_argument(
             "-p",
             "--padding",
-            type=float,
+            type=bool,
             required=False,
             default=True,
             help="padding value added to all axis of the tomogram from both sides, can be useful to pick particles at the edges"
