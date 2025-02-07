@@ -140,7 +140,7 @@ class EmbeddingMaskTool(TomoTwinTool):
             "-p",
             "--padding",
             type=bool,
-            default=True,
+            default=False,
             help="Add padding of half box size to the tomogram so that it is all included in the mask",
         )
 
