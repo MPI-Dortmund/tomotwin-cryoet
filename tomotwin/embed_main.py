@@ -51,6 +51,7 @@ def sliding_window_embedding(
     positions = np.array(positions)
     if padding is True: 
         print("Adjusting positions after padding")
+        odd_factor = box_size % 2
         positions = positions - int((box_size - odd_factor) // 2)
     embeddings = np.hstack([positions, embeddings])
 
