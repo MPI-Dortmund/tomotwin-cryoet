@@ -58,7 +58,6 @@ class EmbedArgParseUI(EmbedUI):
             self.padding = args.padding
             if args.distribution_mode == 0:
                 self.distr_mode = DistrMode.DP
-            self.padding = args.padding
 
     def get_embed_configuration(self) -> EmbedConfiguration:
         conf = EmbedConfiguration(

@@ -273,6 +273,7 @@ def _main_():
     ui.run()
     check_for_updates()
     config = ui.get_embed_configuration()
+    print(config.padding)
     start(config)
 
 

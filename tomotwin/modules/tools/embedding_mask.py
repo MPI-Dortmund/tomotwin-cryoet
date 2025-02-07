@@ -153,7 +153,7 @@ class EmbeddingMaskTool(TomoTwinTool):
                     batch_size: int,
                     threshold: float,
                     dilation: float,
-                    padding: bool = True
+                    padding: bool 
                     ) -> np.array:
         '''
         Calculates a mask based on median embedding
@@ -162,6 +162,7 @@ class EmbeddingMaskTool(TomoTwinTool):
             # Embed
             emb_out_pth = os.path.join(tmp_pth, "embed")
 
+            print (padding)
             conf = EmbedConfiguration(
                 model_path=model_pth,
                 volumes_path=tomo_pth,
