@@ -133,7 +133,7 @@ def embed_tomogram(
     :return: DataFrame of embeddings
     """
     odd_factor = window_size % 2
-
+    print("conf.padding=", conf.padding , "value ", int((window_size - odd_factor) // 2))
     if mask is not None and conf.padding == False:
         assert tomo.shape == mask.shape, f"Tomogram shape ({tomo.shape}) and mask shape ({mask.shape}) need to be equal."
 
@@ -151,7 +151,7 @@ def embed_tomogram(
         print(f"padded the tomogram with padding value of {conf.padding}, new shape is {tomo.shape}")
         if mask is not None:
             assert tomo.shape == mask.shape, f"Tomogram shape ({tomo.shape}) and mask shape ({mask.shape}) need to be equal."
-
+    print(window_size)
     boxer = SlidingWindowBoxer(
         box_size=window_size, stride=conf.stride, zrange=conf.zrange, mask=mask
     )
