@@ -162,7 +162,7 @@ class EmbeddingMaskTool(TomoTwinTool):
             # Embed
             emb_out_pth = os.path.join(tmp_pth, "embed")
 
-            print (padding)
+            print ('median_moade.padding = ', padding)
             conf = EmbedConfiguration(
                 model_path=model_pth,
                 volumes_path=tomo_pth,
@@ -250,6 +250,7 @@ class EmbeddingMaskTool(TomoTwinTool):
 
         print("Calculate mask")
         if sys.argv[2] == "median":
+            print('args.padding = ', args.padding)
             mask = self.median_mode(tomo_pth=args.input,
                                     model_pth=args.modelpth,
                                     stride=args.stride,
