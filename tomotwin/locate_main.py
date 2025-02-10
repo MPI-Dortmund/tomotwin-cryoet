@@ -97,14 +97,11 @@ def scale_and_pad_heatmap(vol: np.array, stride: int, tomo_input_shape: tuple) -
         if total_pad % 2 == 0:
             return (total_pad // 2, total_pad // 2)
         return (total_pad // 2 + 1, total_pad // 2)
-    print('tomo_input_shape ', tomo_input_shape)
-    print('vol before zoom ', vol.shape)
+
     vol = zoom(vol, stride)
-    print('vol after zoom ', vol.shape)
     vol = vol.swapaxes(0, 2)
-    print('vol after swap ', vol.shape)
+
     get_pad_tuble(np.abs(tomo_input_shape[0] - vol.shape[0]))
-    print("pad tuble", get_pad_tuble(np.abs(tomo_input_shape[0] - vol.shape[0])), get_pad_tuble(np.abs(tomo_input_shape[1] - vol.shape[1])), get_pad_tuble(np.abs(tomo_input_shape[2] - vol.shape[2])) )
     vol = np.pad(
         vol, (
             get_pad_tuble(np.abs(tomo_input_shape[0] - vol.shape[0])),
@@ -112,8 +109,6 @@ def scale_and_pad_heatmap(vol: np.array, stride: int, tomo_input_shape: tuple) -
             get_pad_tuble(np.abs(tomo_input_shape[2] - vol.shape[2]))),
         "constant",
         constant_values=np.min(vol) - 0.01 * np.abs(np.min(vol)))
-    print('vol after pad ', vol.shape)
-    print('constant ', np.min(vol) - 0.01 * np.abs(np.min(vol)))
     return vol
 
 
