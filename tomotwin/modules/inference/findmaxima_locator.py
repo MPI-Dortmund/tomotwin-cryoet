@@ -62,6 +62,13 @@ class FindMaximaLocator(Locator):
         z_val = (df["Z"].values - half_bs) / stride[2]
         z_val = z_val.astype(int)
 
+        print("X min/max:", df["X"].min(), df["X"].max())
+        print("Y min/max:", df["Y"].min(), df["Y"].max())
+        print("Z min/max:", df["Z"].min(), df["Z"].max())
+
+        print("Computed X min/max:", x_val.min(), x_val.max())
+        print("Computed Y min/max:", y_val.min(), y_val.max())
+        print("Computed Z min/max:", z_val.min(), z_val.max())
         # This array contains the distance(similarity)/probability at each coordinate
         vol = np.zeros(shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1))
 

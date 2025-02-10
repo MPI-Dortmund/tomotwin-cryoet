@@ -206,6 +206,11 @@ class EmbeddingMaskTool(TomoTwinTool):
             # Heatmap
             print("Calculate heatmap")
             map_output = pd.read_pickle(glob(os.path.join(map_out_pth, "*.tmap"))[0])
+            print(map_output.shape)  # Expected: (587412, 4)
+            print(map_output.columns)  # Expected: ['X', 'Y', 'Z', 'd_class_0']
+            print(map_output.attrs)  # Check metadata
+
+            print(stride)
             raw_heatmap = FindMaximaLocator.to_volume(
                 df=map_output,
                 target_class=0,
