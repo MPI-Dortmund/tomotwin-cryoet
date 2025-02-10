@@ -99,6 +99,8 @@ def run(conf: MapConfiguration) -> None:
             columns=["index", "filepath", "X", "Y", "Z"], errors="ignore"
         ).to_numpy()
 
+        print ('volume_embeddings_np', volume_embeddings_np.shape)
+        print ('reference_embeddings_np', reference_embeddings_np.shape)
 
         dm = DistanceManager()
         distance = dm.get_distance(volume_embeddings.attrs["tomotwin_config"]["distance"])
@@ -125,6 +127,7 @@ def run(conf: MapConfiguration) -> None:
             reference=reference_embeddings_np,
             volumes=volume_embeddings_np,
         )
+        print('distances', distances.shape)
         print("Prepare output...")
         del volume_embeddings_np
         del reference_embeddings_np
@@ -159,6 +162,7 @@ def run(conf: MapConfiguration) -> None:
         classes_df.attrs["references"] = ref_names
         classes_df.attrs["skip_refinement"] = conf.skip_refinement
         pth = os.path.join(output_path, "map.tmap")
+        print('classes_df ',classes_df.shape)
         classes_df.to_pickle(pth)
         print(f"Wrote output to {pth}")
 
