@@ -170,7 +170,6 @@ class EmbeddingMaskTool(TomoTwinTool):
             # Embed
             emb_out_pth = os.path.join(tmp_pth, "embed")
 
-            print ('median_mode.padding = ', padding)
             conf = EmbedConfiguration(
                 model_path=model_pth,
                 volumes_path=tomo_pth,
@@ -206,16 +205,12 @@ class EmbeddingMaskTool(TomoTwinTool):
             # Heatmap
             print("Calculate heatmap")
             map_output = pd.read_pickle(glob(os.path.join(map_out_pth, "*.tmap"))[0])
-            print(map_output.shape)  # Expected: (587412, 4)
-            print(map_output.columns)  # Expected: ['X', 'Y', 'Z', 'd_class_0']
-            print(map_output.attrs)  # Check metadata
 
-            print(stride)
             raw_heatmap = FindMaximaLocator.to_volume(
                 df=map_output,
                 target_class=0,
                 stride=(stride, stride, stride),
-                window_size=map_output.attrs['window_size'],
+                window_size=box_size,
             )
             raw_heatmap = raw_heatmap.astype(np.float32)
             heatmap = locate.scale_and_pad_heatmap(raw_heatmap,
@@ -231,7 +226,6 @@ class EmbeddingMaskTool(TomoTwinTool):
                 )
 
             bin_mask = np.zeros_like(mask, dtype=np.float32)
-            print(bin_mask.shape)
             bin_mask[mask] = 1
 
             return bin_mask

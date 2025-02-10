@@ -54,21 +54,18 @@ class FindMaximaLocator(Locator):
         window_size: int,
     ) -> Tuple[np.array, np.array]:
         # Convert to volume:
-        half_bs = (window_size - 1) / 2
-        x_val = (df["X"].values - half_bs) / stride[0]
+        half_bs_x = df["X"].min()
+        half_bs_y = df["Y"].min()
+        half_bs_z = df["Z"].min()
+        # half_bs = (window_size - 1) / 2 This is modified because of padding
+        x_val = (df["X"].values - half_bs_x) / stride[0]
         x_val = x_val.astype(int)
-        y_val = (df["Y"].values - half_bs) / stride[1]
+        y_val = (df["Y"].values - half_bs_y) / stride[1]
         y_val = y_val.astype(int)
-        z_val = (df["Z"].values - half_bs) / stride[2]
+        z_val = (df["Z"].values - half_bs_z) / stride[2]
         z_val = z_val.astype(int)
 
-        print("X min/max:", df["X"].min(), df["X"].max())
-        print("Y min/max:", df["Y"].min(), df["Y"].max())
-        print("Z min/max:", df["Z"].min(), df["Z"].max())
 
-        print("Computed X min/max:", x_val.min(), x_val.max())
-        print("Computed Y min/max:", y_val.min(), y_val.max())
-        print("Computed Z min/max:", z_val.min(), z_val.max())
         # This array contains the distance(similarity)/probability at each coordinate
         vol = np.zeros(shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1))
 
