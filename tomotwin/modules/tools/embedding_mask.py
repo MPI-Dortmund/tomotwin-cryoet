@@ -210,7 +210,7 @@ class EmbeddingMaskTool(TomoTwinTool):
                 df=map_output,
                 target_class=0,
                 stride=(stride, stride, stride),
-                window_size=box_size,
+                window_size=map_output.attrs['window_size'],
             )
             raw_heatmap = raw_heatmap.astype(np.float32)
             heatmap = locate.scale_and_pad_heatmap(raw_heatmap,
