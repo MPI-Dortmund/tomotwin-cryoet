@@ -134,7 +134,6 @@ def embed_tomogram(
     :return: DataFrame of embeddings
     """
     odd_factor = window_size % 2
-    print("conf.padding=", conf.padding , "value ", int((window_size - odd_factor) // 2))
     if mask is not None and conf.padding == False:
         assert tomo.shape == mask.shape, f"Tomogram shape ({tomo.shape}) and mask shape ({mask.shape}) need to be equal."
 
