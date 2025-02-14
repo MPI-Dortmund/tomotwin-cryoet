@@ -151,7 +151,6 @@ def embed_tomogram(
         print(f"padded the tomogram with padding value of {conf.padding}, new shape is {tomo.shape}")
         if mask is not None:
             assert tomo.shape == mask.shape, f"Tomogram shape ({tomo.shape}) and mask shape ({mask.shape}) need to be equal."
-    print(window_size)
     boxer = SlidingWindowBoxer(
         box_size=window_size, stride=conf.stride, zrange=conf.zrange, mask=mask
     )
@@ -179,6 +178,7 @@ def embed_tomogram(
     df.attrs["stride"] = conf.stride
     df.attrs["tomogram_input_shape"] = tomo.shape
     df.attrs["tomotwin_config"] = embedor.tomotwin_config
+    df.attrs["padding"] = conf.padding
     if conf.zrange:
         df.attrs["zrange"] = conf.zrange
 

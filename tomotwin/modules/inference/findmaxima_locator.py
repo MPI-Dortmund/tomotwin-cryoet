@@ -54,10 +54,11 @@ class FindMaximaLocator(Locator):
         window_size: int,
     ) -> Tuple[np.array, np.array]:
         # Convert to volume:
+
         half_bs_x = df["X"].min()
         half_bs_y = df["Y"].min()
         half_bs_z = df["Z"].min()
-        # half_bs = (window_size - 1) / 2 This is modified because of padding
+        # half_bs = (window_size - 1) / 2 This is modified because of padding now we substract the minimum that could either be 0 or half box size if padded it will be 0
         x_val = (df["X"].values - half_bs_x) / stride[0]
         x_val = x_val.astype(int)
         y_val = (df["Y"].values - half_bs_y) / stride[1]
@@ -84,12 +85,16 @@ class FindMaximaLocator(Locator):
         maximas: List[Tuple[float, float, float]],
         target: int,
         stride: Tuple[int],
-        boxsize: int
+        boxsize: int,
+        padding: float
 
     ) -> pd.DataFrame:
 
-        #bshalf = (boxsize-1)//2
-        bshalf = 0
+        if padding == True:
+            bshalf = 0
+        else:
+            bshalf = (boxsize - (boxsize%2))//2
+        
         dat = {
             "X": [],
             "Y": [],
@@ -215,8 +220,13 @@ class FindMaximaLocator(Locator):
         ]  # more than one pixel coordinate must be involved.
 
         print("done", class_id)
+        if "padding" in map_output.attrs:
+            padding = map_output.attrs['padding']
+        else:
+            padding = False
+        print('padding of locate: ', padding)
         particle_df = FindMaximaLocator.maxima_to_df(
-            maximas, class_id, stride=stride, boxsize=window_size
+            maximas, class_id, stride=stride, boxsize=window_size, padding = padding
         )
 
         return particle_df.copy(deep=True), vol
