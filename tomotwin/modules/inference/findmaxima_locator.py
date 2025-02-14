@@ -88,7 +88,8 @@ class FindMaximaLocator(Locator):
 
     ) -> pd.DataFrame:
 
-        bshalf = (boxsize-1)//2
+        #bshalf = (boxsize-1)//2
+        bshalf = 0
         dat = {
             "X": [],
             "Y": [],
