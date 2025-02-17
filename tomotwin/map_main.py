@@ -158,7 +158,6 @@ def run(conf: MapConfiguration) -> None:
         # Add additional meta information
         classes_df.attrs["references"] = ref_names
         classes_df.attrs["skip_refinement"] = conf.skip_refinement
-        classes_df.attrs["padding"] = volume_embeddings.attrs['padding']
         pth = os.path.join(output_path, "map.tmap")
         classes_df.to_pickle(pth)
         print(f"Wrote output to {pth}")
