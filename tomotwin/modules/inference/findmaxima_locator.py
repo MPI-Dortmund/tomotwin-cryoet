@@ -224,7 +224,6 @@ class FindMaximaLocator(Locator):
             padding = map_output.attrs['padding']
         else:
             padding = False
-        print('padding of locate: ', padding)
         particle_df = FindMaximaLocator.maxima_to_df(
             maximas, class_id, stride=stride, boxsize=window_size, padding = padding
         )
