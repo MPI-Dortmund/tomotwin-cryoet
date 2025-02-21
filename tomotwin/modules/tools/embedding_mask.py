@@ -136,6 +136,22 @@ class EmbeddingMaskTool(TomoTwinTool):
             help="Dilation radius. Add an additional",
         )
 
+        parse_median.add_argument(
+            "-p"
+            "--padding",
+            dest="padding",
+            action="store_true",
+            default=True,
+            help="Add padding of half box size to the tomogram so that it is all included in the mask",
+        )
+
+        parse_median.add_argument(
+        "--no-padding",
+        dest="padding",
+        action="store_false",
+        help="Disable padding"
+        )
+
         return parser
 
     def median_mode(self,
@@ -144,7 +160,8 @@ class EmbeddingMaskTool(TomoTwinTool):
                     stride: int,
                     batch_size: int,
                     threshold: float,
-                    dilation: float
+                    dilation: float,
+                    padding: bool 
                     ) -> np.array:
         '''
         Calculates a mask based on median embedding
@@ -162,7 +179,8 @@ class EmbeddingMaskTool(TomoTwinTool):
                 stride=stride,
                 zrange=None,
                 maskpth=None,
-                distr_mode=DistrMode.DDP
+                distr_mode=DistrMode.DDP,
+                padding = padding
             )
 
             embed.start(conf)
@@ -187,6 +205,7 @@ class EmbeddingMaskTool(TomoTwinTool):
             # Heatmap
             print("Calculate heatmap")
             map_output = pd.read_pickle(glob(os.path.join(map_out_pth, "*.tmap"))[0])
+
             raw_heatmap = FindMaximaLocator.to_volume(
                 df=map_output,
                 target_class=0,
@@ -210,6 +229,7 @@ class EmbeddingMaskTool(TomoTwinTool):
             bin_mask[mask] = 1
 
             return bin_mask
+
 
     def intensity_mode(self, img: np.array) -> np.array:
         '''
@@ -238,12 +258,14 @@ class EmbeddingMaskTool(TomoTwinTool):
 
         print("Calculate mask")
         if sys.argv[2] == "median":
+            print('args.padding = ', args.padding)
             mask = self.median_mode(tomo_pth=args.input,
                                     model_pth=args.modelpth,
                                     stride=args.stride,
                                     dilation=args.dilation,
                                     threshold=args.threshold,
-                                    batch_size=args.batchsize)
+                                    batch_size=args.batchsize,
+                                    padding = args.padding)
             print(f"Masked out: {100 - np.sum(mask) * 100 / np.prod(mask.shape):.2f}%")
         elif sys.argv[2] == "intensity":
             print("Read data")
