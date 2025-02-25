@@ -76,7 +76,7 @@ class ExtractReference(TomoTwinTool):
             x = row['X']
             y = row['Y']
             z = row['Z']
-            odd_factor = box_size % 2 == 0
+            odd_factor = box_size % 2 
             # Define corners of box
             nx1 = (x - (box_size - odd_factor) // 2)
             nx2 = (x + (box_size - odd_factor) // 2 + odd_factor)
