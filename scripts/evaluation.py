@@ -215,7 +215,7 @@ def locate_positions_stats(locate_results, class_positions, iou_thresh, fbeta=1)
     recall = true_positive / (true_positive + false_negative)
     precision = true_positive / (true_positive + false_positive)
     f1_score = get_fbeta(recall, precision, beta=fbeta)
-    class_stats["F1"] = float(f1_score)
+    class_stats[f"F{fbeta}"] = float(f1_score)
     class_stats["Recall"] = recall
     class_stats["Precision"] = float(precision)
     class_stats["TruePositiveRate"] = float(true_positive_rate)
@@ -254,7 +254,7 @@ class SubvolumeEvaluator():
 
             balanced_accuracy = (true_positive_rate+true_negative_rate)/2
             f1_score = get_fbeta(recall, precision, beta=fbeta)
-            stats[gtclass]["F1"] = float(f1_score)
+            stats[gtclass][f"F{fbeta}"] = float(f1_score)
             stats[gtclass]["Recall"] = float(recall)
             stats[gtclass]["Precision"] = float(precision)
             stats[gtclass]["TrueNegativeRate"] = float(true_negative_rate)
@@ -410,7 +410,7 @@ class LocateOptimEvaluator():
             #print(best_stats)
             #import sys
             #sys.exit()
-            best_f1 = best_stats["F1"]
+            best_f1 = best_stats[f"F{self.fbeta}"]
             best_value = 0
             best_df = locate_results
 
@@ -422,8 +422,8 @@ class LocateOptimEvaluator():
                 if len(df) == 0:
                     continue
                 stats = self.get_stats(df, positions)
-                if stats["F1"] > best_f1:
-                    best_f1 = stats["F1"]
+                if stats[f"F{self.fbeta}"] > best_f1:
+                    best_f1 = stats[f"F{self.fbeta}"]
                     best_stats = stats
                     best_value = val
                     best_df = df.copy()
