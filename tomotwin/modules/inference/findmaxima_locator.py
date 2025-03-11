@@ -86,7 +86,7 @@ class FindMaximaLocator(Locator):
         target: int,
         stride: Tuple[int],
         boxsize: int,
-        padding: float
+        padding: bool
 
     ) -> pd.DataFrame:
 
