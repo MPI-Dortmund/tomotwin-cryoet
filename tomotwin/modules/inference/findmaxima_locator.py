@@ -86,7 +86,7 @@ class FindMaximaLocator(Locator):
         target: int,
         stride: Tuple[int],
         boxsize: int,
-        padding: float
+        padding: bool
 
     ) -> pd.DataFrame:
 
@@ -116,7 +116,7 @@ class FindMaximaLocator(Locator):
         dat["X"] = dat["X"].astype(np.float16)
         dat["Y"] = dat["Y"].astype(np.float16)
         dat["Z"] = dat["Z"].astype(np.float16)
-        dat["predicted_class"] = dat["predicted_class"].astype(np.int8)
+        dat["predicted_class"] = dat["predicted_class"].astype(np.uint16)
         dat["size"] = dat["size"].astype(np.uint16)
         dat["metric_best"] = dat["metric_best"].astype(np.float16)
         return dat
