@@ -113,6 +113,7 @@ def embed_subvolumes(paths: List[str], embedor: Embedor, conf: EmbedConfiguratio
     df.index.name = "index"
     df.attrs["modelpth"] = conf.model_path
     df.attrs["modelmd5"] = get_file_md5(conf.model_path)
+    df.attrs["tomotwin_config"] = embedor.tomotwin_config
     f = os.path.join(conf.output_path, "embeddings.temb")
     df.to_pickle(f)
     print(f"Done. Wrote results to {f}")
