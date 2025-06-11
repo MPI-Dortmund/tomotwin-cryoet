@@ -79,19 +79,19 @@ Which you can download with:
     unzip references.zip
     mv gen01_t*.mrc refs/
 
-You can also download a set of standard boxsizes for the entire training data with:
+Note: this tomogram contains proteins that were not in the training/validation data used to train TomoTwin. Therefore, it is useful to assess the generalization of any models trained using our publicly available training data.
+
+You can also download a set of standard boxsizes for all of the proteins in the training/validation/evaluation data with:
 
  .. prompt:: bash $
 
     wget https://github.com/MPI-Dortmund/tomotwin-cryoet/blob/main/resources/boxsizes.json
 
-Note: this tomogram contains proteins that were not in the training/validation data used to train TomoTwin. Therefore, it is useful to assess the generalization of any models trained using our publicly available training data.
-
 To run the evaluation, you should use the reference-based workflow to generate a locate file (replacing the path to your model):
 
  .. prompt:: bash $
 
-    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -m /path/to/model.pth -v tiltseries_rec.mrc -o ./ -b 256; tomotwin_embed.py subvolumes -m /path/to/model.pth -v refs/ -b 8 -o ./; tomotwin_map.py distance -r embeddings.temb -v tiltseries_rec_embeddings.temb --refine -o ./; tomotwin_locate.py findmax -m map.tmap -o ./ --write_heatmaps
+    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -m /path/to/model.pth -v tiltseries_rec.mrc -o ./ -b 256; CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py subvolumes -m /path/to/model.pth -v refs/ -b 8 -o ./; tomotwin_map.py distance -r embeddings.temb -v tiltseries_rec_embeddings.temb --refine -o ./; tomotwin_locate.py findmax -m map.tmap -o ./ --write_heatmaps
 
 Then to run the evaluation use:
 
