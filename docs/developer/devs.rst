@@ -81,7 +81,7 @@ Which you can download with:
 
 Note: this tomogram contains proteins that were not in the training/validation data used to train TomoTwin. Therefore, it is useful to assess the generalization of any models trained using our publicly available training data.
 
-You can also download a set of standard boxsizes for all of the proteins in the training/validation/evaluation data with:
+You can also download a json file containing predetermined boxsizes for all of the proteins in the training/validation/evaluation data with:
 
  .. prompt:: bash $
 
