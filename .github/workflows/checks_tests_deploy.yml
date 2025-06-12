@@ -32,7 +32,6 @@ jobs:
       uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
-        mamba-version: '*'
         activate-environment: tomotwin
         python-version: ${{ matrix.python-version }}
         environment-file: conda_env_tomotwin.yml
