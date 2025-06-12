@@ -3,7 +3,7 @@ class CoordsFormat:
 
     @staticmethod
     def read(pth: str) -> pd.DataFrame:
-        names = ["x", "y", "z"]
+        names = ["X", "Y", "Z"]
         return pd.read_csv(pth, delim_whitespace=True, header=None, index_col=False, dtype=float, names=names,
                            usecols=[0, 1, 2])
 

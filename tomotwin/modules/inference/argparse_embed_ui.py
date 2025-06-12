@@ -56,6 +56,7 @@ class EmbedArgParseUI(EmbedUI):
 
         if "coords" in sys.argv[1]:
             self.mode = EmbedMode.COORDS
+            self.coords = args.coords
 
         if sys.argv[1] in ["coords", 'tomogram']:
             self.zrange = args.zrange
