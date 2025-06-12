@@ -91,7 +91,10 @@ To run the evaluation, you should use the reference-based workflow to generate a
 
  .. prompt:: bash $
 
-    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -m /path/to/model.pth -v tiltseries_rec.mrc -o ./ -b 256; CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py subvolumes -m /path/to/model.pth -v refs/ -b 8 -o ./; tomotwin_map.py distance -r embeddings.temb -v tiltseries_rec_embeddings.temb --refine -o ./; tomotwin_locate.py findmax -m map.tmap -o ./ --write_heatmaps
+    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py tomogram -m /path/to/model.pth -v tiltseries_rec.mrc -o ./ -b 256
+    CUDA_VISIBLE_DEVICES=0,1 tomotwin_embed.py subvolumes -m /path/to/model.pth -v refs/ -b 8 -o ./
+    tomotwin_map.py distance -r embeddings.temb -v tiltseries_rec_embeddings.temb --refine -o ./
+    tomotwin_locate.py findmax -m map.tmap -o ./ --write_heatmaps
 
 Then to run the evaluation use:
 
