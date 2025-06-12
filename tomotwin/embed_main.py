@@ -25,12 +25,12 @@ import tomotwin
 from tomotwin.modules.common.io.mrc_format import MrcFormat
 from tomotwin.modules.common.utils import check_for_updates
 from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration, DistrMode
-from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
+from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer, CoordsBoxer
 from tomotwin.modules.inference.embedor import TorchEmbedorDistributed, Embedor, TorchEmbedor
 from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
 
 
-def sliding_window_embedding(
+def embed_boxes(
     tomo: np.array, boxer: Boxer, embedor: Embedor
 ) -> np.array:
     '''
@@ -122,6 +122,7 @@ def embed_subvolumes(paths: List[str], embedor: Embedor, conf: EmbedConfiguratio
 def embed_tomogram(
         tomo: np.array,
         embedor: Embedor,
+        boxer: Boxer,
         conf: EmbedConfiguration,
         window_size: int,
         mask: np.array = None) -> pd.DataFrame:
@@ -142,10 +143,7 @@ def embed_tomogram(
             maxz,
         )  # here we need to take make sure that the box size is subtracted etc.
 
-    boxer = SlidingWindowBoxer(
-        box_size=window_size, stride=conf.stride, zrange=conf.zrange, mask=mask
-    )
-    embeddings = sliding_window_embedding(tomo=tomo, boxer=boxer, embedor=embedor)
+    embeddings = embed_boxes(tomo=tomo, boxer=boxer, embedor=embedor)
     if embeddings is None:
         return
 
@@ -212,12 +210,19 @@ def run(rank, conf: EmbedConfiguration, world_size) -> None:
     embedor = make_embeddor(conf, rank=rank, world_size=world_size)
 
     window_size = get_window_size(conf.model_path)
-    if conf.mode == EmbedMode.TOMO:
+    if conf.mode in [EmbedMode.TOMO, EmbedMode.COORDS]:
         tomo = -1 * MrcFormat.read(conf.volumes_path)  # -1 to invert the contrast
         mask = None
         if conf.maskpth is not None:
             mask = MrcFormat.read(conf.maskpth)!=0
-        embed_tomogram(tomo, embedor, conf, window_size, mask)
+
+        if conf.mode == EmbedMode.COORDS:
+            boxer = CoordsBoxer(coordspth=conf.coords_path, box_size=window_size, mask=mask)
+        else:
+            boxer = SlidingWindowBoxer(
+                box_size=window_size, stride=conf.stride, zrange=conf.zrange, mask=mask
+            )
+        embed_tomogram(tomo, embedor, boxer, conf, window_size, mask)
     elif conf.mode == EmbedMode.VOLUMES:
         paths = []
         for p in conf.volumes_path:

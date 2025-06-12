@@ -20,6 +20,7 @@ import mrcfile
 import numpy as np
 import pandas as pd
 import tqdm
+
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
 
@@ -72,11 +73,13 @@ class ExtractReference(TomoTwinTool):
         '''
 
         files_written = []
+        print(positions.shape)
         for index, row in tqdm.tqdm(positions.iterrows()):
+            print("iter")
             x = row['X']
             y = row['Y']
             z = row['Z']
-            odd_factor = box_size % 2 == 0
+            odd_factor = box_size % 2
             # Define corners of box
             nx1 = (x - (box_size - odd_factor) // 2)
             nx2 = (x + (box_size - odd_factor) // 2 + odd_factor)
@@ -85,14 +88,15 @@ class ExtractReference(TomoTwinTool):
             nz1 = (z - (box_size - odd_factor) // 2)
             nz2 = (z + (box_size - odd_factor) // 2 + odd_factor)
 
-
+            print(nx1, nx2, ny1, ny2, nz1, nz2)
             subvol = volume[int(nz1): int(nz2), int(ny1): int(ny2), int(nx1): int(nx2)]
-
+            print(subvol.shape, box_size)
             if subvol.shape != (box_size, box_size, box_size):
                 continue
             subvol = -1 * subvol  # invert
             subvol = subvol.astype(np.float32)
             fname = os.path.join(out_pth,f"{basename}_{index}.mrc")
+            print(f"Writing {fname}")
             with mrcfile.new(fname) as newmrc:
                 newmrc.set_data(subvol)
                 if apix:

@@ -24,6 +24,7 @@ class EmbedArgParseUI(EmbedUI):
     def __init__(self):
         self.modelpth = None
         self.volumes = None
+        self.coords: str = None
         self.batchsize = None
         self.output = None
         self.stride = None
@@ -49,9 +50,14 @@ class EmbedArgParseUI(EmbedUI):
         if "tomogram" in sys.argv[1]:
             self.mode = EmbedMode.TOMO
             self.stride = args.stride
-            self.zrange = args.zrange
             if len(self.stride) == 1:
                 self.stride = self.stride * 3
+
+        if "coords" in sys.argv[1]:
+            self.mode = EmbedMode.COORDS
+
+        if sys.argv[1] in ["coords", 'tomogram']:
+            self.zrange = args.zrange
             self.maskpth = args.mask
             self.distr_mode = DistrMode.DDP
             if args.distribution_mode == 0:
@@ -61,6 +67,7 @@ class EmbedArgParseUI(EmbedUI):
         conf = EmbedConfiguration(
             model_path=self.modelpth,
             volumes_path=self.volumes,
+            coords_path=self.coords,
             output_path=self.output,
             mode=self.mode,
             batchsize=self.batchsize,
@@ -111,6 +118,79 @@ class EmbedArgParseUI(EmbedUI):
             help="All output files are written in that path.",
         )
 
+    @staticmethod
+    def create_coords_parser(parser):
+        """
+        Creates parser for the coords command
+        """
+
+        parser.add_argument(
+            "-m",
+            "--modelpth",
+            type=str,
+            required=True,
+            help="Path to the tomotwin model",
+        )
+
+        parser.add_argument(
+            "-v",
+            "--volumes",
+            type=str,
+            required=True,
+            help="Path to a single tomogram file",
+        )
+
+        parser.add_argument(
+            "-c",
+            "--coords",
+            type=str,
+            required=True,
+            help="Path to a coords file containing the coordinates to embed",
+        )
+
+        parser.add_argument(
+            "-b",
+            "--batchsize",
+            type=int,
+            default=64,
+            required=False,
+            help="Batch size during calculating the embeddings",
+        )
+
+        parser.add_argument(
+            "-o",
+            "--outpath",
+            type=str,
+            required=True,
+            help="All output files are written in that path.",
+        )
+
+        parser.add_argument(
+            "-z",
+            "--zrange",
+            type=int,
+            default=None,
+            nargs=2,
+            help="Minimum z and maximum z for to run the sliding window on. Handy to skip the void volume in order to speed up the embedding.",
+        )
+
+        parser.add_argument(
+            "--mask",
+            type=str,
+            required=False,
+            default=None,
+            help="Path to binary mask to define embedding region (mrc format). All values != 0 are interpreted as 'True'.",
+        )
+
+        parser.add_argument(
+            "-d",
+            "--distribution_mode",
+            type=int,
+            required=False,
+            choices=[0, 1],
+            default=1,
+            help="0: DataParallel,  1: Faster parallelism mode using DistributedDataParallel"
+        )
 
 
     @staticmethod
@@ -210,5 +290,12 @@ class EmbedArgParseUI(EmbedUI):
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         self.create_tomo_parser(parser_embed_tomogram)
+
+        parser_embed_coords = subparsers.add_parser(
+            "coords",
+            help="Embed coordinates from a tomogram",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        )
+        self.create_coords_parser(parser_embed_coords)
 
         return parser_parent

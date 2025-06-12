@@ -23,6 +23,7 @@ class EmbedMode(Enum):
     """
     TOMO = auto()
     VOLUMES = auto()
+    COORDS = auto()
 
 
 class DistrMode(Enum):
@@ -44,10 +45,12 @@ class EmbedConfiguration:
     output_path: str
     mode: EmbedMode
     batchsize: int
+    coords_path: str = None
     stride: int = None
     zrange: Tuple[int, int] = None
     maskpth: str = None
     distr_mode: DistrMode = None
+    coord_path: str = None
 
 
 class EmbedUI(ABC):
