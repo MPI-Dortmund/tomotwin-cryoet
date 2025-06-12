@@ -31,7 +31,7 @@ jobs:
     - name: Set up conda ${{ matrix.python-version }}
       uses: conda-incubator/setup-miniconda@v3
       with:
-        auto-update-conda: true
+        auto-activate-base: false
         activate-environment: tomotwin
         python-version: ${{ matrix.python-version }}
         environment-file: conda_env_tomotwin.yml
