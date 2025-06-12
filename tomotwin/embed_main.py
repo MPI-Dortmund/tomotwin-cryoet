@@ -25,13 +25,13 @@ import tomotwin
 from tomotwin.modules.common.io.mrc_format import MrcFormat
 from tomotwin.modules.common.utils import check_for_updates
 from tomotwin.modules.inference.argparse_embed_ui import EmbedArgParseUI, EmbedMode, EmbedConfiguration, DistrMode
-from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer
+from tomotwin.modules.inference.boxer import Boxer, SlidingWindowBoxer, CoordsBoxer
 from tomotwin.modules.inference.embedor import TorchEmbedorDistributed, Embedor, TorchEmbedor
 from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
 
 
-def sliding_window_embedding(
-    tomo: np.array, boxer: Boxer, embedor: Embedor, box_size: int, padding: bool 
+def embed_boxes(
+    tomo: np.array, boxer: Boxer, embedor: Embedor, box_size: int, padding: bool
 ) -> np.array:
     '''
     Embeds the tomogram using a sliding window approach
@@ -49,7 +49,7 @@ def sliding_window_embedding(
     for i in range(embeddings.shape[0]):
         positions.append(boxes.get_localization(i))
     positions = np.array(positions)
-    if padding is True: 
+    if padding is True:
         print("Adjusting positions after padding")
         odd_factor = box_size % 2
         positions = positions - int((box_size - odd_factor) // 2)
@@ -126,6 +126,7 @@ def embed_subvolumes(paths: List[str], embedor: Embedor, conf: EmbedConfiguratio
 def embed_tomogram(
         tomo: np.array,
         embedor: Embedor,
+        boxer: Boxer,
         conf: EmbedConfiguration,
         window_size: int,
         mask: np.array = None) -> pd.DataFrame:
@@ -145,15 +146,15 @@ def embed_tomogram(
             minz,
             maxz,
         )  # here we need to take make sure that the box size is subtracted etc.
+
     if conf.padding == True:
         tomo = np.pad(tomo, int((window_size - odd_factor) // 2), mode='reflect')
         print(f"padded the tomogram with padding value of {int((window_size - odd_factor) // 2)}, new shape is {tomo.shape}")
         if mask is not None:
             assert tomo.shape == mask.shape, f"Tomogram shape ({tomo.shape}) and mask shape ({mask.shape}) need to be equal."
-    boxer = SlidingWindowBoxer(
-        box_size=window_size, stride=conf.stride, zrange=conf.zrange, mask=mask
-    )
-    embeddings = sliding_window_embedding(tomo=tomo, boxer=boxer, embedor=embedor, box_size = window_size, padding = conf.padding)
+
+    embeddings = embed_boxes(tomo=tomo, boxer=boxer, embedor=embedor, box_size = window_size, padding = conf.padding)
+
     if embeddings is None:
         return
 
@@ -221,12 +222,19 @@ def run(rank, conf: EmbedConfiguration, world_size) -> None:
     embedor = make_embeddor(conf, rank=rank, world_size=world_size)
 
     window_size = get_window_size(conf.model_path)
-    if conf.mode == EmbedMode.TOMO:
+    if conf.mode in [EmbedMode.TOMO, EmbedMode.COORDS]:
         tomo = -1 * MrcFormat.read(conf.volumes_path)  # -1 to invert the contrast
         mask = None
         if conf.maskpth is not None:
             mask = MrcFormat.read(conf.maskpth)!=0
-        embed_tomogram(tomo, embedor, conf, window_size, mask)
+
+        if conf.mode == EmbedMode.COORDS:
+            boxer = CoordsBoxer(coordspth=conf.coords_path, box_size=window_size, mask=mask)
+        else:
+            boxer = SlidingWindowBoxer(
+                box_size=window_size, stride=conf.stride, zrange=conf.zrange, mask=mask
+            )
+        embed_tomogram(tomo, embedor, boxer, conf, window_size, mask)
     elif conf.mode == EmbedMode.VOLUMES:
         paths = []
         for p in conf.volumes_path:

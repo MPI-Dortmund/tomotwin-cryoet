@@ -19,6 +19,7 @@ import numpy as np
 import numpy.lib.stride_tricks as tricks
 from numpy.typing import NDArray
 
+from tomotwin.modules.common.io.coords_format import CoordsFormat
 from tomotwin.modules.inference.volumedata import SimpleVolumeData, VolumeROI
 
 
@@ -34,6 +35,37 @@ class Boxer(ABC):
 class InvalidZRangeConfiguration(Exception):
     ...
 
+
+class CoordsBoxer(Boxer):
+
+    def __init__(self, coordspth: str,
+                 box_size: int,
+                 mask: np.array = None):
+        self.coords = CoordsFormat.read(coordspth)[['Z', 'Y', 'X']].to_numpy()
+        self.mask = mask
+        self.box_size = box_size
+
+    def box(self, tomogram: NDArray) -> SimpleVolumeData:
+
+        relevant_center_coords = []
+
+        # Apply mask if necessary
+        if self.mask is not None:
+            for c in self.coords:
+                if self.mask[tuple(c.astype(int).tolist())]:
+                    relevant_center_coords.append(c)
+            relevant_center_coords = np.vstack(relevant_center_coords)
+        else:
+            relevant_center_coords = self.coords
+
+        roi = VolumeROI(center_coords=relevant_center_coords, box_size=self.box_size)
+
+        data = SimpleVolumeData(
+            volumes=tomogram,
+            roi=roi
+        )
+
+        return data
 
 class SlidingWindowBoxer(Boxer):
     """
