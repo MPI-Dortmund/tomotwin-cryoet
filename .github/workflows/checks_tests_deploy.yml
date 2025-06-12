@@ -29,7 +29,7 @@ jobs:
         swap-storage: false
     - uses: actions/checkout@v4
     - name: Set up conda ${{ matrix.python-version }}
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         auto-update-conda: true
         miniforge-variant: Mambaforge
