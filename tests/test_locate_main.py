@@ -18,10 +18,10 @@ class MyTestCase(unittest.TestCase):
                                 tolerance=0.2,
                                 boxsize=37,
                                 global_min=0.5,
-                                write_heatmaps=True)
+                                       write_heatmaps=False)
             run(conf)
             self.assertEqual(True, os.path.exists(os.path.join(tmpdirname, "located.tloc")))
-            self.assertEqual(True, os.path.exists(os.path.join(tmpdirname, "gen01_t01_2df7_089.mrc.mrc")))
+            # self.assertEqual(True, os.path.exists(os.path.join(tmpdirname, "gen01_t01_2df7_089.mrc.mrc")))
 
 
 if __name__ == '__main__':

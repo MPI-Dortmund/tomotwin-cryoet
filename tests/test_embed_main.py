@@ -10,6 +10,7 @@ import torch
 
 import tomotwin.embed_main
 from tomotwin.modules.inference.argparse_embed_ui import EmbedConfiguration, EmbedMode, DistrMode
+from tomotwin.modules.inference.boxer import Boxer
 from tomotwin.modules.inference.embedor import Embedor
 from tomotwin.modules.inference.embedor import TorchEmbedor, TorchEmbedorDistributed
 from tomotwin.modules.inference.volumedata import VolumeDataset
@@ -23,6 +24,27 @@ class DummyEmbedor(Embedor):
     def embed(self, volume_data: VolumeDataset) -> np.array:
         embeddings = np.random.randn(2, 32)
         return embeddings
+
+
+class DummySimpleVolumeData:
+
+    def __len__(self) -> int:
+        return 1
+
+    def __getitem__(self, itemindex) -> np.array:
+        return 0
+
+    def get_localization(self, itemindex):
+        return (0, 0, 0)
+
+
+class DummyBoxer(Boxer):
+
+    def __init__(self):
+        self.tomotwin_config = {}
+
+    def box(self, tomogram):
+        return DummySimpleVolumeData()
 
 
 class TestsEmbedMain(unittest.TestCase):
@@ -187,7 +209,7 @@ class TestsEmbedMain(unittest.TestCase):
                 zrange=None,
             )
             embed_tomogram(
-                tomo=tomo, embedor=DummyEmbedor(), window_size=10, conf=embed_conf
+                tomo=tomo, embedor=DummyEmbedor(), boxer=DummyBoxer(), window_size=10, conf=embed_conf
             )
             import os
 

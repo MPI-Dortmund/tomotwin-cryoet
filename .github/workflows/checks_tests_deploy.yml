@@ -27,13 +27,11 @@ jobs:
         large-packages: false
         docker-images: false
         swap-storage: false
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up conda ${{ matrix.python-version }}
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
-        auto-update-conda: true
-        miniforge-variant: Mambaforge
-        use-mamba: true
+        auto-activate-base: false
         activate-environment: tomotwin
         python-version: ${{ matrix.python-version }}
         environment-file: conda_env_tomotwin.yml
