@@ -41,12 +41,24 @@ class CoordsBoxer(Boxer):
     def __init__(self, coordspth: str,
                  box_size: int,
                  mask: np.array = None):
-        self.coords = CoordsFormat.read(coordspth)[['Z', 'Y', 'X']].to_numpy()
+        self.coords = None
+        if coordspth:
+            self.coords = CoordsFormat.read(coordspth)[['Z', 'Y', 'X']].to_numpy()
         self.mask = mask
         self.box_size = box_size
 
     def box(self, tomogram: NDArray) -> SimpleVolumeData:
+        """
+        Extracts a volume of interest (ROI) from the provided tomogram using specific
+        center coordinates and a defined box size. Optionally applies a mask to
+        determine which coordinates should be included.
 
+        :param tomogram: A multidimensional array representing the input tomogram.
+        :type tomogram: NDArray
+        :return: A SimpleVolumeData instance containing the extracted volume data
+            constrained by the ROI.
+        :rtype: SimpleVolumeData
+        """
         relevant_center_coords = []
 
         # Apply mask if necessary
