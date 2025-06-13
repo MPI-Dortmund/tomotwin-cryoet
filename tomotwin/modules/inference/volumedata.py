@@ -86,9 +86,11 @@ class SimpleVolumeData(VolumeDataset):
 
     def __getitem__(self, itemindex) -> np.array:
         p = self.roi.center_coords[itemindex].astype(int)
+        print(itemindex)
         p_min = p - int((self.roi.box_size - 1) / 2)
         p_max = p + int((self.roi.box_size - 1) / 2 + 1)
         v = self.volumes[p_min[0]:p_max[0], p_min[1]:p_max[1], p_min[2]:p_max[2]]
+        print('done')
         return v
 
     def get_localization(self, itemindex) -> Tuple[int, int, int]:
