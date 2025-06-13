@@ -40,10 +40,15 @@ class CoordsBoxer(Boxer):
 
     def __init__(self, coordspth: str,
                  box_size: int,
-                 mask: np.array = None):
+                 mask: np.array = None,
+                 padding: bool = False,
+                 ):
         self.coords = None
         if coordspth:
-            self.coords = CoordsFormat.read(coordspth)[['Z', 'Y', 'X']].to_numpy()
+            pad = 0
+            if padding:
+                pad = int((box_size - box_size % 2) // 2)
+            self.coords = CoordsFormat.read(coordspth)[['Z', 'Y', 'X']].to_numpy() + pad
         self.mask = mask
         self.box_size = box_size
 
