@@ -179,6 +179,7 @@ def embed_tomogram(
     df.attrs["tomogram_input_shape"] = tomo.shape
     df.attrs["tomotwin_config"] = embedor.tomotwin_config
     df.attrs["padding"] = conf.padding
+    df.attrs["mode"] = conf.mode.name
     if conf.zrange:
         df.attrs["zrange"] = conf.zrange
 
