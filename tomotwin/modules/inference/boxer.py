@@ -40,10 +40,15 @@ class CoordsBoxer(Boxer):
 
     def __init__(self, coordspth: str,
                  box_size: int,
-                 mask: np.array = None):
+                 mask: np.array = None,
+                 padding: bool = False,
+                 ):
         self.coords = None
         if coordspth:
-            self.coords = CoordsFormat.read(coordspth)[['Z', 'Y', 'X']].to_numpy()
+            pad = 0
+            if padding:
+                pad = int((box_size - box_size % 2) // 2)
+            self.coords = CoordsFormat.read(coordspth)[['Z', 'Y', 'X']].to_numpy() + pad
         self.mask = mask
         self.box_size = box_size
 
@@ -69,6 +74,23 @@ class CoordsBoxer(Boxer):
             relevant_center_coords = np.vstack(relevant_center_coords)
         else:
             relevant_center_coords = self.coords
+
+        # Filter coordinates that are within tomogram bounds
+        valid_coords = []
+        half_box = self.box_size // 2
+        for coord in relevant_center_coords:
+            z, y, x = coord.astype(int)
+            if (z >= half_box and z < tomogram.shape[0] - half_box and
+                    y >= half_box and y < tomogram.shape[1] - half_box and
+                    x >= half_box and x < tomogram.shape[2] - half_box):
+                valid_coords.append(coord)
+            else:
+                print("out of bounds coordinate: ", coord, " skipping.")
+
+        if valid_coords:
+            relevant_center_coords = np.vstack(valid_coords)
+        else:
+            relevant_center_coords = np.empty((0, 3))
 
         roi = VolumeROI(center_coords=relevant_center_coords, box_size=self.box_size)
 

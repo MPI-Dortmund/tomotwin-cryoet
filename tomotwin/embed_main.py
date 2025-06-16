@@ -229,7 +229,7 @@ def run(rank, conf: EmbedConfiguration, world_size) -> None:
             mask = MrcFormat.read(conf.maskpth)!=0
 
         if conf.mode == EmbedMode.COORDS:
-            boxer = CoordsBoxer(coordspth=conf.coords_path, box_size=window_size, mask=mask)
+            boxer = CoordsBoxer(coordspth=conf.coords_path, box_size=window_size, mask=mask, padding=conf.padding)
         else:
             boxer = SlidingWindowBoxer(
                 box_size=window_size, stride=conf.stride, zrange=conf.zrange, mask=mask
