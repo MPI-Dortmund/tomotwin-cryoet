@@ -203,7 +203,7 @@ class TestsEmbedMain(unittest.TestCase):
                 model_path=None,
                 volumes_path="my/fake/volume.mrc",
                 output_path=tmpdirname,
-                mode=None,
+                mode=EmbedMode.TOMO,
                 batchsize=3,
                 stride=1,
                 zrange=None,
