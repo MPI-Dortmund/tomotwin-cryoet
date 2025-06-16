@@ -14,6 +14,7 @@ import glob
 import hashlib
 import os
 import random
+import shutil
 from typing import List
 
 import numpy as np
@@ -273,10 +274,20 @@ def start(config):
     else:
         run(None, config, None)
 
+
+def check_ldconfig():
+    """Check if ldconfig is available in the system path"""
+    if not shutil.which('ldconfig'):
+        raise RuntimeError("ldconfig not found in system path. Please install it before running tomotwin.")
+
+
 def _main_():
+
     ########################
     # Get configuration from user interface
     ########################
+
+    check_ldconfig()
     ui = EmbedArgParseUI()
     ui.run()
     check_for_updates()
