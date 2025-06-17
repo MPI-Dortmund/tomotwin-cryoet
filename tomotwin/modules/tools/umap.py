@@ -129,6 +129,8 @@ class UmapTool(TomoTwinTool):
         df_embeddings = pd.concat([embeddings[['X', 'Y', 'Z']], df_embeddings], axis=1)
         df_embeddings.attrs['embeddings_attrs'] = embeddings.attrs
         df_embeddings.attrs['embeddings_path'] = os.path.realpath(args.input)
+        df_embeddings.attrs['umap_neighbors'] = args.neighbors
+        df_embeddings.attrs['umap_metric'] = metric
 
         df_embeddings.to_pickle(os.path.join(out_pth,fname+".tumap"))
 
