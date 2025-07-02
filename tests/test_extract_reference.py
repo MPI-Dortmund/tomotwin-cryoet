@@ -6,7 +6,7 @@ import mrcfile
 import numpy as np
 import pandas as pd
 
-from tomotwin.modules.tools.extract_reference import ExtractReference, EvenBoxSizeException
+from tomotwin.modules.tools.extract_reference import ExtractReference
 
 
 class MyTestCase(unittest.TestCase):
