@@ -54,13 +54,18 @@ class FindMaximaLocator(Locator):
         window_size: int,
     ) -> Tuple[np.array, np.array]:
         # Convert to volume:
-        half_bs = (window_size - 1) / 2
-        x_val = (df["X"].values - half_bs) / stride[0]
+
+        half_bs_x = df["X"].min()
+        half_bs_y = df["Y"].min()
+        half_bs_z = df["Z"].min()
+        # half_bs = (window_size - 1) / 2 This is modified because of padding now we substract the minimum that could either be 0 or half box size if padded it will be 0
+        x_val = (df["X"].values - half_bs_x) / stride[0]
         x_val = x_val.astype(int)
-        y_val = (df["Y"].values - half_bs) / stride[1]
+        y_val = (df["Y"].values - half_bs_y) / stride[1]
         y_val = y_val.astype(int)
-        z_val = (df["Z"].values - half_bs) / stride[2]
+        z_val = (df["Z"].values - half_bs_z) / stride[2]
         z_val = z_val.astype(int)
+
 
         # This array contains the distance(similarity)/probability at each coordinate
         vol = np.zeros(shape=(np.max(x_val) + 1, np.max(y_val) + 1, np.max(z_val) + 1))
@@ -80,11 +85,16 @@ class FindMaximaLocator(Locator):
         maximas: List[Tuple[float, float, float]],
         target: int,
         stride: Tuple[int],
-        boxsize: int
+        boxsize: int,
+        padding: bool
 
     ) -> pd.DataFrame:
 
-        bshalf = (boxsize-1)//2
+        if padding == True:
+            bshalf = 0
+        else:
+            bshalf = (boxsize - (boxsize%2))//2
+        
         dat = {
             "X": [],
             "Y": [],
@@ -106,7 +116,7 @@ class FindMaximaLocator(Locator):
         dat["X"] = dat["X"].astype(np.float16)
         dat["Y"] = dat["Y"].astype(np.float16)
         dat["Z"] = dat["Z"].astype(np.float16)
-        dat["predicted_class"] = dat["predicted_class"].astype(np.int8)
+        dat["predicted_class"] = dat["predicted_class"].astype(np.uint16)
         dat["size"] = dat["size"].astype(np.uint16)
         dat["metric_best"] = dat["metric_best"].astype(np.float16)
         return dat
@@ -210,8 +220,12 @@ class FindMaximaLocator(Locator):
         ]  # more than one pixel coordinate must be involved.
 
         print("done", class_id)
+        if "padding" in map_output.attrs:
+            padding = map_output.attrs['padding']
+        else:
+            padding = False
         particle_df = FindMaximaLocator.maxima_to_df(
-            maximas, class_id, stride=stride, boxsize=window_size
+            maximas, class_id, stride=stride, boxsize=window_size, padding = padding
         )
 
         return particle_df.copy(deep=True), vol

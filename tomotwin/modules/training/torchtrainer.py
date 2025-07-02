@@ -315,12 +315,21 @@ class TorchTrainer(Trainer):
         self.model.eval()
         t = tqdm(test_loader, desc="Validation", leave=False)
 
+        try:
+            self.criterion.set_validation(True)
+        except:
+            print("Cant activate validation mode for loss")
         with torch.no_grad():
             for _, batch in enumerate(t):
+
                 valloss = self.run_batch(batch)
                 val_loss.append(valloss.cpu().detach().numpy())
                 desc_t = f"Validation (running loss: {np.mean(val_loss[-20:]):.4f} "
                 t.set_description(desc=desc_t)
+        try:
+            self.criterion.set_validation(False)
+        except:
+            print("Cant deactivate validation mode for loss")
 
         current_val_loss = np.mean(val_loss)
         return current_val_loss
@@ -556,14 +565,14 @@ class TorchTrainer(Trainer):
             ep = self.current_epoch
             add = "" + "_f1" if self.f1_improved else ""
             add = add + "_loss" if self.loss_improved else ""
-
-            self.write_model_to_disk(
-                path,
-                mod,
-                "best_model_" + f"{ep + 1}".zfill(3) + f"{add}.pth",
-                ep,
-                **kwargs,
-            )
+            if self.f1_improved or self.loss_improved:
+                self.write_model_to_disk(
+                    path,
+                    mod,
+                    "best_model_" + f"{ep + 1}".zfill(3) + f"{add}.pth",
+                    ep,
+                    **kwargs,
+                )
 
     def get_model(self) -> Any:
         """

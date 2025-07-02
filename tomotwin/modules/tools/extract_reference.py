@@ -20,12 +20,8 @@ import mrcfile
 import numpy as np
 import pandas as pd
 import tqdm
-
 from tomotwin.modules.tools.tomotwintool import TomoTwinTool
 
-
-class EvenBoxSizeException(Exception):
-    ...
 
 class ExtractReference(TomoTwinTool):
     '''
@@ -74,22 +70,20 @@ class ExtractReference(TomoTwinTool):
         :param basename: Basename for files, index and filename are added automatically.
         :return: List with paths of written subvolumes.
         '''
-        if box_size % 2 == 0:
-            raise EvenBoxSizeException()
 
         files_written = []
         for index, row in tqdm.tqdm(positions.iterrows()):
             x = row['X']
             y = row['Y']
             z = row['Z']
-
+            odd_factor = box_size % 2 
             # Define corners of box
-            nx1 = (x - (box_size - 1) // 2)
-            nx2 = (x + (box_size - 1) // 2 + 1)
-            ny1 = (y - (box_size - 1) // 2)
-            ny2 = (y + (box_size - 1) // 2 + 1)
-            nz1 = (z - (box_size - 1) // 2)
-            nz2 = (z + (box_size - 1) // 2 + 1)
+            nx1 = (x - (box_size - odd_factor) // 2)
+            nx2 = (x + (box_size - odd_factor) // 2 + odd_factor)
+            ny1 = (y - (box_size - odd_factor) // 2)
+            ny2 = (y + (box_size - odd_factor) // 2 + odd_factor)
+            nz1 = (z - (box_size - odd_factor) // 2)
+            nz2 = (z + (box_size - odd_factor) // 2 + odd_factor)
 
 
             subvol = volume[int(nz1): int(nz2), int(ny1): int(ny2), int(nx1): int(nx2)]
@@ -123,12 +117,24 @@ class ExtractReference(TomoTwinTool):
         os.makedirs(path_output,exist_ok=True)
         # Extract X Y Z coords from correct csv file
         #coords = pd.read_csv(path_ref, sep='    ', header=None)
-        coords = pd.read_csv(path_ref,
-                             delim_whitespace=True,
-                             header=None,
-                             index_col=False,
-                             dtype=float,
-                             )
+        try:
+            coords = pd.read_csv(path_ref,
+                                 delim_whitespace=True,
+                                 header=None,
+                                 index_col=False,
+                                 dtype=float,
+                                 )
+        except:
+            print("Error while reading. Try to skip first row")
+            coords = pd.read_csv(path_ref,
+                                 delim_whitespace=True,
+                                 header=None,
+                                 index_col=False,
+                                 dtype=float,
+                                 skiprows=1
+                                 )
+            
+
         coords.columns = ['X', 'Y', 'Z']
         mrc = mrcfile.mmap(path_tomo, permissive=True, mode='r')
 

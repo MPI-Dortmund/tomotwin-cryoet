@@ -54,7 +54,7 @@ setup(
             'tomotwin_scripts_evaluate.py = scripts.evaluation:_main_',
             'tomotwin_dev_matrix.py = scripts.pdb_similarity_matrix:_main_',
             'tomotwin_dev_json2tloc.py = scripts.json2tloc:_main_',
-            'tomotwin_dev_optuna.py = tomotwin.train_optuna:_main_',
+            'tomotwin_dev_optuna.py = scripts.train_optuna:_main_',
             'tomotwin_dev_molmapbbox.py = scripts.molmapsbbox:_main_',
             'tomotwin_tools.py = tomotwin.tools_main:_main_'
         ]},

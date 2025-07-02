@@ -31,6 +31,7 @@ class EmbedArgParseUI(EmbedUI):
         self.zrange = None
         self.maskpth = None
         self.distr_mode = None
+        self.padding = None
 
     def run(self, args=None) -> None:
         parser = self.create_parser()
@@ -54,6 +55,7 @@ class EmbedArgParseUI(EmbedUI):
                 self.stride = self.stride * 3
             self.maskpth = args.mask
             self.distr_mode = DistrMode.DDP
+            self.padding = args.padding
             if args.distribution_mode == 0:
                 self.distr_mode = DistrMode.DP
 
@@ -67,7 +69,8 @@ class EmbedArgParseUI(EmbedUI):
             stride=self.stride,
             zrange=self.zrange,
             maskpth=self.maskpth,
-            distr_mode=self.distr_mode
+            distr_mode=self.distr_mode,
+            padding = self.padding
         )
         return conf
 
@@ -186,6 +189,14 @@ class EmbedArgParseUI(EmbedUI):
             choices=[0, 1],
             default=1,
             help="0: DataParallel,  1: Faster parallelism mode using DistributedDataParallel"
+        )
+
+        parser.add_argument(
+            "--no-padding",
+            dest="padding",
+            action="store_false",
+            default=True,
+            help="Disable padding. By default, padding is enabled."
         )
 
     def create_parser(self) -> argparse.ArgumentParser:

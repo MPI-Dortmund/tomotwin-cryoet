@@ -133,6 +133,7 @@ def write_heatmaps(reference_names: List[str], out_path: str, heatmaps: List[np.
             vol = heatmaps[ref_i]
             vol = vol.astype(np.float32)
             vol = scale_and_pad_heatmap(vol, stride, tomo_input_shape)
+
             mrc.set_data(vol)
 
 
@@ -199,7 +200,11 @@ def run(conf: LocateConfiguration) -> None:
 
     # Write picking headmaps
     if conf.write_heatmaps:
-        write_heatmaps(map_attrs["references"], out_path, class_vols, stride, map_attrs["tomogram_input_shape"])
+        if map_attrs['padding']:
+            orig_shape = tuple(dim - ((window_size//2)*2) for dim in map_attrs["tomogram_input_shape"])
+            write_heatmaps(map_attrs["references"], out_path, class_vols, stride, orig_shape)
+        else:
+            write_heatmaps(map_attrs["references"], out_path, class_vols, stride, map_attrs["tomogram_input_shape"])
 
 def _main_():
     ui = LocateArgParseUI()

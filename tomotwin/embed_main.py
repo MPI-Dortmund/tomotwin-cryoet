@@ -31,7 +31,7 @@ from tomotwin.modules.inference.volumedata import FileNameVolumeDataset
 
 
 def sliding_window_embedding(
-    tomo: np.array, boxer: Boxer, embedor: Embedor
+    tomo: np.array, boxer: Boxer, embedor: Embedor, box_size: int, padding: bool 
 ) -> np.array:
     '''
     Embeds the tomogram using a sliding window approach
@@ -49,6 +49,10 @@ def sliding_window_embedding(
     for i in range(embeddings.shape[0]):
         positions.append(boxes.get_localization(i))
     positions = np.array(positions)
+    if padding is True: 
+        print("Adjusting positions after padding")
+        odd_factor = box_size % 2
+        positions = positions - int((box_size - odd_factor) // 2)
     embeddings = np.hstack([positions, embeddings])
 
     return embeddings
@@ -130,23 +134,27 @@ def embed_tomogram(
     Embeds a tomogram
     :return: DataFrame of embeddings
     """
-
-    if mask is not None:
+    odd_factor = window_size % 2
+    if mask is not None and conf.padding == False:
         assert tomo.shape == mask.shape, f"Tomogram shape ({tomo.shape}) and mask shape ({mask.shape}) need to be equal."
 
     if conf.zrange:
-        hb = int((window_size - 1) // 2)
+        hb = int((window_size - odd_factor) // 2)
         minz = max(0, conf.zrange[0] - hb)
         maxz = min(conf.zrange[1] + hb, tomo.shape[0])
         conf.zrange = (
             minz,
             maxz,
         )  # here we need to take make sure that the box size is subtracted etc.
-
+    if conf.padding == True:
+        tomo = np.pad(tomo, int((window_size - odd_factor) // 2), mode='reflect')
+        print(f"padded the tomogram with padding value of {int((window_size - odd_factor) // 2)}, new shape is {tomo.shape}")
+        if mask is not None:
+            assert tomo.shape == mask.shape, f"Tomogram shape ({tomo.shape}) and mask shape ({mask.shape}) need to be equal."
     boxer = SlidingWindowBoxer(
         box_size=window_size, stride=conf.stride, zrange=conf.zrange, mask=mask
     )
-    embeddings = sliding_window_embedding(tomo=tomo, boxer=boxer, embedor=embedor)
+    embeddings = sliding_window_embedding(tomo=tomo, boxer=boxer, embedor=embedor, box_size = window_size, padding = conf.padding)
     if embeddings is None:
         return
 
@@ -170,6 +178,7 @@ def embed_tomogram(
     df.attrs["stride"] = conf.stride
     df.attrs["tomogram_input_shape"] = tomo.shape
     df.attrs["tomotwin_config"] = embedor.tomotwin_config
+    df.attrs["padding"] = conf.padding
     if conf.zrange:
         df.attrs["zrange"] = conf.zrange
 

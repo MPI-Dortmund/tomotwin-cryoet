@@ -4,3 +4,6 @@
 tomotwin/__init__.py
 VERSION.txt
 /coverage.xml
+/resources/optuna_config/storage_adress
+ **/__pycache__/
+/tomotwin_cryoet.egg-info/

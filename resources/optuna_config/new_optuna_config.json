@@ -1,0 +1,67 @@
+{
+  "identifier": "SiameseNet",
+  "network_config": {
+    "output_channels": {
+      "suggest_categorical": {
+        "choices": [
+          32,
+          64,
+          128
+        ]
+      }
+    },
+    "dropout": 0.2,
+    "repeat_layers": 0,
+    "norm_name": "GroupNorm",
+    "norm_kwargs": {
+      "num_groups": 64
+    },
+    "gem_pooling_p": 0
+  },
+  "train_config": {
+    "loss": "MultiSimilarityLoss",
+    "miner": {
+      "name": "MultiSimilarityMiner",
+      "epsilon": {
+        "suggest_float": {
+          "low": 0.1,
+          "high": 0.8
+        }
+      }
+    },
+    "learning_rate": {
+      "suggest_float": {
+        "low": 1e-06,
+        "high": 1e-04,
+        "log": true
+      }
+    },
+    "optimizer": "Adam",
+    "weight_decay": 0,
+    "epoch": 100,
+    "batchsize": {
+      "suggest_int": {
+        "low": 32,
+        "high": 128
+      }
+    },
+    "patience": {
+      "suggest_int": {
+        "low": 10,
+        "high": 50
+      }
+    },
+    "aug_train_shift_distance": 2
+  },
+  "optuna": {
+    "target": "VAL_LOSS",
+    "minmax": "minimize",
+    "retry": true,
+    "max_retry": 8,
+    "prune": true,
+    "n_warmup": 100,
+    "heartbeat": 60,
+    "RDB": true,
+    "STORAGE": "add storage url here
+  }
+}

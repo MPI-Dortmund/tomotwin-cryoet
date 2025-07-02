@@ -233,10 +233,42 @@ def get_loss_func(
         loss_func = losses.TripletMarginLoss(
             margin=train_conf["tl_margin"], distance=distance
         )
+    elif train_conf["loss"] == "MultiSimilarityLoss":
+        loss_func = losses.MultiSimilarityLoss(
+            distance=distance
+        )
     else:
         raise exceptions.UnknownLoss("Specified loss not known")
 
     return loss_func
+
+
+def get_miner(miner_conf: dict):
+    miner = None
+    if miner_conf is None:
+        return miner
+
+    if miner_conf['name'] == "TripletMarginMiner":
+        miner = miners.TripletMarginMiner(
+            margin=miner_conf["miner_margin"], type_of_triplets="semihard"
+        )
+    elif miner_conf['name'] == "DistanceWeightedMiner":
+        miner = miners.DistanceWeightedMiner(
+            cutoff=miner_conf["cutoff"],
+            nonzero_loss_cutoff=miner_conf["nonzero_loss_cutoff"],
+        )
+    elif miner_conf['name'] == "UniformHistogramMiner":
+        miner = miners.UniformHistogramMiner(
+            num_bins=miner_conf["num_bins"],
+            pos_per_bin=miner_conf["pos_per_bin"],
+            neg_per_bin=miner_conf["neg_per_bin"],
+            distance=distances.CosineSimilarty()
+        )
+    elif miner_conf['name'] == "MultiSimilarityMiner":
+        miner = miners.MultiSimilarityMiner(epsilon=miner_conf["epsilon"])
+
+    return miner
+
 
 
 def _main_():
@@ -326,11 +358,7 @@ def _main_():
     ########################
     # Setup miners and loss
     ########################
-    miner = None
-    if config["train_config"]["miner"]:
-        miner = miners.TripletMarginMiner(
-            margin=config["train_config"]["miner_margin"], type_of_triplets="semihard"
-        )
+    miner = get_miner(config["train_config"].get("miner", None))
 
     loss_func = get_loss_func(
         net_conf=config["network_config"],
