@@ -411,6 +411,7 @@ class LocateOptimEvaluator():
             #import sys
             #sys.exit()
             best_f1 = best_stats[f"F{self.fbeta}"]
+            print(best_f1)
             best_value = 0
             best_df = locate_results
 
@@ -419,6 +420,7 @@ class LocateOptimEvaluator():
                     df = self.filter(locate_results, min_val=val, field=field)
                 if type == "max":
                     df = self.filter(locate_results, max_val=val, field=field)
+                print('len(df): ',len(df))
                 if len(df) == 0:
                     continue
                 stats = self.get_stats(df, positions)
@@ -429,10 +431,10 @@ class LocateOptimEvaluator():
                     best_df = df.copy()
             return best_stats, best_df, best_value
 
-        min_size_range = [101, 101]
-        max_size_range = [111, 111]
-        dsize = 2
-        min_similarity_range = [0.99,0.99]
+        min_size_range = [101, 102]
+        max_size_range = [111, 112]
+        dsize = 1
+        min_similarity_range = [0.98,1.0]
         dsim = self.stepsize_optim_similarity
         locate_results_id = locate_results
         o_dict = {}
