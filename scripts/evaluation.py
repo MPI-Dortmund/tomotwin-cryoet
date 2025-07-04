@@ -429,10 +429,10 @@ class LocateOptimEvaluator():
                     best_df = df.copy()
             return best_stats, best_df, best_value
 
-        min_size_range = [1, 500]
-        max_size_range = [1, 500]
+        min_size_range = [101, 101]
+        max_size_range = [111, 111]
         dsize = 2
-        min_similarity_range = [0,1]
+        min_similarity_range = [0.99,0.99]
         dsim = self.stepsize_optim_similarity
         locate_results_id = locate_results
         o_dict = {}
