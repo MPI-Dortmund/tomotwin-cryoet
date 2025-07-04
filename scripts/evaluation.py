@@ -468,9 +468,9 @@ class LocateOptimEvaluator():
         # if locate_results_filtered is not None:
         #     o_dict["O_MAX_SIZE"] = int(best_value)
         #     locate_results_id = locate_results_filtered
-        th = 0.99
-        min_s = 101
-        max_s = 109
+        th = 0.92
+        min_s = 1
+        max_s = 400
         #df = self.filter(locate_results, min_val=th, field="metric_best")
         #df = self.filter(df, min_val=min_s, field="size")
         #df = self.filter(df, max_val=max_s, field="size")
