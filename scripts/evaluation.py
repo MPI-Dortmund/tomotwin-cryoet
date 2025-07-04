@@ -411,7 +411,6 @@ class LocateOptimEvaluator():
             #import sys
             #sys.exit()
             best_f1 = best_stats[f"F{self.fbeta}"]
-            print(best_f1)
             best_value = 0
             best_df = locate_results
 
@@ -420,7 +419,6 @@ class LocateOptimEvaluator():
                     df = self.filter(locate_results, min_val=val, field=field)
                 if type == "max":
                     df = self.filter(locate_results, max_val=val, field=field)
-                print('len(df): ',len(df))
                 if len(df) == 0:
                     continue
                 stats = self.get_stats(df, positions)
@@ -431,45 +429,56 @@ class LocateOptimEvaluator():
                     best_df = df.copy()
             return best_stats, best_df, best_value
 
-        min_size_range = [101, 102]
-        max_size_range = [111, 112]
-        dsize = 1
-        min_similarity_range = [0.98,1.0]
+        min_size_range = [1, 500]
+        max_size_range = [1, 500]
+        dsize = 2
+        min_similarity_range = [0,1]
         dsim = self.stepsize_optim_similarity
         locate_results_id = locate_results
         o_dict = {}
-        stats, locate_results_filtered, best_value = find_best(
-            locate_results=locate_results_id,
-            field="metric_best",
-            range=min_similarity_range,
-            stepsize=dsim,
-            type="min"
-        )
-        if locate_results_filtered is not None:
-            o_dict["O_METRIC"] = float(best_value)
-            locate_results_id = locate_results_filtered
+        # stats, locate_results_filtered, best_value = find_best(
+        #     locate_results=locate_results_id,
+        #     field="metric_best",
+        #     range=min_similarity_range,
+        #     stepsize=dsim,
+        #     type="min"
+        # )
+        # if locate_results_filtered is not None:
+        #     o_dict["O_METRIC"] = float(best_value)
+        #     locate_results_id = locate_results_filtered
 
-        stats, locate_results_filtered, best_value = find_best(
-            locate_results=locate_results_id,
-            field="size",
-            range=min_size_range,
-            stepsize=dsize,
-            type="min"
-        )
-        if locate_results_filtered is not None:
-            o_dict["O_MIN_SIZE"] = int(best_value)
-            locate_results_id = locate_results_filtered
+        # stats, locate_results_filtered, best_value = find_best(
+        #     locate_results=locate_results_id,
+        #     field="size",
+        #     range=min_size_range,
+        #     stepsize=dsize,
+        #     type="min"
+        # )
+        # if locate_results_filtered is not None:
+        #     o_dict["O_MIN_SIZE"] = int(best_value)
+        #     locate_results_id = locate_results_filtered
 
-        stats, locate_results_filtered, best_value = find_best(
-            locate_results=locate_results_id,
-            field="size",
-            range=max_size_range,
-            stepsize=dsize,
-            type="max"
-        )
-        if locate_results_filtered is not None:
-            o_dict["O_MAX_SIZE"] = int(best_value)
-            locate_results_id = locate_results_filtered
+        # stats, locate_results_filtered, best_value = find_best(
+        #     locate_results=locate_results_id,
+        #     field="size",
+        #     range=max_size_range,
+        #     stepsize=dsize,
+        #     type="max"
+        # )
+        # if locate_results_filtered is not None:
+        #     o_dict["O_MAX_SIZE"] = int(best_value)
+        #     locate_results_id = locate_results_filtered
+        th = 0.99
+        min_s = 101
+        max_s = 109
+        df = self.filter(locate_results, min_val=th, field="metric_best")
+        df = self.filter(df, min_val=min_s, field="size")
+        df = self.filter(df, max_val=max_s, field="size")
+        o_dict["O_METRIC"] = th
+        o_dict["O_MIN_SIZE"] = min_s
+        o_dict["O_MAX_SIZE"] = max_s
+        
+        stats = self.get_stats(df, positions)
 
         stats.update(o_dict)
 
