@@ -475,7 +475,7 @@ class LocateOptimEvaluator():
         #df = self.filter(df, min_val=min_s, field="size")
         #df = self.filter(df, max_val=max_s, field="size")
         tomo_df = locate_results
-        df = [(tomo_df["metric_best"] > th) &
+        df = tomo_df[(tomo_df["metric_best"] > th) &
                 (tomo_df["size"] > min_s) & (tomo_df["size"] < max_s)]
         print(len(df))
         o_dict["O_METRIC"] = th
