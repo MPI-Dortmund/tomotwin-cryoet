@@ -474,10 +474,11 @@ class LocateOptimEvaluator():
         df = self.filter(locate_results, min_val=th, field="metric_best")
         df = self.filter(df, min_val=min_s, field="size")
         df = self.filter(df, max_val=max_s, field="size")
+        print(len(df))
         o_dict["O_METRIC"] = th
         o_dict["O_MIN_SIZE"] = min_s
         o_dict["O_MAX_SIZE"] = max_s
-        
+
         stats = self.get_stats(df, positions)
 
         stats.update(o_dict)
