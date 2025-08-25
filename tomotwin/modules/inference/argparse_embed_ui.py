@@ -281,20 +281,13 @@ class EmbedArgParseUI(EmbedUI):
             help="0: DataParallel,  1: Faster parallelism mode using DistributedDataParallel"
         )
 
-        parser.add_argument(
-            "-p",
-            "--padding",
-            dest="padding",
-            action="store_true",
-            default=True,
-            help="padding value added to all axis of the tomogram from both sides, can be useful to pick particles at the edges"
-        )
 
         parser.add_argument(
             "--no-padding",
             dest="padding",
             action="store_false",
-            help="Disable padding"
+            default=True,
+            help="Disable padding. By default, padding is enabled."
         )
 
     def create_parser(self) -> argparse.ArgumentParser:
