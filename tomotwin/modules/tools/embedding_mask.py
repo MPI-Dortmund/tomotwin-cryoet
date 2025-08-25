@@ -136,20 +136,13 @@ class EmbeddingMaskTool(TomoTwinTool):
             help="Dilation radius. Add an additional",
         )
 
-        parse_median.add_argument(
-            "-p"
-            "--padding",
-            dest="padding",
-            action="store_true",
-            default=True,
-            help="Add padding of half box size to the tomogram so that it is all included in the mask",
-        )
 
         parse_median.add_argument(
         "--no-padding",
         dest="padding",
         action="store_false",
-        help="Disable padding"
+        default=True,
+        help="Disable padding. By default, padding is enabled."
         )
 
         return parser
