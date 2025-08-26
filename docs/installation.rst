@@ -28,11 +28,19 @@ Next you can create the TomoTwin environment:
 2. Install Napari
 """""""""""""""""""
 
-Here we assume that you don't have napari installed. Please do:
+To install Napari along with the tools and plugins needed for TomoTwin, please do:
 
 .. prompt:: bash $
 
     mamba env create -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/napari-tomotwin/main/conda_env.yml
+    conda activate napari-tomotwin
+    pip install napari-tomotwin
+
+If you do not have a computer with an NVIDIA GPU (Mac computers for example), you can install napari without GPU support with:
+
+.. prompt:: bash $
+
+    mamba env create -n napari-tomotwin -f https://raw.githubusercontent.com/MPI-Dortmund/napari-tomotwin/main/conda_env_noGPU.yml
     conda activate napari-tomotwin
     pip install napari-tomotwin
 
