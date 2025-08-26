@@ -11,5 +11,5 @@ Particle picking in Tomograms using triplet networks and metric learning
 
 ## Instructions
 
-For installation instructions and tutorials please see our [documentation](https://tomotwin-cryoet.readthedocs.io/)
+For installation instructions and tutorials please see our [documentation](https://tomotwin-cryoet.readthedocs.io/en/latest/)
 
