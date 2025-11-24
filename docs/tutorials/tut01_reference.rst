@@ -106,7 +106,7 @@ Open your particles with the following command or drag the files into an open na
 
 .. prompt:: bash $
 
-    napari_boxmanager tomo/your_tomo_a10.mrc out/locate/located.tloc
+    napari_boxmanager tomo/your_tomo_a10.mrc out/locate/your_tomo_a10_located.tloc
 
 .. image:: ../img/tutorial_1/start.png
    :width: 650
@@ -123,9 +123,15 @@ To convert the :file:`.tloc` file into :file:`.coords` you need to run
 
 .. prompt:: bash $
 
-    tomotwin_pick.py -l coords.tloc -o coords/
+    tomotwin_pick.py -l selected_coords.tloc -o coords/
 
 You will find coordinate file for each reference in :file:`.coords` format in the :file:`coords/` folder.
+
+Once you have the picking parameters optimized for one tomogram, you usually do not need to repeat this step for other tomograms of the same dataset, as the picking parameters should be the same. You can skip checking each tomogram in napari and instead just use the parameters you found in napari directly with tomotwin_pick.py for the rest of your tomograms like this:
+
+.. prompt:: bash $
+
+    tomotwin_pick.py -l your_tomo_a10_located.tloc -o coords/ --minmetric 0.95 --minsize 35 --maxsize 200
 
 .. hint:: **Strategy: Improve your picks by refining your references**
 

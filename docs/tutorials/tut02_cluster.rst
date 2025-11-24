@@ -148,6 +148,8 @@ The map command will calculate the pairwise distances/similarity between the tar
 
     tomotwin_map.py distance -r out/clustering/cluster_targets.temb -v out/embed/tomo/your_tomo_a10_embeddings.temb -o out/map/
 
+Note that if you generated the cluster_targets.temb that contains a protein of interest and you want to pick the same protein in other tomograms of the same dataset, you can reuse the same cluster_targets.temb and just map it against the embeddings of your other tomograms. No need to redo the clustering on each tomogram.
+
 7. Localize potential particles
 -------------------------------
 
@@ -158,7 +160,7 @@ Open your particles with the following command or drag the files into an open na
 
 .. prompt:: bash $
 
-    napari_boxmanager tomo/your_tomo_a10.mrc out/locate/located.tloc
+    napari_boxmanager tomo/your_tomo_a10.mrc out/locate/your_tomo_a10_located.tloc
 
 .. image:: ../img/tutorial_1/start.png
    :width: 650
@@ -182,6 +184,12 @@ To convert the :file:`.tloc` file into :file:`.coords` you need to run
 .. prompt:: bash $
 
     tomotwin_pick.py -l coords.tloc -o coords/
+
+Once you have the picking parameters optimized for one tomogram, you usually do not need to repeat this step for other tomograms of the same dataset, as the picking parameters should be the same. You can skip checking each tomogram in napari and instead just use the parameters you found in napari directly with tomotwin_pick.py for the rest of your tomograms like this:
+
+.. prompt:: bash $
+
+    tomotwin_pick.py -l your_tomo_a10_located.tloc -o coords/ --minmetric 0.95 --minsize 35 --maxsize 200
 
 You will find coordinate file for each reference in :file:`.coords` format in the :file:`coords/` folder.
 
