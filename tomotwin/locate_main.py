@@ -196,7 +196,10 @@ def run(conf: LocateConfiguration) -> None:
     for meta_key in map_attrs:
         located_particles.attrs[meta_key] = map_attrs[meta_key]
 
-    located_particles.to_pickle(os.path.join(out_path, "located.tloc"))
+    base = os.path.splitext(os.path.basename(conf.map_path))[0]
+    root = base[: -len("_map")] 
+    located_filename = f"{root}_located.tloc"
+    located_particles.to_pickle(os.path.join(out_path, located_filename))
 
     # Write picking headmaps
     if conf.write_heatmaps:

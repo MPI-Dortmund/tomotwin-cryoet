@@ -124,6 +124,14 @@ def run(conf: PickConfiguration) -> None:
     writer.append(StarFormat())
     writer.append(CoordsFormat())
 
+    base = os.path.splitext(os.path.basename(conf.locate_results_path))[0]
+    if base.endswith("_located"):
+        prefix = base[: -len("_located")]
+    elif base.endswith("_map"):
+        prefix = base[: -len("_map")]
+    else:
+        prefix = base
+
     for target in targets:
         if target not in references:
             print(f"Target {target} is not a known reference. Skip")
@@ -137,11 +145,12 @@ def run(conf: PickConfiguration) -> None:
             f"Target: {target} - Write {len(locate_results_target)} positions to disk."
         )
         try:
+            target_prefixed = f"{prefix}_{target}"
             write_results(
                 locate_results=locate_results_target,
                 writer=writer,
                 output_path=conf.output_path,
-                target=target,
+                target=target_prefixed,
             )
         except InvalidLocateResults:
             print("Skip.")
