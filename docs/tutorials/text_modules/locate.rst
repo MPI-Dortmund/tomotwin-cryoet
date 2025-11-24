@@ -2,7 +2,7 @@ To locate potential particles positions for each target run:
 
 .. prompt:: bash $
 
-    tomotwin_locate.py findmax -m out/map/map.tmap -o out/locate/
+    tomotwin_locate.py findmax -m out/map/your_tomo_a10_map.tmap -o out/locate/
 
 .. hint:: **Similarity maps**
 

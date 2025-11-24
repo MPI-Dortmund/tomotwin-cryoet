@@ -148,7 +148,7 @@ The map command will calculate the pairwise distances/similarity between the tar
 
     tomotwin_map.py distance -r out/clustering/cluster_targets.temb -v out/embed/tomo/your_tomo_a10_embeddings.temb -o out/map/
 
-Note that if you generated the cluster_targets.temb that contains a protein of interest and you want to pick the same protein in other tomograms of the same dataset, you can reuse the same cluster_targets.temb and just map it against the embeddings of your other tomograms. No need to redo the clustering on each tomogram.
+Note that if you generated the cluster_targets.temb that contains a protein of interest and you want to pick the same protein in other tomograms of the same dataset, you can reuse the same cluster_targets.temb and just map them against the embeddings of your other tomograms. No need to redo the clustering on each tomogram.
 
 7. Localize potential particles
 -------------------------------

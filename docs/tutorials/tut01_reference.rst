@@ -93,6 +93,8 @@ The map command will calculate the pairwise distances/similarity between the ref
 
     tomotwin_map.py distance -r out/embed/reference/embeddings.temb -v out/embed/tomo/your_tomo_a10_embeddings.temb -o out/map/
 
+Note if you have selected references for a protein in one tomogram and want to pick the same protein in other tomograms of the same dataset, you can reuse the same reference embeddings and just map them against the embeddings of your other tomograms. No need to find references on each tomogram!
+
 6. Localize potential particles
 -------------------------------
 
